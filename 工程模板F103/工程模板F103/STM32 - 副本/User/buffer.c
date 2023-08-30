@@ -250,7 +250,7 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
         else
             return 0;
     }
-    if (size == 16)
+    else if (size == 16)
     {
         for (i = 0; i < head_number; i++)
         {
@@ -289,8 +289,10 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
             }
             return 1;
         }
+		else
+            return 0;
     }
-    if (size == 32)
+    else if (size == 32)
     {
         for (i = 0; i < head_number; i++)
         {
@@ -318,7 +320,7 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
                     two = (u8)Read_BUFF(BUFF);
                     three = (u8)Read_BUFF(BUFF);
                     four = (u8)Read_BUFF(BUFF);
-                    (*(u32 *)data) = four + (three << 8) + (two << 16) + (one << 32);
+                    (*(u32 *)data) = four + (three << 8) + (two << 16) + (one << 24);
                     ((u32 *)data)++;
                 }
                 else
@@ -329,7 +331,7 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
                     three = (u8)Read_BUFF(BUFF);
                     four = (u8)Read_BUFF(BUFF);
                     (*(u32 *)data) = one + (two << 8) ; 
-                    (*(u32 *)data) +=(three << 16) + (four << 32);
+                    (*(u32 *)data) +=(three << 16) + (four << 24);
                     ((u32 *)data)++;
                 }
             }
@@ -337,5 +339,7 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
         }
 				return 0;
     }
+	else
+		return 0;
 }
 

@@ -477,51 +477,51 @@ Image Symbol Table
 
     Symbol Name                              Value     Ov Type        Size  Object(Section)
 
-    ../clib/microlib/division.c              0x00000000   Number         0  uidiv.o ABSOLUTE
     ../clib/microlib/division.c              0x00000000   Number         0  uldiv.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
+    ../clib/microlib/division.c              0x00000000   Number         0  uidiv.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
+    ../clib/microlib/longlong.c              0x00000000   Number         0  llshl.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llushr.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llsshr.o ABSOLUTE
-    ../clib/microlib/longlong.c              0x00000000   Number         0  llshl.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf4.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf3.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf1.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf0.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printfb.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf2.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf7.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf6.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf5.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printfa.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf0.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printfb.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf4.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf7.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf3.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf2.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf1.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf8.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printfa.o ABSOLUTE
     ../clib/microlib/printf/stubs.s          0x00000000   Number         0  stubs.o ABSOLUTE
     ../clib/microlib/stdio/streams.c         0x00000000   Number         0  stdout.o ABSOLUTE
     ../clib/microlib/string/memcpy.c         0x00000000   Number         0  memcpyb.o ABSOLUTE
     ../clib/microlib/string/memcpy.c         0x00000000   Number         0  memcpya.o ABSOLUTE
     ../clib/microlib/string/strlen.c         0x00000000   Number         0  strlen.o ABSOLUTE
     ../clib/microlib/stubs.s                 0x00000000   Number         0  iusefp.o ABSOLUTE
-    ../fplib/microlib/fpadd.c                0x00000000   Number         0  dadd.o ABSOLUTE
     ../fplib/microlib/fpadd.c                0x00000000   Number         0  fadd.o ABSOLUTE
+    ../fplib/microlib/fpadd.c                0x00000000   Number         0  dadd.o ABSOLUTE
     ../fplib/microlib/fpdiv.c                0x00000000   Number         0  ddiv.o ABSOLUTE
-    ../fplib/microlib/fpepilogue.c           0x00000000   Number         0  fepilogue.o ABSOLUTE
     ../fplib/microlib/fpepilogue.c           0x00000000   Number         0  depilogue.o ABSOLUTE
+    ../fplib/microlib/fpepilogue.c           0x00000000   Number         0  fepilogue.o ABSOLUTE
     ../fplib/microlib/fpfix.c                0x00000000   Number         0  dfixul.o ABSOLUTE
     ../fplib/microlib/fpfix.c                0x00000000   Number         0  ffixi.o ABSOLUTE
     ../fplib/microlib/fpflt.c                0x00000000   Number         0  fflti.o ABSOLUTE
-    ../fplib/microlib/fpmul.c                0x00000000   Number         0  dmul.o ABSOLUTE
     ../fplib/microlib/fpmul.c                0x00000000   Number         0  fmul.o ABSOLUTE
+    ../fplib/microlib/fpmul.c                0x00000000   Number         0  dmul.o ABSOLUTE
     ..\..\FreeRTOS\port\MemMang\heap_4.c     0x00000000   Number         0  heap_4.o ABSOLUTE
     ..\..\FreeRTOS\port\RVDS\ARM_CM3\port.c  0x00000000   Number         0  port.o ABSOLUTE
     ..\..\FreeRTOS\src\croutine.c            0x00000000   Number         0  croutine.o ABSOLUTE
@@ -570,6 +570,7 @@ Image Symbol Table
     ..\..\User\Sysclk_output.c               0x00000000   Number         0  sysclk_output.o ABSOLUTE
     ..\..\User\VL53.c                        0x00000000   Number         0  vl53.o ABSOLUTE
     ..\..\User\buffer.c                      0x00000000   Number         0  buffer.o ABSOLUTE
+    ..\..\User\car_layer\car_control.c       0x00000000   Number         0  car_control.o ABSOLUTE
     ..\..\User\encoder.c                     0x00000000   Number         0  encoder.o ABSOLUTE
     ..\..\User\exti\bsp_exti.c               0x00000000   Number         0  bsp_exti.o ABSOLUTE
     ..\..\User\flash.c                       0x00000000   Number         0  flash.o ABSOLUTE
@@ -633,9 +634,9 @@ Image Symbol Table
     .text                                    0x0800298c   Section        0  driver.o(.text)
     .text                                    0x08002b50   Section        0  usart.o(.text)
     NVIC_USART1_Configuration                0x08002b51   Thumb Code    42  usart.o(.text)
-    NVIC_USART2_Configuration                0x08002c23   Thumb Code    42  usart.o(.text)
-    .text                                    0x08002e54   Section        0  software_usart.o(.text)
-    .text                                    0x0800307c   Section        0  buffer.o(.text)
+    NVIC_USART2_Configuration                0x08002c17   Thumb Code    42  usart.o(.text)
+    .text                                    0x08002e48   Section        0  software_usart.o(.text)
+    .text                                    0x08003070   Section        0  buffer.o(.text)
     .text                                    0x08003478   Section        0  jy62.o(.text)
     NVIC_USART4_Configuration                0x08003479   Thumb Code    42  jy62.o(.text)
     .text                                    0x08003678   Section        0  sys.o(.text)
@@ -1092,30 +1093,30 @@ Image Symbol Table
     PULL_High                                0x08002aaf   Thumb Code    76  driver.o(.text)
     PULL_Low                                 0x08002afb   Thumb Code    76  driver.o(.text)
     USART1_Config                            0x08002b7b   Thumb Code   136  usart.o(.text)
-    USART1_IRQHandler                        0x08002c03   Thumb Code    32  usart.o(.text)
-    USART2_Config                            0x08002c4d   Thumb Code   132  usart.o(.text)
-    USART2_IRQHandler                        0x08002cd1   Thumb Code    42  usart.o(.text)
-    Usart_SendByte                           0x08002cfb   Thumb Code    30  usart.o(.text)
-    VOFA_Send_float                          0x08002d19   Thumb Code    78  usart.o(.text)
-    Usart_SendArray                          0x08002d67   Thumb Code    48  usart.o(.text)
-    Usart_SendString                         0x08002d97   Thumb Code    42  usart.o(.text)
-    Usart_SendHalfWord                       0x08002dc1   Thumb Code    60  usart.o(.text)
-    fputc                                    0x08002dfd   Thumb Code    32  usart.o(.text)
-    fgetc                                    0x08002e1d   Thumb Code    26  usart.o(.text)
-    Software_USART_TXD                       0x08002e55   Thumb Code   102  software_usart.o(.text)
-    USART_Send                               0x08002ebb   Thumb Code    26  software_usart.o(.text)
-    Software_USART_IOConfig                  0x08002ed5   Thumb Code   142  software_usart.o(.text)
-    TIM7_Int_Init                            0x08002f63   Thumb Code    90  software_usart.o(.text)
-    EXTI15_10_IRQHandler                     0x08002fbd   Thumb Code    56  software_usart.o(.text)
-    TIM7_IRQHandler                          0x08002ff5   Thumb Code   116  software_usart.o(.text)
-    Iinitial_BUFF                            0x0800307d   Thumb Code    66  buffer.o(.text)
-    Write_BUFF                               0x080030bf   Thumb Code    60  buffer.o(.text)
-    Check_Buffer                             0x080030fb   Thumb Code    24  buffer.o(.text)
-    Read_BUFF                                0x08003113   Thumb Code    66  buffer.o(.text)
-    Find_Char                                0x08003155   Thumb Code    92  buffer.o(.text)
-    Read_Data                                0x080031b1   Thumb Code   102  buffer.o(.text)
-    Read_buff                                0x08003217   Thumb Code   126  buffer.o(.text)
-    Read_buff_Void                           0x08003295   Thumb Code   478  buffer.o(.text)
+    USART1_IRQHandler                        0x08002c03   Thumb Code    20  usart.o(.text)
+    USART2_Config                            0x08002c41   Thumb Code   132  usart.o(.text)
+    USART2_IRQHandler                        0x08002cc5   Thumb Code    42  usart.o(.text)
+    Usart_SendByte                           0x08002cef   Thumb Code    30  usart.o(.text)
+    VOFA_Send_float                          0x08002d0d   Thumb Code    78  usart.o(.text)
+    Usart_SendArray                          0x08002d5b   Thumb Code    48  usart.o(.text)
+    Usart_SendString                         0x08002d8b   Thumb Code    42  usart.o(.text)
+    Usart_SendHalfWord                       0x08002db5   Thumb Code    60  usart.o(.text)
+    fputc                                    0x08002df1   Thumb Code    32  usart.o(.text)
+    fgetc                                    0x08002e11   Thumb Code    26  usart.o(.text)
+    Software_USART_TXD                       0x08002e49   Thumb Code   102  software_usart.o(.text)
+    USART_Send                               0x08002eaf   Thumb Code    26  software_usart.o(.text)
+    Software_USART_IOConfig                  0x08002ec9   Thumb Code   142  software_usart.o(.text)
+    TIM7_Int_Init                            0x08002f57   Thumb Code    90  software_usart.o(.text)
+    EXTI15_10_IRQHandler                     0x08002fb1   Thumb Code    56  software_usart.o(.text)
+    TIM7_IRQHandler                          0x08002fe9   Thumb Code   116  software_usart.o(.text)
+    Iinitial_BUFF                            0x08003071   Thumb Code    66  buffer.o(.text)
+    Write_BUFF                               0x080030b3   Thumb Code    60  buffer.o(.text)
+    Check_Buffer                             0x080030ef   Thumb Code    24  buffer.o(.text)
+    Read_BUFF                                0x08003107   Thumb Code    66  buffer.o(.text)
+    Find_Char                                0x08003149   Thumb Code    92  buffer.o(.text)
+    Read_Data                                0x080031a5   Thumb Code   102  buffer.o(.text)
+    Read_buff                                0x0800320b   Thumb Code   126  buffer.o(.text)
+    Read_buff_Void                           0x08003289   Thumb Code   494  buffer.o(.text)
     USART4_Config_JY62                       0x080034a3   Thumb Code   136  jy62.o(.text)
     CopeSerial2Data                          0x0800352b   Thumb Code   118  jy62.o(.text)
     UART4_IRQHandler                         0x080035a1   Thumb Code   118  jy62.o(.text)
@@ -1285,15 +1286,15 @@ Memory Map of the image
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x08000000   0x08000000   0x00000130   Data   RO            3    RESET               startup_stm32f10x_hd.o
-    0x08000130   0x08000130   0x00000000   Code   RO         1033  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
-    0x08000130   0x08000130   0x00000004   Code   RO         1315    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
-    0x08000134   0x08000134   0x00000004   Code   RO         1318    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
-    0x08000138   0x08000138   0x00000000   Code   RO         1320    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
-    0x08000138   0x08000138   0x00000000   Code   RO         1322    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
-    0x08000138   0x08000138   0x00000008   Code   RO         1323    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
-    0x08000140   0x08000140   0x00000000   Code   RO         1325    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
-    0x08000140   0x08000140   0x00000000   Code   RO         1327    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
-    0x08000140   0x08000140   0x00000004   Code   RO         1316    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
+    0x08000130   0x08000130   0x00000000   Code   RO         1042  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
+    0x08000130   0x08000130   0x00000004   Code   RO         1324    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
+    0x08000134   0x08000134   0x00000004   Code   RO         1327    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
+    0x08000138   0x08000138   0x00000000   Code   RO         1329    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
+    0x08000138   0x08000138   0x00000000   Code   RO         1331    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
+    0x08000138   0x08000138   0x00000008   Code   RO         1332    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
+    0x08000140   0x08000140   0x00000000   Code   RO         1334    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
+    0x08000140   0x08000140   0x00000000   Code   RO         1336    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
+    0x08000140   0x08000140   0x00000004   Code   RO         1325    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
     0x08000144   0x08000144   0x00000096   Code   RO         1003    .emb_text           port.o
     0x080001da   0x080001da   0x00000002   PAD
     0x080001dc   0x080001dc   0x00000024   Code   RO            4    .text               startup_stm32f10x_hd.o
@@ -1311,9 +1312,10 @@ Memory Map of the image
     0x0800262c   0x0800262c   0x00000078   Code   RO          563    .text               delay.o
     0x080026a4   0x080026a4   0x000002e8   Code   RO          587    .text               pwm.o
     0x0800298c   0x0800298c   0x000001c4   Code   RO          603    .text               driver.o
-    0x08002b50   0x08002b50   0x00000304   Code   RO          619    .text               usart.o
-    0x08002e54   0x08002e54   0x00000228   Code   RO          634    .text               software_usart.o
-    0x0800307c   0x0800307c   0x000003fc   Code   RO          669    .text               buffer.o
+    0x08002b50   0x08002b50   0x000002f8   Code   RO          619    .text               usart.o
+    0x08002e48   0x08002e48   0x00000228   Code   RO          634    .text               software_usart.o
+    0x08003070   0x08003070   0x00000406   Code   RO          669    .text               buffer.o
+    0x08003476   0x08003476   0x00000002   PAD
     0x08003478   0x08003478   0x00000200   Code   RO          740    .text               jy62.o
     0x08003678   0x08003678   0x00000002   Code   RO          760    .text               sys.o
     0x0800367a   0x0800367a   0x00000002   PAD
@@ -1325,21 +1327,21 @@ Memory Map of the image
     0x08005d1c   0x08005d1c   0x000005a4   Code   RO          973    .text               timers.o
     0x080062c0   0x080062c0   0x000002a0   Code   RO          988    .text               heap_4.o
     0x08006560   0x08006560   0x00000268   Code   RO         1004    .text               port.o
-    0x080067c8   0x080067c8   0x00000024   Code   RO         1036    .text               mc_w.l(memcpya.o)
-    0x080067ec   0x080067ec   0x0000000e   Code   RO         1038    .text               mc_w.l(strlen.o)
-    0x080067fa   0x080067fa   0x00000062   Code   RO         1332    .text               mc_w.l(uldiv.o)
-    0x0800685c   0x0800685c   0x00000024   Code   RO         1347    .text               mc_w.l(init.o)
-    0x08006880   0x08006880   0x0000001e   Code   RO         1349    .text               mc_w.l(llshl.o)
-    0x0800689e   0x0800689e   0x00000020   Code   RO         1351    .text               mc_w.l(llushr.o)
+    0x080067c8   0x080067c8   0x00000024   Code   RO         1045    .text               mc_w.l(memcpya.o)
+    0x080067ec   0x080067ec   0x0000000e   Code   RO         1047    .text               mc_w.l(strlen.o)
+    0x080067fa   0x080067fa   0x00000062   Code   RO         1341    .text               mc_w.l(uldiv.o)
+    0x0800685c   0x0800685c   0x00000024   Code   RO         1356    .text               mc_w.l(init.o)
+    0x08006880   0x08006880   0x0000001e   Code   RO         1358    .text               mc_w.l(llshl.o)
+    0x0800689e   0x0800689e   0x00000020   Code   RO         1360    .text               mc_w.l(llushr.o)
     0x080068be   0x080068be   0x00000002   PAD
-    0x080068c0   0x080068c0   0x00000020   Code   RO         1175    i.__0printf$5       mc_w.l(printf5.o)
-    0x080068e0   0x080068e0   0x0000000e   Code   RO         1359    i.__scatterload_copy  mc_w.l(handlers.o)
-    0x080068ee   0x080068ee   0x00000002   Code   RO         1360    i.__scatterload_null  mc_w.l(handlers.o)
-    0x080068f0   0x080068f0   0x0000000e   Code   RO         1361    i.__scatterload_zeroinit  mc_w.l(handlers.o)
+    0x080068c0   0x080068c0   0x00000020   Code   RO         1184    i.__0printf$5       mc_w.l(printf5.o)
+    0x080068e0   0x080068e0   0x0000000e   Code   RO         1368    i.__scatterload_copy  mc_w.l(handlers.o)
+    0x080068ee   0x080068ee   0x00000002   Code   RO         1369    i.__scatterload_null  mc_w.l(handlers.o)
+    0x080068f0   0x080068f0   0x0000000e   Code   RO         1370    i.__scatterload_zeroinit  mc_w.l(handlers.o)
     0x080068fe   0x080068fe   0x00000002   PAD
-    0x08006900   0x08006900   0x000002c0   Code   RO         1182    i._printf_core      mc_w.l(printf5.o)
+    0x08006900   0x08006900   0x000002c0   Code   RO         1191    i._printf_core      mc_w.l(printf5.o)
     0x08006bc0   0x08006bc0   0x00000010   Data   RO          604    .constdata          driver.o
-    0x08006bd0   0x08006bd0   0x00000020   Data   RO         1357    Region$$Table       anon$$obj.o
+    0x08006bd0   0x08006bd0   0x00000020   Data   RO         1366    Region$$Table       anon$$obj.o
 
 
     Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08006bf0, Size: 0x00009e70, Max: 0x00010000, ABSOLUTE)
@@ -1358,7 +1360,7 @@ Memory Map of the image
     0x200000d0   0x08006cc0   0x00000014   Data   RW          975    .data               timers.o
     0x200000e4   0x08006cd4   0x00000018   Data   RW          990    .data               heap_4.o
     0x200000fc   0x08006cec   0x0000000c   Data   RW         1005    .data               port.o
-    0x20000108   0x08006cf8   0x00000004   Data   RW         1329    .data               mc_w.l(stdout.o)
+    0x20000108   0x08006cf8   0x00000004   Data   RW         1338    .data               mc_w.l(stdout.o)
     0x2000010c        -       0x0000040c   Zero   RW          670    .bss                buffer.o
     0x20000518        -       0x000001fa   Zero   RW          741    .bss                jy62.o
     0x20000712   0x08006cfc   0x00000002   PAD
@@ -1376,39 +1378,39 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-       188         14          0          0          0        984   bsp_led.o
-      1020          6          0          0       1036       5307   buffer.o
+       188         14          0          0          0       1036   bsp_led.o
+      1030          4          0          0       1036       5551   buffer.o
          0          0          0          0          0       4508   core_cm3.o
-       120          4          0          0          0       1370   delay.o
-       452         10         16          0          0       1794   driver.o
-      1036         32          0          0          0       2678   encoder.o
-      1040         56          0          0          0      15932   event_groups.o
-       672         82          0         24      36864       3308   heap_4.o
-       512         40          0         27        506       3083   jy62.o
-       148          0          0          0          0       1886   list.o
-      1616        400          0         68          0      20455   main.o
-       220         22          0          0          0       1837   misc.o
-       766         96          0         12          0       7727   port.o
-       744         66          0          0          0       3751   pwm.o
-      2604         56          0          0         80      12299   queue.o
-       552         20          0          3          0      17953   software_usart.o
-        36          8        304          0       1024        868   startup_stm32f10x_hd.o
-       284         10          0          0          0       2291   stm32f10x_exti.o
-       860         38          0          0          0       5765   stm32f10x_gpio.o
-        36          0          0          0          0       1127   stm32f10x_it.o
-       932         36          0         20          0       8952   stm32f10x_rcc.o
-      3610         88          0          0          0      22876   stm32f10x_tim.o
-      1032         22          0          0          0       8492   stm32f10x_usart.o
-         2          0          0          0          0        417   sys.o
-       480         38          0         20          0     252567   system_stm32f10x.o
-      5060        344          0         60        740      28188   tasks.o
-      1444        114          0         20         40       7847   timers.o
-       772         30          0          8          0       4085   usart.o
+       120          4          0          0          0       1474   delay.o
+       452         10         16          0          0       1898   driver.o
+      1036         32          0          0          0       2730   encoder.o
+      1040         56          0          0          0      16244   event_groups.o
+       672         82          0         24      36864       3464   heap_4.o
+       512         40          0         27        506       3291   jy62.o
+       148          0          0          0          0       1990   list.o
+      1616        400          0         68          0      21027   main.o
+       220         22          0          0          0       1941   misc.o
+       766         96          0         12          0       7983   port.o
+       744         66          0          0          0       3855   pwm.o
+      2604         56          0          0         80      12455   queue.o
+       552         20          0          3          0      18161   software_usart.o
+        36          8        304          0       1024        916   startup_stm32f10x_hd.o
+       284         10          0          0          0       2395   stm32f10x_exti.o
+       860         38          0          0          0       5869   stm32f10x_gpio.o
+        36          0          0          0          0       1179   stm32f10x_it.o
+       932         36          0         20          0       9108   stm32f10x_rcc.o
+      3610         88          0          0          0      22980   stm32f10x_tim.o
+      1032         22          0          0          0       8596   stm32f10x_usart.o
+         2          0          0          0          0        469   sys.o
+       480         38          0         20          0     253087   system_stm32f10x.o
+      5060        344          0         60        740      28500   tasks.o
+      1444        114          0         20         40       8003   timers.o
+       760         30          0          8          0       4221   usart.o
 
     ----------------------------------------------------------------------
-     26244       1632        352        264      40292     448347   Object Totals
+     26244       1630        352        264      40292     452931   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-         6          0          0          2          2          0   (incl. Padding)
+         8          0          0          2          2          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -1452,9 +1454,9 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     27280       1704        352        268      40292     446515   Grand Totals
-     27280       1704        352        268      40292     446515   ELF Image Totals
-     27280       1704        352        268          0          0   ROM Totals
+     27280       1702        352        268      40292     451099   Grand Totals
+     27280       1702        352        268      40292     451099   ELF Image Totals
+     27280       1702        352        268          0          0   ROM Totals
 
 ==============================================================================
 

@@ -78,10 +78,10 @@ void USART1_Config(void)
 
 void USART1_IRQHandler()
 {
-	u8 dr;
+	//u8 dr;
     if (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == 1)
     {
-        dr = USART_ReceiveData(USART1);
+        //dr = USART_ReceiveData(USART1);
       
     }
     USART_ClearFlag(USART1, USART_FLAG_RXNE);
