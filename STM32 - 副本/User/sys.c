@@ -14,7 +14,8 @@ extern int32_t Y_Speed;
 extern int32_t X_Speed;
 extern int32_t angle_speed;
 
-extern struct PID Coord, Turn_Angle_PID, Turn_Left_PID;
+extern struct PID Coord, Turn_Angle_PID;
+extern int32_t position_of_car[3];
 extern int32_t CCR_wheel[4];
 
 void OLED_SHOW_TASK()
@@ -30,7 +31,7 @@ void OLED_SHOW_TASK()
     OLED_ShowString(3, 1, buff);
     sprintf(buff, "FD:%.1f", VOFA_Data[3]);
     OLED_ShowString(3, 9, buff);
-    sprintf(buff, "%8d%8d", X_have_achieved, Y_have_achieved);
+    sprintf(buff, "%.2f  %.2f", Turn_Angle_PID.Target, current_angle);
     OLED_ShowString(4,1,buff);
 }
 void Read_RGB()

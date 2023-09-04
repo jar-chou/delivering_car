@@ -3,7 +3,7 @@
 #include "stdio.h"
 struct Buff U3_buffer, U2_buffer, Soft_Usart, U1_buffer, U4_buffer, U5_buffer, U1_buffer,IIC_buff;
 /**
- * @description: ³õÊ¼»¯»·ĞÎ»º³åÇø
+ * @description: åˆå§‹åŒ–ç¯å½¢ç¼“å†²åŒº
  * @param {Buff} *BUFF
  * @return {*}
  */
@@ -20,7 +20,7 @@ void Iinitial_BUFF(struct Buff *BUFF)
     printf("%x\n", BUFF->read_p);
 }
 /**
- * @description: °ÑÊı¾İĞ´Èë»º³åÇø
+ * @description: æŠŠæ•°æ®å†™å…¥ç¼“å†²åŒº
  * @param {u8} *P
  * @param {Buff} *BUFF
  * @return {*}
@@ -44,8 +44,8 @@ void Write_BUFF(u8 *P, struct Buff *BUFF)
     }
 }
 /**
- * @description: ¼ì²é»º³åÇøÊÇ·ñÓĞÊı¾İ¶Á
- * @param {Buff} *BUFF ´«ÈëĞèÒª¼ì²âµÄ»º³åÇø
+ * @description: æ£€æŸ¥ç¼“å†²åŒºæ˜¯å¦æœ‰æ•°æ®è¯»
+ * @param {Buff} *BUFF ä¼ å…¥éœ€è¦æ£€æµ‹çš„ç¼“å†²åŒº
  * @return {*}
  */
 u8 Check_Buffer(struct Buff *BUFF)
@@ -58,7 +58,7 @@ u8 Check_Buffer(struct Buff *BUFF)
         return 1;
 }
 /**
- * @description: ´Ó»º³åÇø¶ÁÈ¡Êı¾İ
+ * @description: ä»ç¼“å†²åŒºè¯»å–æ•°æ®
  * @param {Buff} *BUFF
  * @return {*}
  */
@@ -68,7 +68,7 @@ u8 Read_BUFF(struct Buff *BUFF)
     if (BUFF->read_p == BUFF->write_p && BUFF->max == 0)
     {
         // printf("%u", *BUFF->read_p);
-        // printf("\nÊı¾İÎª¿Õ\n");
+        // printf("\næ•°æ®ä¸ºç©º\n");
         return 0;
     }
     else
@@ -78,21 +78,21 @@ u8 Read_BUFF(struct Buff *BUFF)
 
             p = BUFF->read_p;
             BUFF->max = 0;
-            // printf("\n¶Áµ½µÄÊı¾İÎª:%c\n", *p);
+            // printf("\nè¯»åˆ°çš„æ•°æ®ä¸º:%c\n", *p);
             BUFF->read_p = BUFF->head_p;
             return *p;
         }
         else
         {
             p = BUFF->read_p;
-            //  printf("\n¶Áµ½µÄÊı¾İÎª1:%c\n", *p);
+            //  printf("\nè¯»åˆ°çš„æ•°æ®ä¸º1:%c\n", *p);
             BUFF->read_p++;
         }
         return *p;
     }
 }
 /**
- * @description: ´Ó»º³åÇøÑ°ÕÒÖ¸¶¨×Ö·û´®
+ * @description: ä»ç¼“å†²åŒºå¯»æ‰¾æŒ‡å®šå­—ç¬¦ä¸²
  * @param {Buff} *BUFF
  * @param {char} *p
  * @return {*}
@@ -207,15 +207,15 @@ u8 Read_buff(struct Buff *BUFF, const u8 *head, u8 head_number, u8 *data, u8 dat
         return 0;
 }
 /**
- * @description: ¶ÁÈ¡²»Í¬ÀàĞÍÊı¾İ   
- * @param {Buff} *BUFF »º³åÇø
- * @param {u8} *head Ğ­ÒéÍ·
- * @param {u8} head_number Ğ­ÒéÍ·¸öÊı
- * @param {void} *data ½ÓÊÜÊı¾İÖ¸Õë
- * @param {u8} data_number ½ÓÊÜÊı¾İµÄ¸öÊı
- * @param {u8} size ½ÓÊÜÊı¾İµÄÀàĞÍ Èçu8 u16 u32
- * @param {u8} bigfron ¸ßÎ»ÔÚÇ°Ôò1£¬µÍÎ»ÔÚÇ°Ôò0
- * @return {*} ·µ»Ø0¶ÁÈ¡Ê§°Ü£¬1³É¹¦
+ * @description: è¯»å–ä¸åŒç±»å‹æ•°æ®   
+ * @param {Buff} *BUFF ç¼“å†²åŒº
+ * @param {u8} *head åè®®å¤´
+ * @param {u8} head_number åè®®å¤´ä¸ªæ•°
+ * @param {void} *data æ¥å—æ•°æ®æŒ‡é’ˆ
+ * @param {u8} data_number æ¥å—æ•°æ®çš„ä¸ªæ•°
+ * @param {u8} size æ¥å—æ•°æ®çš„ç±»å‹ å¦‚u8 u16 u32
+ * @param {u8} bigfron é«˜ä½åœ¨å‰åˆ™1ï¼Œä½ä½åœ¨å‰åˆ™0
+ * @return {*} è¿”å›0è¯»å–å¤±è´¥ï¼Œ1æˆåŠŸ
  */
 u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data, u8 data_number, u8 size, u8 bigfron)
 {
@@ -318,7 +318,7 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
                     two = (u8)Read_BUFF(BUFF);
                     three = (u8)Read_BUFF(BUFF);
                     four = (u8)Read_BUFF(BUFF);
-                    (*(u32 *)data) = four + (three << 8) + (two << 16) + (one << 32);
+                    (*(u32 *)data) = four + (three << 8) + (two << 16) + (one << 24);
                     ((u32 *)data)++;
                 }
                 else
@@ -329,7 +329,7 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
                     three = (u8)Read_BUFF(BUFF);
                     four = (u8)Read_BUFF(BUFF);
                     (*(u32 *)data) = one + (two << 8) ; 
-                    (*(u32 *)data) +=(three << 16) + (four << 32);
+                    (*(u32 *)data) +=(three << 16) + (four << 24);
                     ((u32 *)data)++;
                 }
             }

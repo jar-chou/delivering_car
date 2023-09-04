@@ -1,9 +1,8 @@
 
 #include "PID.h"
-struct PID Coord, Turn_Angle_PID, X_Speed_PID, Y_Speed_PID;
 /**
- * @description: ��ʼ��PID�ṹ�����
- * @param {PID} pid ����PID�ṹ�����
+ * @description: 初始化PID结构体变量
+ * @param {PID} pid 传入PID结构体变量
  * @param {float} KP
  * @param {float} KD
  * @param {float} KI
@@ -23,28 +22,28 @@ void PID_Initialize(struct PID *pid, float KP, float KD, float KI, float Traget,
     pid->Previous_Error = 0;
 }
 
-//! λ��ʽPID����
+//! 位置式PID控制
 /**
- * @description:λ��ʽPID����
- * @param {PID} pid ����PID�ṹ�����
- * @param {float} Target Ŀ��ֵ
- * @param {float} Current ��ǰֵ
+ * @description:位置式PID控制
+ * @param {PID} pid 传入PID结构体变量
+ * @param {float} Target 目标值
+ * @param {float} Current 当前值
  * @return {*}
  */
 float PID_Realize(struct PID *pid, float Current)
 {
 
-    float iError, Realize;                                                                                     // ʵ�����
-    iError = pid->Target - Current;                                                                            // ���㵱ǰ���
-    pid->Cumulation_Error += iError;                                                                           // ������
-    pid->Cumulation_Error = pid->Cumulation_Error > pid->limit_high ? pid->limit_high : pid->Cumulation_Error; // �����޷�//����
-    pid->Cumulation_Error = pid->Cumulation_Error < pid->limit_low ? pid->limit_low : pid->Cumulation_Error;   // �����޷�//����
+    float iError, Realize;                                                                                     // 实际输出
+    iError = pid->Target - Current;                                                                            // 计算当前误差
+    pid->Cumulation_Error += iError;                                                                           // 误差积分
+    pid->Cumulation_Error = pid->Cumulation_Error > pid->limit_high ? pid->limit_high : pid->Cumulation_Error; // 积分限幅//上限
+    pid->Cumulation_Error = pid->Cumulation_Error < pid->limit_low ? pid->limit_low : pid->Cumulation_Error;   // 积分限幅//下限
     Realize = pid->KP * iError + pid->Cumulation_Error * pid->KI + pid->KD * (iError - pid->Last_Error);
-    pid->Last_Error = iError; // �����ϴ����
-    return Realize;           // ����ʵ��ֵ
+    pid->Last_Error = iError; // 更新上次误差
+    return Realize;           // 返回实际值
 }
 /**
- * @description: ����ʽPID�㷨����
+ * @description: 增量式PID算法函数
  * @param {PID} *pid
  * @param {float} Target
  * @param {float} Current
@@ -53,23 +52,23 @@ float PID_Realize(struct PID *pid, float Current)
 float PID_Increase(struct PID *pid, float Current)
 {
 
-    float iError, // ��ǰ���
-        Increase; // ���ó���ʵ������
+    float iError, // 当前误差
+        Increase; // 最后得出的实际增量
 
-    iError = pid->Target - Current; // ���㵱ǰ���
+    iError = pid->Target - Current; // 计算当前误差
 
-    Increase = pid->KP * (iError - pid->Last_Error) + pid->KI * iError + pid->KD * (iError - 2 * pid->Last_Error + pid->Previous_Error); // ΢��D
+    Increase = pid->KP * (iError - pid->Last_Error) + pid->KI * iError + pid->KD * (iError - 2 * pid->Last_Error + pid->Previous_Error); // 微分D
 
-    pid->Previous_Error = pid->Last_Error; // ����ǰ�����
-    pid->Last_Error = iError;              // �����ϴ����
+    pid->Previous_Error = pid->Last_Error; // 更新前次误差
+    pid->Last_Error = iError;              // 更新上次误差
 
-    return Increase; // ��������
+    return Increase; // 返回增量
 }
 /**
- * @description: ����޷�����
- * @param {int} Out_PID PID���ֵ
- * @param {int} Max ���ֵ
- * @param {int} Min ��Сֵ
+ * @description: 输出限幅函数
+ * @param {int} Out_PID PID输出值
+ * @param {int} Max 最大值
+ * @param {int} Min 最小值
  * @return {*}
  */
 int Limited_Out(int Out_PID, int Max, int Min)
@@ -85,7 +84,7 @@ int Limited_Out(int Out_PID, int Max, int Min)
     return Out_PID;
 }
 /**
- * @description: ����PID
+ * @description: 串级PID
  * @param {int} *Out_PID_x
  * @param {int} *Out_PID_y
  * @return {*}
@@ -101,30 +100,30 @@ void Series_PID(int *Out_PID_x, int *Out_PID_y)
     // set_computer_value(SEND_TARGET_CMD, CURVES_CH1, &target_speed, 1);
 }
 /*
-����ʽ��λ��ʽ����
-1����ʽ�㷨����Ҫ���ۼӣ�������������ȷ�������������ƫ�����ֵ�йأ��������Կ��� �������Ӱ���С����λ��ʽ�㷨Ҫ�õ���ȥƫ����ۼ�ֵ�����ײ����ϴ���ۼ���
+增量式与位置式区别：
+1增量式算法不需要做累加，控制量增量的确定仅与最近几次偏差采样值有关，计算误差对控制 量计算的影响较小。而位置式算法要用到过去偏差的累加值，容易产生较大的累加误差。
 
-        2����ʽ�㷨�ó����ǿ������������������ڷ��ſ����У�ֻ������ſ��ȵı仯���֣����� Ӱ��С����Ҫʱ����ͨ���߼��ж����ƻ��ֹ�����������������Ӱ��ϵͳ�Ĺ����� ��λ��ʽ�����ֱ�Ӷ�Ӧ������������˶�ϵͳӰ��ϴ�
+        2增量式算法得出的是控制量的增量，例如在阀门控制中，只输出阀门开度的变化部分，误动作 影响小，必要时还可通过逻辑判断限制或禁止本次输出，不会严重影响系统的工作。 而位置式的输出直接对应对象的输出，因此对系统影响较大。
 
-        3����ʽPID����������ǿ��������������޻������ã���˸÷���������ִ�л��������ֲ����Ķ����粽������ȣ���λ��ʽPID������ִ�л����������ֲ����Ķ������Һ�ŷ�����
+        3增量式PID控制输出的是控制量增量，并无积分作用，因此该方法适用于执行机构带积分部件的对象，如步进电机等，而位置式PID适用于执行机构不带积分部件的对象，如电液伺服阀。
 
-        4�ڽ���PID����ʱ��λ��ʽPID��Ҫ�л����޷�������޷���������ʽPIDֻ������޷�
+        4在进行PID控制时，位置式PID需要有积分限幅和输出限幅，而增量式PID只需输出限幅
 
-        λ��ʽPID��ȱ�㣺
-            �ŵ㣺
-��λ��ʽPID��һ�ַǵ���ʽ�㷨����ֱ�ӿ���ִ�л�������ƽ��С������u(k) ��ֵ��ִ�л�����ʵ��λ�ã���С����ǰ�Ƕȣ���һһ��Ӧ�ģ������ִ�л����������ֲ����Ķ����п��Ժܺ�Ӧ��
+        位置式PID优缺点：
+            优点：
+①位置式PID是一种非递推式算法，可直接控制执行机构（如平衡小车），u(k) 的值和执行机构的实际位置（如小车当前角度）是一一对应的，因此在执行机构不带积分部件的对象中可以很好应用
 
-        ȱ�㣺
-��ÿ����������ȥ��״̬�йأ�����ʱҪ��e(k) �����ۼӣ����㹤������
+        缺点：
+①每次输出均与过去的状态有关，计算时要对e(k) 进行累加，运算工作量大。
 
-        ����ʽPID��ȱ�㣺
-        �ŵ㣺
-������ʱӰ��С����Ҫʱ�����߼��жϵķ���ȥ���������ݡ�
-���ֶ� / �Զ��л�ʱ���С������ʵ�����Ŷ��л��������������ʱ�����ܱ���ԭֵ��
-����ʽ�в���Ҫ�ۼӡ�����������u(k) ��ȷ���������3�εĲ���ֵ�йء�
+        增量式PID优缺点：
+        优点：
+①误动作时影响小，必要时可用逻辑判断的方法去掉出错数据。
+②手动 / 自动切换时冲击小，便于实现无扰动切换。当计算机故障时，仍能保持原值。
+③算式中不需要累加。控制增量Δu(k) 的确定仅与最近3次的采样值有关。
 
-        ȱ�㣺
-�ٻ��ֽض�ЧӦ������̬��
+        缺点：
+①积分截断效应大，有稳态误差；
 
-�������Ӱ����еı��ض���������ʽ��̫�ã�
+②溢出的影响大。有的被控对象用增量式则不太好；
 */

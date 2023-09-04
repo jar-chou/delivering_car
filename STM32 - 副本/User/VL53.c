@@ -6,18 +6,18 @@ static void NVIC_USARTX_VL53_Configuration(void)
 {
     NVIC_InitTypeDef NVIC_InitStructure;
 
-    /* Ç¶Ì×ÏòÁ¿ÖĞ¶Ï¿ØÖÆÆ÷×éÑ¡Ôñ */
+    /* åµŒå¥—å‘é‡ä¸­æ–­æ§åˆ¶å™¨ç»„é€‰æ‹© */
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
-    /* ÅäÖÃUSARTÎªÖĞ¶ÏÔ´ */
+    /* é…ç½®USARTä¸ºä¸­æ–­æº */
     NVIC_InitStructure.NVIC_IRQChannel = VL53_USARTX_IRQn;
-    /* ÇÀ¶ÏÓÅÏÈ¼¶*/
+    /* æŠ¢æ–­ä¼˜å…ˆçº§*/
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 6;
-    /* ×ÓÓÅÏÈ¼¶ */
+    /* å­ä¼˜å…ˆçº§ */
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-    /* Ê¹ÄÜÖĞ¶Ï */
+    /* ä½¿èƒ½ä¸­æ–­ */
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    /* ³õÊ¼»¯ÅäÖÃNVIC */
+    /* åˆå§‹åŒ–é…ç½®NVIC */
     NVIC_Init(&NVIC_InitStructure);
 }
 
@@ -26,46 +26,46 @@ void USARTX_VL53_Config(void)
     GPIO_InitTypeDef GPIO_InitStructure;
     USART_InitTypeDef USART_InitStructure;
 
-    // ´ò¿ª´®¿ÚGPIOµÄÊ±ÖÓ
+    // æ‰“å¼€ä¸²å£GPIOçš„æ—¶é’Ÿ
     RCC_APB2PeriphClockCmd(VL53_GPIO_CLOCK, ENABLE);
 
-    // ´ò¿ª´®¿ÚÍâÉèµÄÊ±ÖÓ
+    // æ‰“å¼€ä¸²å£å¤–è®¾çš„æ—¶é’Ÿ
     RCC_APB1PeriphClockCmd(VL53_USARTX_CLOCK, ENABLE);
 
-    // ½«USART TxµÄGPIOÅäÖÃÎªÍÆÍì¸´ÓÃÄ£Ê½
+    // å°†USART Txçš„GPIOé…ç½®ä¸ºæ¨æŒ½å¤ç”¨æ¨¡å¼
     GPIO_InitStructure.GPIO_Pin = VL53_TX;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(VL53_GPIOX, &GPIO_InitStructure);
 
-    // ½«USART RxµÄGPIOÅäÖÃÎª¸¡¿ÕÊäÈëÄ£Ê½
+    // å°†USART Rxçš„GPIOé…ç½®ä¸ºæµ®ç©ºè¾“å…¥æ¨¡å¼
     GPIO_InitStructure.GPIO_Pin = VL53_RX;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_Init(VL53_GPIOX, &GPIO_InitStructure);
 
-    // ÅäÖÃ´®¿ÚµÄ¹¤×÷²ÎÊı
-    // ÅäÖÃ²¨ÌØÂÊ
+    // é…ç½®ä¸²å£çš„å·¥ä½œå‚æ•°
+    // é…ç½®æ³¢ç‰¹ç‡
     USART_InitStructure.USART_BaudRate = VL53_BAUDRATE;
-    // ÅäÖÃ ÕëÊı¾İ×Ö³¤
+    // é…ç½® é’ˆæ•°æ®å­—é•¿
     USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-    // ÅäÖÃÍ£Ö¹Î»
+    // é…ç½®åœæ­¢ä½
     USART_InitStructure.USART_StopBits = USART_StopBits_1;
-    // ÅäÖÃĞ£ÑéÎ»
+    // é…ç½®æ ¡éªŒä½
     USART_InitStructure.USART_Parity = USART_Parity_No;
-    // ÅäÖÃÓ²¼şÁ÷¿ØÖÆ
+    // é…ç½®ç¡¬ä»¶æµæ§åˆ¶
     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    // ÅäÖÃ¹¤×÷Ä£Ê½£¬ÊÕ·¢Ò»Æğ
+    // é…ç½®å·¥ä½œæ¨¡å¼ï¼Œæ”¶å‘ä¸€èµ·
     USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-    // Íê³É´®¿ÚµÄ³õÊ¼»¯ÅäÖÃ
+    // å®Œæˆä¸²å£çš„åˆå§‹åŒ–é…ç½®
     USART_Init(VL53_USARTX, &USART_InitStructure);
 
-    // ´®¿ÚÖĞ¶ÏÓÅÏÈ¼¶ÅäÖÃ
+    // ä¸²å£ä¸­æ–­ä¼˜å…ˆçº§é…ç½®
     NVIC_USARTX_VL53_Configuration();
 
-    // Ê¹ÄÜ´®¿Ú½ÓÊÕÖĞ¶Ï
+    // ä½¿èƒ½ä¸²å£æ¥æ”¶ä¸­æ–­
     USART_ITConfig(VL53_USARTX, USART_IT_RXNE, ENABLE);
 
-    // Ê¹ÄÜ´®¿Ú
+    // ä½¿èƒ½ä¸²å£
     USART_Cmd(VL53_USARTX, ENABLE);
 }
 
@@ -77,12 +77,12 @@ void VL53_USARTX_IRQHandler()
     if (USART_GetFlagStatus(VL53_USARTX, USART_FLAG_RXNE) == 1)
     {
         Data = VL53_USARTX->DR;
-        Write_BUFF(&Data, &VL53_USARTX_Buff); // °Ñ´®¿Ú½ÓÊÕµ½µÄÊı¾İ²¢´æ½ø»·ĞÎ»º³åÇø
+        Write_BUFF(&Data, &VL53_USARTX_Buff); // æŠŠä¸²å£æ¥æ”¶åˆ°çš„æ•°æ®å¹¶å­˜è¿›ç¯å½¢ç¼“å†²åŒº
     }
     USART_ClearFlag(VL53_USARTX, USART_FLAG_RXNE);
 }
 /**
- * @description: ³õÊ¼»¯¼¤¹â²â¾à£¨×Üº¯Êı£©
+ * @description: åˆå§‹åŒ–æ¿€å…‰æµ‹è·ï¼ˆæ€»å‡½æ•°ï¼‰
  * @return {*}
  */
 void VL53_Initial()
@@ -91,8 +91,8 @@ void VL53_Initial()
     Iinitial_BUFF(&VL53_USARTX_Buff);
 }
 /**
- * @description: ¶ÁÈ¡BuffÊı¾İ£¬²¢½âÎöÎª¾àÀëÊı¾İ
- * @param {u16} *distance ´«ÈëÒ»¸öu16µÄÖ¸Õë½ÓÊÕ¾àÀëÊı¾İ
+ * @description: è¯»å–Buffæ•°æ®ï¼Œå¹¶è§£æä¸ºè·ç¦»æ•°æ®
+ * @param {u16} *distance ä¼ å…¥ä¸€ä¸ªu16çš„æŒ‡é’ˆæ¥æ”¶è·ç¦»æ•°æ®
  * @return {*}
  */
 // void VL53_Read_Data(u16 *distance)
@@ -117,7 +117,7 @@ void VL53_Initial()
 //     }
 // }
 /**
- * @description: ·¢ËÍ¶ÁÈ¡Êı¾İÃüÁî
+ * @description: å‘é€è¯»å–æ•°æ®å‘½ä»¤
  * @return {*}
  */
 void VL53_Send_Agrement()

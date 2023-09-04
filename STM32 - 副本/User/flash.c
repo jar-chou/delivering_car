@@ -1,72 +1,72 @@
 #include "flash.h"
 
-//#define STARTADDR 0x0800F000 //STM32F103C8T6ÊÊÓÃ
+//#define STARTADDR 0x0800F000 //STM32F103C8T6é€‚ç”¨
 
-//volatile FLASH_Status FLASHStatus = FLASH_BUSY; //Flash²Ù×÷×´Ì¬±äÁ¿
+//volatile FLASH_Status FLASHStatus = FLASH_BUSY; //Flashæ“ä½œçŠ¶æ€å˜é‡
 
 
 ///*
 // * Name:	    WriteFlashOneWord
-// * Function:	ÏòÄÚ²¿FlashĞ´Èë32Î»Êı¾İ
-// * Input:	    WriteAddress£ºÊı¾İÒªĞ´ÈëµÄÄ¿±êµØÖ·£¨Æ«ÒÆµØÖ·£©
-// *              WriteData£º   Ğ´ÈëµÄÊı¾İ
+// * Function:	å‘å†…éƒ¨Flashå†™å…¥32ä½æ•°æ®
+// * Input:	    WriteAddressï¼šæ•°æ®è¦å†™å…¥çš„ç›®æ ‡åœ°å€ï¼ˆåç§»åœ°å€ï¼‰
+// *              WriteDataï¼š   å†™å…¥çš„æ•°æ®
 // */
 //void WriteFlashOneWord(uint32_t WriteAddress, uint32_t WriteData)
 //{   
 //    FLASH_UnlockBank1();
 //    FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPRTERR);
 
-//    FLASHStatus = 1;    //Çå¿Õ×´Ì¬Ö¸Ê¾±êÖ¾Î»
+//    FLASHStatus = 1;    //æ¸…ç©ºçŠ¶æ€æŒ‡ç¤ºæ ‡å¿—ä½
 //    FLASHStatus = FLASH_ErasePage(STARTADDR);  
 //    if(FLASHStatus == FLASH_COMPLETE)   
 //    {  
-//        FLASHStatus = 1;    //Çå¿Õ×´Ì¬Ö¸Ê¾±êÖ¾Î»
-//        FLASHStatus = FLASH_ProgramWord(STARTADDR+WriteAddress, WriteData); //flash.c ÖĞAPIº¯Êı
+//        FLASHStatus = 1;    //æ¸…ç©ºçŠ¶æ€æŒ‡ç¤ºæ ‡å¿—ä½
+//        FLASHStatus = FLASH_ProgramWord(STARTADDR+WriteAddress, WriteData); //flash.c ä¸­APIå‡½æ•°
 //    }
 //    
-//    FLASHStatus = 1;    //Çå¿Õ×´Ì¬Ö¸Ê¾±êÖ¾Î»
+//    FLASHStatus = 1;    //æ¸…ç©ºçŠ¶æ€æŒ‡ç¤ºæ ‡å¿—ä½
 //    FLASH_LockBank1();    
 //}
 
 ///*
 // * Name:	    WriteFlashData
-// * Function:	ÏòÄÚ²¿FlashĞ´ÈëÊı¾İ
-// * Input:	    WriteAddress£ºÊı¾İÒªĞ´ÈëµÄÄ¿±êµØÖ·£¨Æ«ÒÆµØÖ·£©
-// *             data[]£º      Ğ´ÈëµÄÊı¾İÊ×µØÖ·
-// *             num£º         Ğ´ÈëÊı¾İµÄ¸öÊı
+// * Function:	å‘å†…éƒ¨Flashå†™å…¥æ•°æ®
+// * Input:	    WriteAddressï¼šæ•°æ®è¦å†™å…¥çš„ç›®æ ‡åœ°å€ï¼ˆåç§»åœ°å€ï¼‰
+// *             data[]ï¼š      å†™å…¥çš„æ•°æ®é¦–åœ°å€
+// *             numï¼š         å†™å…¥æ•°æ®çš„ä¸ªæ•°
 // */
 //void WriteFlashData(uint32_t WriteAddress, uint8_t data[], uint32_t num)
 //{
 //    uint32_t i = 0;
 //    uint16_t temp = 0;
 //    
-//	FLASH_UnlockBank1();    //½âËøflash
+//	FLASH_UnlockBank1();    //è§£é”flash
 //    FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPRTERR); 
 //    
-//    FLASHStatus = 1;        //Çå¿Õ×´Ì¬Ö¸Ê¾±êÖ¾Î»
-//    FLASHStatus = FLASH_ErasePage(STARTADDR);//²Á³ıÕûÒ³
-//	if(FLASHStatus == FLASH_COMPLETE)//flash²Ù×÷Íê³É
+//    FLASHStatus = 1;        //æ¸…ç©ºçŠ¶æ€æŒ‡ç¤ºæ ‡å¿—ä½
+//    FLASHStatus = FLASH_ErasePage(STARTADDR);//æ“¦é™¤æ•´é¡µ
+//	if(FLASHStatus == FLASH_COMPLETE)//flashæ“ä½œå®Œæˆ
 //	{
-//        FLASHStatus = 1;    //Çå¿Õ×´Ì¬Ö¸Ê¾±êÖ¾Î»
+//        FLASHStatus = 1;    //æ¸…ç©ºçŠ¶æ€æŒ‡ç¤ºæ ‡å¿—ä½
 //        for(i=0; i<num; i++)
 //        {
 //            temp = (uint16_t)data[i];
-//            FLASHStatus = FLASH_ProgramHalfWord(STARTADDR+WriteAddress+i*2, temp);//Ğ´ÈëÊı¾İ
+//            FLASHStatus = FLASH_ProgramHalfWord(STARTADDR+WriteAddress+i*2, temp);//å†™å…¥æ•°æ®
 //        }
 //	}
 //    
-//    FLASHStatus = 1;    //Çå¿Õ×´Ì¬Ö¸Ê¾±êÖ¾Î»
+//    FLASHStatus = 1;    //æ¸…ç©ºçŠ¶æ€æŒ‡ç¤ºæ ‡å¿—ä½
 //    
-//	FLASH_LockBank1();  //Ëø¶¨flash
+//	FLASH_LockBank1();  //é”å®šflash
 //} 
 
 ///*
 // * Name:	    ReadFlashNBtye
-// * Function:	´ÓÄÚ²¿Flash¶ÁÈ¡N×Ö½ÚÊı¾İ
-// * Input:	    ReadAddress£ºÊı¾İµØÖ·£¨Æ«ÒÆµØÖ·£©
-// *              ReadBuf£º¶ÁÈ¡µ½µÄÊı¾İ´æ·ÅÎ»ÖÃÖ¸Õë
-// *              ReadNum£º¶ÁÈ¡×Ö½Ú¸öÊı
-// * Output:      ¶ÁÈ¡µÄ×Ö½ÚÊı
+// * Function:	ä»å†…éƒ¨Flashè¯»å–Nå­—èŠ‚æ•°æ®
+// * Input:	    ReadAddressï¼šæ•°æ®åœ°å€ï¼ˆåç§»åœ°å€ï¼‰
+// *              ReadBufï¼šè¯»å–åˆ°çš„æ•°æ®å­˜æ”¾ä½ç½®æŒ‡é’ˆ
+// *              ReadNumï¼šè¯»å–å­—èŠ‚ä¸ªæ•°
+// * Output:      è¯»å–çš„å­—èŠ‚æ•°
 // */
 //int ReadFlashNBtye(uint32_t ReadAddress, uint8_t *ReadBuf, int32_t ReadNum)
 //{   
@@ -84,10 +84,10 @@
 
 ///*
 // * Name:	    ReadFlashData
-// * Function:	´ÓÄÚ²¿Flash¶ÁÈ¡num×Ö½ÚÊı¾İ
-// * Input:	    ReadAddress£ºÊı¾İµØÖ·£¨Æ«ÒÆµØÖ·£©
-// *              dest_Data£º  ¶ÁÈ¡µ½µÄÊı¾İ´æ·ÅÎ»ÖÃÖ¸Õë
-// *              num£º        ¶ÁÈ¡×Ö½Ú¸öÊı
+// * Function:	ä»å†…éƒ¨Flashè¯»å–numå­—èŠ‚æ•°æ®
+// * Input:	    ReadAddressï¼šæ•°æ®åœ°å€ï¼ˆåç§»åœ°å€ï¼‰
+// *              dest_Dataï¼š  è¯»å–åˆ°çš„æ•°æ®å­˜æ”¾ä½ç½®æŒ‡é’ˆ
+// *              numï¼š        è¯»å–å­—èŠ‚ä¸ªæ•°
 // */
 //void ReadFlashData(uint32_t ReadAddress, uint8_t *dest_Data, uint32_t num)
 //{

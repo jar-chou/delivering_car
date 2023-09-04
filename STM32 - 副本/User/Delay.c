@@ -2,42 +2,42 @@
 #include "Delay.h"
 
 /**
- * @description: ¶¨Ê±Æ÷×öÑÓÊ±º¯Êı³õÊ¼»¯
- * @param CLOCK:Ñ¡ÔñÊ±ÖÓÔ´£¬×¢£ºÖ»ÄÜ³õÊ¼»¯TIM2-7
- * @param TIM_PERIOD£ºÖØ×°ÔØ¼ÆÊıÖµ
- * @param TIM_PRESCALER£ºÔ¤·ÖÆµÏµÊı£¬½¨ÒéÑ¡72£¨72¶¨Ê±Æ÷Ã¿¼ÆÊıÒ»´ÎÎª1us£©
+ * @description: å®šæ—¶å™¨åšå»¶æ—¶å‡½æ•°åˆå§‹åŒ–
+ * @param CLOCK:é€‰æ‹©æ—¶é’Ÿæºï¼Œæ³¨ï¼šåªèƒ½åˆå§‹åŒ–TIM2-7
+ * @param TIM_PERIODï¼šé‡è£…è½½è®¡æ•°å€¼
+ * @param TIM_PRESCALERï¼šé¢„åˆ†é¢‘ç³»æ•°ï¼Œå»ºè®®é€‰72ï¼ˆ72å®šæ—¶å™¨æ¯è®¡æ•°ä¸€æ¬¡ä¸º1usï¼‰
  * @return {*}
  */
 //*TIMX_Delay_Init(RCC_APB1Periph_TIM6, 65530, 72, TIM6)
 void TIMX_Delay_Init(uint32_t ClOCK, uint16_t TIM_PERIOD, uint16_t TIM_PRESCALER, TIM_TypeDef *TIMX)
 {
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
-    RCC_APB1PeriphClockCmd(ClOCK, ENABLE);                          /// Ê¹ÄÜTIM3Ê±ÖÓ
-    TIM_TimeBaseInitStructure.TIM_Period = TIM_PERIOD;              // ×Ô¶¯ÖØ×°ÔØÖµ
-    TIM_TimeBaseInitStructure.TIM_Prescaler = TIM_PRESCALER - 1;    // ¶¨Ê±Æ÷·ÖÆµ
-    TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; // ÏòÉÏ¼ÆÊıÄ£Ê½
-    TIM_TimeBaseInit(TIMX, &TIM_TimeBaseInitStructure);             // ³õÊ¼»¯TIM3
-    TIM_Cmd(TIMX, DISABLE);                                         // ¹Ø±Õ¶¨Ê±Æ÷
+    RCC_APB1PeriphClockCmd(ClOCK, ENABLE);                          /// ä½¿èƒ½TIM3æ—¶é’Ÿ
+    TIM_TimeBaseInitStructure.TIM_Period = TIM_PERIOD;              // è‡ªåŠ¨é‡è£…è½½å€¼
+    TIM_TimeBaseInitStructure.TIM_Prescaler = TIM_PRESCALER - 1;    // å®šæ—¶å™¨åˆ†é¢‘
+    TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; // å‘ä¸Šè®¡æ•°æ¨¡å¼
+    TIM_TimeBaseInit(TIMX, &TIM_TimeBaseInitStructure);             // åˆå§‹åŒ–TIM3
+    TIM_Cmd(TIMX, DISABLE);                                         // å…³é—­å®šæ—¶å™¨
 }
 /**
- * @description:Î¢ÃîÑÓÊ±º¯Êı
- * @param TIMX£ºÑ¡Ôñ¶¨Ê±Æ÷
- * @param xus£ºÑÓÊ±¶àĞ¡Î¢Ãî
+ * @description:å¾®å¦™å»¶æ—¶å‡½æ•°
+ * @param TIMXï¼šé€‰æ‹©å®šæ—¶å™¨
+ * @param xusï¼šå»¶æ—¶å¤šå°å¾®å¦™
  * @return {*}
  */
 void Delayus(u16 xus)
 {
 
-    TIM_Cmd(TIM6, ENABLE); // Æô¶¯¶¨Ê±Æ÷
+    TIM_Cmd(TIM6, ENABLE); // å¯åŠ¨å®šæ—¶å™¨
     while (TIM6->CNT < xus)
-        ;                   // »ñÈ¡¶¨Ê±Æ÷¼Ä´æÆ÷CNTµÄÖµ
-    TIM_Cmd(TIM6, DISABLE); // ¹Ø±Õ¶¨Ê±Æ÷
+        ;                   // è·å–å®šæ—¶å™¨å¯„å­˜å™¨CNTçš„å€¼
+    TIM_Cmd(TIM6, DISABLE); // å…³é—­å®šæ—¶å™¨
     TIM6->CNT = 0;
 }
 /**
- * @description: ºÁÃëÑÓÊ±º¯Êı
- * @param TIMX£ºÑ¡Ôñ¶¨Ê±Æ÷
- * @param xms£ºÑÓÊ±¶àĞ¡ºÁÃë
+ * @description: æ¯«ç§’å»¶æ—¶å‡½æ•°
+ * @param TIMXï¼šé€‰æ‹©å®šæ—¶å™¨
+ * @param xmsï¼šå»¶æ—¶å¤šå°æ¯«ç§’
  */
 void Delayms(u16 xms)
 {

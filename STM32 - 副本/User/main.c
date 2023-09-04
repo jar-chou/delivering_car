@@ -1,15 +1,41 @@
+/*
+ *                        _oo0oo_
+ *                       o8888888o
+ *                       88" . "88
+ *                       (| -_- |)
+ *                       0\  =  /0
+ *                     ___/`---'\___
+ *                   .' \\|     |// '.
+ *                  / \\|||  :  |||// \
+ *                 / _||||| -:- |||||- \
+ *                |   | \\\  - /// |   |
+ *                | \_|  ''\---/''  |_/ |
+ *                \  .-\__  '-'  ___/-. /
+ *              ___'. .'  /--.--\  `. .'___
+ *           ."" '<  `.___\_<|>_/___.' >' "".
+ *          | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+ *          \  \ `_.   \_ __\ /__ _/   .-` /  /
+ *      =====`-.____`.___ \_____/___.-`___.-'=====
+ *                        `=---='
+ * 
+ * 
+ *      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * 
+ *            ä½›ç¥–ä¿ä½‘     æ°¸ä¸å®•æœº     æ°¸æ— BUG
+ */
+
 
 /*
 *************************************************************************
-*                             °üº¬µÄÍ·ÎÄ¼ş
+*                             åŒ…å«çš„å¤´æ–‡ä»¶
 *************************************************************************
 */
-/* FreeRTOSÍ·ÎÄ¼ş */
+/* FreeRTOSå¤´æ–‡ä»¶ */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "event_groups.h"
 #include "queue.h"
-/* ¿ª·¢°åÓ²¼şbspÍ·ÎÄ¼ş */
+/* å¼€å‘æ¿ç¡¬ä»¶bspå¤´æ–‡ä»¶ */
 #include "stdio.h"
 #include "bsp_led.h"
 #include "usart.h"
@@ -31,34 +57,40 @@
 #include "VL53.h"
 #include "sys.h"
 #include <math.h>
+#include <stdbool.h>
 
-/**************************** ÈÎÎñ¾ä±ú ********************************/
+
+
+/**************************** ä»»åŠ¡å¥æŸ„ ********************************/
 /*
- * ÈÎÎñ¾ä±úÊÇÒ»¸öÖ¸Õë£¬ÓÃÓÚÖ¸ÏòÒ»¸öÈÎÎñ£¬µ±ÈÎÎñ´´½¨ºÃÖ®ºó£¬Ëü¾Í¾ßÓĞÁËÒ»¸öÈÎÎñ¾ä±ú
- * ÒÔºóÎÒÃÇÒªÏë²Ù×÷Õâ¸öÈÎÎñ¶¼ĞèÒªÍ¨¹ıÕâ¸öÈÎÎñ¾ä±ú£¬Èç¹ûÊÇ×ÔÉíµÄÈÎÎñ²Ù×÷×Ô¼º£¬ÄÇÃ´
- * Õâ¸ö¾ä±ú¿ÉÒÔÎªNULL¡£
+ * ä»»åŠ¡å¥æŸ„æ˜¯ä¸€ä¸ªæŒ‡é’ˆï¼Œç”¨äºæŒ‡å‘ä¸€ä¸ªä»»åŠ¡ï¼Œå½“ä»»åŠ¡åˆ›å»ºå¥½ä¹‹åï¼Œå®ƒå°±å…·æœ‰äº†ä¸€ä¸ªä»»åŠ¡å¥æŸ„
+ * ä»¥åæˆ‘ä»¬è¦æƒ³æ“ä½œè¿™ä¸ªä»»åŠ¡éƒ½éœ€è¦é€šè¿‡è¿™ä¸ªä»»åŠ¡å¥æŸ„ï¼Œå¦‚æœæ˜¯è‡ªèº«çš„ä»»åŠ¡æ“ä½œè‡ªå·±ï¼Œé‚£ä¹ˆ
+ * è¿™ä¸ªå¥æŸ„å¯ä»¥ä¸ºNULLã€‚
  */
 
 QueueHandle_t Task_Number_Handle = NULL;
 
-static TimerHandle_t Turn_Angle_Handle = NULL;     			//+·¢ËÍÊı¾İµ½ÉÏÎ»»ú¶¨Ê±Æ÷¾ä±ú
-static TimerHandle_t sendto_Upper_Handle = NULL;   			//+·¢ËÍÊı¾İµ½ÉÏÎ»»ú¶¨Ê±Æ÷¾ä±ú
-static TimerHandle_t line_walking_Handle = NULL;   			//+Ñ²ÏßPID¶¨Ê±Æ÷¾ä±ú
-static TimerHandle_t analyse_data_Handle = NULL;   			//+½âÎöÊı¾İ¶¨Ê±Æ÷¾ä±ú
-static TimerHandle_t Achieve_Distance_For_Front_Laser_Handle = NULL;	//¸ù¾İ¼¤¹âÀ´ÅÜÖ±Ïß
+static TimerHandle_t Turn_Angle_Handle = NULL;     			//+å‘é€æ•°æ®åˆ°ä¸Šä½æœºå®šæ—¶å™¨å¥æŸ„
+static TimerHandle_t sendto_Upper_Handle = NULL;   			//+å‘é€æ•°æ®åˆ°ä¸Šä½æœºå®šæ—¶å™¨å¥æŸ„
+static TimerHandle_t line_walking_Handle = NULL;   			//+å·¡çº¿PIDå®šæ—¶å™¨å¥æŸ„
+static TimerHandle_t analyse_data_Handle = NULL;   			//+è§£ææ•°æ®å®šæ—¶å™¨å¥æŸ„
+static TimerHandle_t Achieve_Distance_For_Front_Laser_Handle = NULL;	//æ ¹æ®æ¿€å…‰æ¥è·‘ç›´çº¿
 static TimerHandle_t Achieve_Distance_For_Right_Laser_Handle = NULL;
 static TimerHandle_t Car_Running_Handle = NULL;
-static TaskHandle_t OLED_SHOW_Handle = NULL;       			//+OLDEÏÔÊ¾¾ä±ú
-static TaskHandle_t AppTaskCreate_Handle = NULL;   			//+´´½¨ÈÎÎñ¾ä±ú
-static TaskHandle_t Task__ONE_Handle = NULL;       			//+ÈÎÎñ1¾ä±ú
-static TaskHandle_t Task__TWO_Handle = NULL;       			//+ÈÎÎñ2¾ä±ú
-static TaskHandle_t Task__THREE_Handle = NULL;     			//+ÈÎÎñ3¾ä±ú
-static TaskHandle_t Task__FOUR_Handle = NULL;      			//+ÈÎÎñ4¾ä±ú
-static EventGroupHandle_t Group_One_Handle = NULL; 			//+ÊÂ¼ş×é¾ä±ú
+static TimerHandle_t Go_Forward_Base_On_Encoder_Handle = NULL;
+static TimerHandle_t Pan_Left_Base_On_Encoder_Handle = NULL;
 
-/******************************* È«¾Ö±äÁ¿ÉùÃ÷ ************************************/
+static TaskHandle_t OLED_SHOW_Handle = NULL;       			//+OLDEæ˜¾ç¤ºå¥æŸ„
+static TaskHandle_t AppTaskCreate_Handle = NULL;   			//+åˆ›å»ºä»»åŠ¡å¥æŸ„
+static TaskHandle_t Task__ONE_Handle = NULL;       			//+ä»»åŠ¡1å¥æŸ„
+static TaskHandle_t Task__TWO_Handle = NULL;       			//+ä»»åŠ¡2å¥æŸ„
+static TaskHandle_t Task__THREE_Handle = NULL;     			//+ä»»åŠ¡3å¥æŸ„
+static TaskHandle_t Task__FOUR_Handle = NULL;      			//+ä»»åŠ¡4å¥æŸ„
+static EventGroupHandle_t Group_One_Handle = NULL; 			//+äº‹ä»¶ç»„å¥æŸ„
+
+/******************************* å…¨å±€å˜é‡å£°æ˜ ************************************/
 /*
- * µ±ÎÒÃÇÔÚĞ´Ó¦ÓÃ³ÌĞòµÄÊ±ºò£¬¿ÉÄÜĞèÒªÓÃµ½Ò»Ğ©È«¾Ö±äÁ¿¡£
+ * å½“æˆ‘ä»¬åœ¨å†™åº”ç”¨ç¨‹åºçš„æ—¶å€™ï¼Œå¯èƒ½éœ€è¦ç”¨åˆ°ä¸€äº›å…¨å±€å˜é‡ã€‚
  */
 #define Initial_Speed 600
 #define Turn_Speed 0
@@ -69,9 +101,10 @@ int32_t X_Speed = 0;
 int32_t angle_speed = 0;
 float VOFA_Data[4];
 extern struct Buff VL53_USARTX_Buff;
-extern struct PID Coord, Turn_Angle_PID, X_Speed_PID, Y_Speed_PID;
-u8 already_turned = 0, Y_have_achieved = 0, X_have_achieved = 0;   //ÊÇ·ñ´ïµ½¶¨Ê±Æ÷Ä¿µÄµÄĞÅºÅÁ¿
+struct PID Coord, Turn_Angle_PID, X_Speed_PID, Y_Speed_PID, X_Base_On_Laser_PID, Y_Base_On_Laser_PID;
+u8 already_turned = 0, Y_have_achieved = 0, X_have_achieved = 0;   //æ˜¯å¦è¾¾åˆ°å®šæ—¶å™¨ç›®çš„çš„ä¿¡å·é‡
 int32_t CCR_wheel[4]={0,0,0,0};
+int32_t position_of_car[3]={0,0,0};
 
 struct distance
 {
@@ -83,181 +116,204 @@ struct distance
 
 /*
 *************************************************************************
-*                             º¯ÊıÉùÃ÷
+*                             å‡½æ•°å£°æ˜
 *************************************************************************
 */
 static void
 analyse_data(void);
 void Angle_Speed_X_PID_fun(u8 EN, int Coordinate_PID);
 static void line_walking(void);
-static void AppTaskCreate(void);           	/* ÓÃÓÚ´´½¨ÈÎÎñ */
-static void Task__TWO(void *pvParameters); 	/* Test_TaskÈÎÎñÊµÏÖ */
-static void OLED_SHOW(void *pvParameters); 	/* Test_TaskÈÎÎñÊµÏÖ */
-static void Task__ONE(void *pvParameters); 	/* Test_TaskÈÎÎñÊµÏÖ */
-static void BSP_Init(void);                	/* ÓÃÓÚ³õÊ¼»¯°åÔØÏà¹Ø×ÊÔ´ */
-static void sendto_Upper(void);            	/* ÓÃÓÚ³õÊ¼»¯°åÔØÏà¹Ø×ÊÔ´ */
+static void AppTaskCreate(void);           	/* ç”¨äºåˆ›å»ºä»»åŠ¡ */
+static void Task__TWO(void *pvParameters); 	/* Test_Taskä»»åŠ¡å®ç° */
+static void OLED_SHOW(void *pvParameters); 	/* Test_Taskä»»åŠ¡å®ç° */
+static void Task__ONE(void *pvParameters); 	/* Test_Taskä»»åŠ¡å®ç° */
+static void BSP_Init(void);                	/* ç”¨äºåˆå§‹åŒ–æ¿è½½ç›¸å…³èµ„æº */
+static void sendto_Upper(void);            	/* ç”¨äºåˆå§‹åŒ–æ¿è½½ç›¸å…³èµ„æº */
 static void Task__THREE(void);             	//
 static void Task__FOUR(void);              	//
 static void Turn_Angle(void);              	//
 static void Achieve_Distance_Front_Head_Laser(void);
 static void Achieve_Distance_For_Right_Laser(void);
 static void Car_Running(void);
+static void Go_Forward_Base_On_Encoder(void);
+static void Pan_Left_Base_On_Encoder(void);
 void Allocation_PID(int PIDOUT);
 /*****************************************************************
-  * @brief  Ö÷º¯Êı
-  * @param  ÎŞ
-  * @retval ÎŞ
-  * @note   µÚÒ»²½£º¿ª·¢°åÓ²¼ş³õÊ¼»¯
-            µÚ¶ş²½£º´´½¨APPÓ¦ÓÃÈÎÎñ
-            µÚÈı²½£ºÆô¶¯FreeRTOS£¬¿ªÊ¼¶àÈÎÎñµ÷¶È
+  * @brief  ä¸»å‡½æ•°
+  * @param  æ— 
+  * @retval æ— 
+  * @note   ç¬¬ä¸€æ­¥ï¼šå¼€å‘æ¿ç¡¬ä»¶åˆå§‹åŒ–
+            ç¬¬äºŒæ­¥ï¼šåˆ›å»ºAPPåº”ç”¨ä»»åŠ¡
+            ç¬¬ä¸‰æ­¥ï¼šå¯åŠ¨FreeRTOSï¼Œå¼€å§‹å¤šä»»åŠ¡è°ƒåº¦
   ****************************************************************/
 int main(void)
 {
-    BaseType_t xReturn = pdPASS; /* ¶¨ÒåÒ»¸ö´´½¨ĞÅÏ¢·µ»ØÖµ£¬Ä¬ÈÏÎªpdPASS */
+    BaseType_t xReturn = pdPASS; /* å®šä¹‰ä¸€ä¸ªåˆ›å»ºä¿¡æ¯è¿”å›å€¼ï¼Œé»˜è®¤ä¸ºpdPASS */
 
-    /* ¿ª·¢°åÓ²¼ş³õÊ¼»¯ */
+    /* å¼€å‘æ¿ç¡¬ä»¶åˆå§‹åŒ– */
     BSP_Init();
-    /* ´´½¨AppTaskCreateÈÎÎñ */
-    xReturn = xTaskCreate((TaskFunction_t)AppTaskCreate,          /* ÈÎÎñÈë¿Úº¯Êı */
-                          (const char *)"AppTaskCreate",          /* ÈÎÎñÃû×Ö */
-                          (uint16_t)256,                          /* ÈÎÎñÕ»´óĞ¡ */
-                          (void *)NULL,                           /* ÈÎÎñÈë¿Úº¯Êı²ÎÊı */
-                          (UBaseType_t)1,                         /* ÈÎÎñµÄÓÅÏÈ¼¶ */
-                          (TaskHandle_t *)&AppTaskCreate_Handle); /* ÈÎÎñ¿ØÖÆ¿éÖ¸Õë */
-    /* Æô¶¯ÈÎÎñµ÷¶È */
+    /* åˆ›å»ºAppTaskCreateä»»åŠ¡ */
+    xReturn = xTaskCreate((TaskFunction_t)AppTaskCreate,          /* ä»»åŠ¡å…¥å£å‡½æ•° */
+                          (const char *)"AppTaskCreate",          /* ä»»åŠ¡åå­— */
+                          (uint16_t)256,                          /* ä»»åŠ¡æ ˆå¤§å° */
+                          (void *)NULL,                           /* ä»»åŠ¡å…¥å£å‡½æ•°å‚æ•° */
+                          (UBaseType_t)1,                         /* ä»»åŠ¡çš„ä¼˜å…ˆçº§ */
+                          (TaskHandle_t *)&AppTaskCreate_Handle); /* ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ */
+    /* å¯åŠ¨ä»»åŠ¡è°ƒåº¦ */
     if (pdPASS == xReturn)
-        vTaskStartScheduler(); /* Æô¶¯ÈÎÎñ£¬¿ªÆôµ÷¶È */
+        vTaskStartScheduler(); /* å¯åŠ¨ä»»åŠ¡ï¼Œå¼€å¯è°ƒåº¦ */
     else
         return -1;
 
     while (1)
-        ; /* Õı³£²»»áÖ´ĞĞµ½ÕâÀï */
+        ; /* æ­£å¸¸ä¸ä¼šæ‰§è¡Œåˆ°è¿™é‡Œ */
 }
 
 /***********************************************************************
- * @ º¯ÊıÃû  £º AppTaskCreate
- * @ ¹¦ÄÜËµÃ÷£º ÎªÁË·½±ã¹ÜÀí£¬ËùÓĞµÄÈÎÎñ´´½¨º¯Êı¶¼·ÅÔÚÕâ¸öº¯ÊıÀïÃæ
- * @ ²ÎÊı    £º ÎŞ
- * @ ·µ»ØÖµ  £º ÎŞ
+ * @ å‡½æ•°å  ï¼š AppTaskCreate
+ * @ åŠŸèƒ½è¯´æ˜ï¼š ä¸ºäº†æ–¹ä¾¿ç®¡ç†ï¼Œæ‰€æœ‰çš„ä»»åŠ¡åˆ›å»ºå‡½æ•°éƒ½æ”¾åœ¨è¿™ä¸ªå‡½æ•°é‡Œé¢
+ * @ å‚æ•°    ï¼š æ— 
+ * @ è¿”å›å€¼  ï¼š æ— 
  **********************************************************************/
 static void AppTaskCreate(void)
 {
-    BaseType_t xReturn = pdPASS; /* ¶¨ÒåÒ»¸ö´´½¨ĞÅÏ¢·µ»ØÖµ£¬Ä¬ÈÏÎªpdPASS */
+    BaseType_t xReturn = pdPASS; /* å®šä¹‰ä¸€ä¸ªåˆ›å»ºä¿¡æ¯è¿”å›å€¼ï¼Œé»˜è®¤ä¸ºpdPASS */
 
-    taskENTER_CRITICAL(); // ½øÈëÁÙ½çÇø
+    taskENTER_CRITICAL(); // è¿›å…¥ä¸´ç•ŒåŒº
 
-    /* ´´½¨Test_TaskÈÎÎñ */
-    xReturn = xTaskCreate((TaskFunction_t)Task__TWO,          /* ÈÎÎñÈë¿Úº¯Êı */
-                          (const char *)"Task__TWO",          /* ÈÎÎñÃû×Ö */
-                          (uint16_t)256,                      /* ÈÎÎñÕ»´óĞ¡ */
-                          (void *)NULL,                       /* ÈÎÎñÈë¿Úº¯Êı²ÎÊı */
-                          (UBaseType_t)10,                    /* ÈÎÎñµÄÓÅÏÈ¼¶ */
-                          (TaskHandle_t *)&Task__TWO_Handle); /* ÈÎÎñ¿ØÖÆ¿éÖ¸Õë */
+    /* åˆ›å»ºTest_Taskä»»åŠ¡ */
+    xReturn = xTaskCreate((TaskFunction_t)Task__TWO,          /* ä»»åŠ¡å…¥å£å‡½æ•° */
+                          (const char *)"Task__TWO",          /* ä»»åŠ¡åå­— */
+                          (uint16_t)256,                      /* ä»»åŠ¡æ ˆå¤§å° */
+                          (void *)NULL,                       /* ä»»åŠ¡å…¥å£å‡½æ•°å‚æ•° */
+                          (UBaseType_t)10,                    /* ä»»åŠ¡çš„ä¼˜å…ˆçº§ */
+                          (TaskHandle_t *)&Task__TWO_Handle); /* ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ */
     if (xReturn == pdPASS)
-        printf("Task__TWOÈÎÎñ´´½¨³É¹¦\r\n");
-    xReturn = xTaskCreate((TaskFunction_t)Task__ONE,          /* ÈÎÎñÈë¿Úº¯Êı */
-                          (const char *)"Task__ONE",          /* ÈÎÎñÃû×Ö */
-                          (uint16_t)256,                      /* ÈÎÎñÕ»´óĞ¡ */
-                          (void *)NULL,                       /* ÈÎÎñÈë¿Úº¯Êı²ÎÊı */
-                          (UBaseType_t)2,                     /* ÈÎÎñµÄÓÅÏÈ¼¶ */
-                          (TaskHandle_t *)&Task__ONE_Handle); /* ÈÎÎñ¿ØÖÆ¿éÖ¸Õë */
+        printf("Task__TWOä»»åŠ¡åˆ›å»ºæˆåŠŸ\r\n");
+    xReturn = xTaskCreate((TaskFunction_t)Task__ONE,          /* ä»»åŠ¡å…¥å£å‡½æ•° */
+                          (const char *)"Task__ONE",          /* ä»»åŠ¡åå­— */
+                          (uint16_t)1024,                      /* ä»»åŠ¡æ ˆå¤§å° */
+                          (void *)NULL,                       /* ä»»åŠ¡å…¥å£å‡½æ•°å‚æ•° */
+                          (UBaseType_t)2,                     /* ä»»åŠ¡çš„ä¼˜å…ˆçº§ */
+                          (TaskHandle_t *)&Task__ONE_Handle); /* ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ */
     if (xReturn == pdPASS)
-        printf("Task__ONEÈÎÎñ´´½¨³É¹¦\r\n");
-    xReturn = xTaskCreate((TaskFunction_t)OLED_SHOW,          /* ÈÎÎñÈë¿Úº¯Êı */
-                          (const char *)"OLED_SHOW",          /* ÈÎÎñÃû×Ö */
-                          (uint16_t)256,                      /* ÈÎÎñÕ»´óĞ¡ */
-                          (void *)NULL,                       /* ÈÎÎñÈë¿Úº¯Êı²ÎÊı */
-                          (UBaseType_t)2,                     /* ÈÎÎñµÄÓÅÏÈ¼¶ */
-                          (TaskHandle_t *)&OLED_SHOW_Handle); /* ÈÎÎñ¿ØÖÆ¿éÖ¸Õë */
+        printf("Task__ONEä»»åŠ¡åˆ›å»ºæˆåŠŸ\r\n");
+    xReturn = xTaskCreate((TaskFunction_t)OLED_SHOW,          /* ä»»åŠ¡å…¥å£å‡½æ•° */
+                          (const char *)"OLED_SHOW",          /* ä»»åŠ¡åå­— */
+                          (uint16_t)256,                      /* ä»»åŠ¡æ ˆå¤§å° */
+                          (void *)NULL,                       /* ä»»åŠ¡å…¥å£å‡½æ•°å‚æ•° */
+                          (UBaseType_t)2,                     /* ä»»åŠ¡çš„ä¼˜å…ˆçº§ */
+                          (TaskHandle_t *)&OLED_SHOW_Handle); /* ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ */
     if (xReturn == pdPASS)
-        printf("OLED_SHOWÈÎÎñ´´½¨³É¹¦\r\n");
-    xReturn = xTaskCreate((TaskFunction_t)Task__THREE,          /* ÈÎÎñÈë¿Úº¯Êı */
-                          (const char *)"Task__THREE",          /* ÈÎÎñÃû×Ö */
-                          (uint16_t)256,                        /* ÈÎÎñÕ»´óĞ¡ */
-                          (void *)NULL,                         /* ÈÎÎñÈë¿Úº¯Êı²ÎÊı */
-                          (UBaseType_t)2,                       /* ÈÎÎñµÄÓÅÏÈ¼¶ */
-                          (TaskHandle_t *)&Task__THREE_Handle); /* ÈÎÎñ¿ØÖÆ¿éÖ¸Õë */
+        printf("OLED_SHOWä»»åŠ¡åˆ›å»ºæˆåŠŸ\r\n");
+    xReturn = xTaskCreate((TaskFunction_t)Task__THREE,          /* ä»»åŠ¡å…¥å£å‡½æ•° */
+                          (const char *)"Task__THREE",          /* ä»»åŠ¡åå­— */
+                          (uint16_t)256,                        /* ä»»åŠ¡æ ˆå¤§å° */
+                          (void *)NULL,                         /* ä»»åŠ¡å…¥å£å‡½æ•°å‚æ•° */
+                          (UBaseType_t)2,                       /* ä»»åŠ¡çš„ä¼˜å…ˆçº§ */
+                          (TaskHandle_t *)&Task__THREE_Handle); /* ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ */
     if (xReturn == pdPASS)
-        printf("Task__THREEÈÎÎñ´´½¨³É¹¦\r\n");
-    xReturn = xTaskCreate((TaskFunction_t)Task__FOUR,          /* ÈÎÎñÈë¿Úº¯Êı */
-                          (const char *)"Task__FOUR",          /* ÈÎÎñÃû×Ö */
-                          (uint16_t)256,                       /* ÈÎÎñÕ»´óĞ¡ */
-                          (void *)NULL,                        /* ÈÎÎñÈë¿Úº¯Êı²ÎÊı */
-                          (UBaseType_t)2,                      /* ÈÎÎñµÄÓÅÏÈ¼¶ */
-                          (TaskHandle_t *)&Task__FOUR_Handle); /* ÈÎÎñ¿ØÖÆ¿éÖ¸Õë */
+        printf("Task__THREEä»»åŠ¡åˆ›å»ºæˆåŠŸ\r\n");
+    xReturn = xTaskCreate((TaskFunction_t)Task__FOUR,          /* ä»»åŠ¡å…¥å£å‡½æ•° */
+                          (const char *)"Task__FOUR",          /* ä»»åŠ¡åå­— */
+                          (uint16_t)256,                       /* ä»»åŠ¡æ ˆå¤§å° */
+                          (void *)NULL,                        /* ä»»åŠ¡å…¥å£å‡½æ•°å‚æ•° */
+                          (UBaseType_t)2,                      /* ä»»åŠ¡çš„ä¼˜å…ˆçº§ */
+                          (TaskHandle_t *)&Task__FOUR_Handle); /* ä»»åŠ¡æ§åˆ¶å—æŒ‡é’ˆ */
     if (xReturn == pdPASS)
-        printf("Task__FOURÈÎÎñ´´½¨³É¹¦\r\n");
+        printf("Task__FOURä»»åŠ¡åˆ›å»ºæˆåŠŸ\r\n");
     line_walking_Handle = xTimerCreate((const char *)"line_walking",
-                                       (TickType_t)30,                         /* ¶¨Ê±Æ÷ÖÜÆÚ 1000(tick) */
-                                       (UBaseType_t)pdTRUE,                    /* ÖÜÆÚÄ£Ê½ */
-                                       (void *)1,                              /* ÎªÃ¿¸ö¼ÆÊ±Æ÷·ÖÅäÒ»¸öË÷ÒıµÄÎ¨Ò»ID */
-                                       (TimerCallbackFunction_t)line_walking); //! »Øµ÷º¯ÊıÃû
+                                       (TickType_t)30,                         /* å®šæ—¶å™¨å‘¨æœŸ 1000(tick) */
+                                       (UBaseType_t)pdTRUE,                    /* å‘¨æœŸæ¨¡å¼ */
+                                       (void *)1,                              /* ä¸ºæ¯ä¸ªè®¡æ—¶å™¨åˆ†é…ä¸€ä¸ªç´¢å¼•çš„å”¯ä¸€ID */
+                                       (TimerCallbackFunction_t)line_walking); //! å›è°ƒå‡½æ•°å
     analyse_data_Handle = xTimerCreate((const char *)"analyse_data",
-                                       (TickType_t)10,                         /* ¶¨Ê±Æ÷ÖÜÆÚ 1000(tick) */
-                                       (UBaseType_t)pdTRUE,                    /* ÖÜÆÚÄ£Ê½ */
-                                       (void *)4,                              /* ÎªÃ¿¸ö¼ÆÊ±Æ÷·ÖÅäÒ»¸öË÷ÒıµÄÎ¨Ò»ID */
-                                       (TimerCallbackFunction_t)analyse_data); //! »Øµ÷º¯ÊıÃû
+                                       (TickType_t)20,                         /* å®šæ—¶å™¨å‘¨æœŸ 1000(tick) */
+                                       (UBaseType_t)pdTRUE,                    /* å‘¨æœŸæ¨¡å¼ */
+                                       (void *)4,                              /* ä¸ºæ¯ä¸ªè®¡æ—¶å™¨åˆ†é…ä¸€ä¸ªç´¢å¼•çš„å”¯ä¸€ID */
+                                       (TimerCallbackFunction_t)analyse_data); //! å›è°ƒå‡½æ•°å
 
     sendto_Upper_Handle = xTimerCreate((const char *)"sendto_Upper",
-                                       (TickType_t)40,                         /* ¶¨Ê±Æ÷ÖÜÆÚ 1000(tick) */
-                                       (UBaseType_t)pdTRUE,                    /* ÖÜÆÚÄ£Ê½ */
-                                       (void *)4,                              /* ÎªÃ¿¸ö¼ÆÊ±Æ÷·ÖÅäÒ»¸öË÷ÒıµÄÎ¨Ò»ID */
-                                       (TimerCallbackFunction_t)sendto_Upper); //! »Øµ÷º¯ÊıÃû
+                                       (TickType_t)40,                         /* å®šæ—¶å™¨å‘¨æœŸ 1000(tick) */
+                                       (UBaseType_t)pdTRUE,                    /* å‘¨æœŸæ¨¡å¼ */
+                                       (void *)4,                              /* ä¸ºæ¯ä¸ªè®¡æ—¶å™¨åˆ†é…ä¸€ä¸ªç´¢å¼•çš„å”¯ä¸€ID */
+                                       (TimerCallbackFunction_t)sendto_Upper); //! å›è°ƒå‡½æ•°å
     Turn_Angle_Handle = xTimerCreate((const char *)"Turn_Angle",
-                                     (TickType_t)40,                       /* ¶¨Ê±Æ÷ÖÜÆÚ 1000(tick) */
-                                     (UBaseType_t)pdTRUE,                  /* ÖÜÆÚÄ£Ê½ */
-                                     (void *)4,                            /* ÎªÃ¿¸ö¼ÆÊ±Æ÷·ÖÅäÒ»¸öË÷ÒıµÄÎ¨Ò»ID */
-                                     (TimerCallbackFunction_t)Turn_Angle); //! »Øµ÷º¯ÊıÃû
+                                     (TickType_t)40,                       /* å®šæ—¶å™¨å‘¨æœŸ 1000(tick) */
+                                     (UBaseType_t)pdTRUE,                  /* å‘¨æœŸæ¨¡å¼ */
+                                     (void *)4,                            /* ä¸ºæ¯ä¸ªè®¡æ—¶å™¨åˆ†é…ä¸€ä¸ªç´¢å¼•çš„å”¯ä¸€ID */
+                                     (TimerCallbackFunction_t)Turn_Angle); //! å›è°ƒå‡½æ•°å
 	Achieve_Distance_For_Front_Laser_Handle = xTimerCreate((const char *)"Achieve_Distance_Front_Head_Laser",
-                                    (TickType_t)20,                      /* ¶¨Ê±Æ÷ÖÜÆÚ 1000(tick) */
-                                    (UBaseType_t)pdTRUE,                 /* ÖÜÆÚÄ£Ê½ */
-                                    (void *)4,                           /* ÎªÃ¿¸ö¼ÆÊ±Æ÷·ÖÅäÒ»¸öË÷ÒıµÄÎ¨Ò»ID */
-                                    (TimerCallbackFunction_t)Achieve_Distance_Front_Head_Laser); //! »Øµ÷º¯ÊıÃû
+                                    (TickType_t)20,                      /* å®šæ—¶å™¨å‘¨æœŸ 1000(tick) */
+                                    (UBaseType_t)pdTRUE,                 /* å‘¨æœŸæ¨¡å¼ */
+                                    (void *)4,                           /* ä¸ºæ¯ä¸ªè®¡æ—¶å™¨åˆ†é…ä¸€ä¸ªç´¢å¼•çš„å”¯ä¸€ID */
+                                    (TimerCallbackFunction_t)Achieve_Distance_Front_Head_Laser); //! å›è°ƒå‡½æ•°å
     Achieve_Distance_For_Right_Laser_Handle = xTimerCreate((const char *)"Achieve_Distance_For_Right_Laser",
-                                    (TickType_t)20,                      /* ¶¨Ê±Æ÷ÖÜÆÚ 1000(tick) */
-                                    (UBaseType_t)pdTRUE,                 /* ÖÜÆÚÄ£Ê½ */
-                                    (void *)4,                           /* ÎªÃ¿¸ö¼ÆÊ±Æ÷·ÖÅäÒ»¸öË÷ÒıµÄÎ¨Ò»ID */
-                                    (TimerCallbackFunction_t)Achieve_Distance_For_Right_Laser); //! »Øµ÷º¯ÊıÃû
+                                    (TickType_t)20,                      /* å®šæ—¶å™¨å‘¨æœŸ 1000(tick) */
+                                    (UBaseType_t)pdTRUE,                 /* å‘¨æœŸæ¨¡å¼ */
+                                    (void *)4,                           /* ä¸ºæ¯ä¸ªè®¡æ—¶å™¨åˆ†é…ä¸€ä¸ªç´¢å¼•çš„å”¯ä¸€ID */
+                                    (TimerCallbackFunction_t)Achieve_Distance_For_Right_Laser); //! å›è°ƒå‡½æ•°å
     Car_Running_Handle = xTimerCreate((const char *)"Car_Running",
-                                    (TickType_t)20,                      /* ¶¨Ê±Æ÷ÖÜÆÚ 1000(tick) */
-                                    (UBaseType_t)pdTRUE,                 /* ÖÜÆÚÄ£Ê½ */
-                                    (void *)4,                           /* ÎªÃ¿¸ö¼ÆÊ±Æ÷·ÖÅäÒ»¸öË÷ÒıµÄÎ¨Ò»ID */
-                                    (TimerCallbackFunction_t)Car_Running); //! »Øµ÷º¯ÊıÃû
+                                    (TickType_t)20,                      /* å®šæ—¶å™¨å‘¨æœŸ 1000(tick) */
+                                    (UBaseType_t)pdTRUE,                 /* å‘¨æœŸæ¨¡å¼ */
+                                    (void *)4,                           /* ä¸ºæ¯ä¸ªè®¡æ—¶å™¨åˆ†é…ä¸€ä¸ªç´¢å¼•çš„å”¯ä¸€ID */
+                                    (TimerCallbackFunction_t)Car_Running); //! å›è°ƒå‡½æ•°å
+    Go_Forward_Base_On_Encoder_Handle = xTimerCreate((const char *)"Go_Forward_Base_On_Encoder",
+                                    (TickType_t)20,                      /* å®šæ—¶å™¨å‘¨æœŸ 1000(tick) */
+                                    (UBaseType_t)pdTRUE,                 /* å‘¨æœŸæ¨¡å¼ */
+                                    (void *)4,                           /* ä¸ºæ¯ä¸ªè®¡æ—¶å™¨åˆ†é…ä¸€ä¸ªç´¢å¼•çš„å”¯ä¸€ID */
+                                    (TimerCallbackFunction_t)Go_Forward_Base_On_Encoder); //! å›è°ƒå‡½æ•°å
+    Pan_Left_Base_On_Encoder_Handle = xTimerCreate((const char *)"Pan_Left_Base_On_Encoder",
+                                    (TickType_t)20,                      /* å®šæ—¶å™¨å‘¨æœŸ 1000(tick) */
+                                    (UBaseType_t)pdTRUE,                 /* å‘¨æœŸæ¨¡å¼ */
+                                    (void *)4,                           /* ä¸ºæ¯ä¸ªè®¡æ—¶å™¨åˆ†é…ä¸€ä¸ªç´¢å¼•çš„å”¯ä¸€ID */
+                                    (TimerCallbackFunction_t)Pan_Left_Base_On_Encoder); //! å›è°ƒå‡½æ•°å
 
-    xTimerStop(line_walking_Handle, 0);
-    xTimerStop(sendto_Upper_Handle, 0);
-    xTimerStart(analyse_data_Handle, 0);
-    xTimerStop(Turn_Angle_Handle, 0);
-	xTimerStop(Achieve_Distance_For_Front_Laser_Handle, 0);
-    xTimerStop(Achieve_Distance_For_Right_Laser_Handle, 0);
-    xTimerStop(Car_Running_Handle, 0);
+    xTimerStop(line_walking_Handle, 1);
+    xTimerStop(sendto_Upper_Handle, 1);
+    xTimerStart(analyse_data_Handle, 1);
+    xTimerStop(Turn_Angle_Handle, 1);
+	xTimerStop(Achieve_Distance_For_Front_Laser_Handle, 1);
+    xTimerStop(Achieve_Distance_For_Right_Laser_Handle, 1);
+    xTimerStop(Car_Running_Handle, 1);
+    xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);
+    xTimerStop(Pan_Left_Base_On_Encoder_Handle, 1);
 
 
-    //xTimerStart(sendto_Upper_Handle, 0); //! ·¢ËÍÊı¾İµ½ÉÏÎ»»ú¶¨Ê±Æ÷
+    //xTimerStart(sendto_Upper_Handle, 0); //! å‘é€æ•°æ®åˆ°ä¸Šä½æœºå®šæ—¶å™¨
 
-    Task_Number_Handle = xQueueCreate(1, 1); // ¿ªÊ¼½âÎöÊı¾İ
+    Task_Number_Handle = xQueueCreate(1, 1); // å¼€å§‹è§£ææ•°æ®
     Group_One_Handle = xEventGroupCreate();
-
-    // ¹Ò»úÈÎÎñ£¬µÈ´ıÑ¡ÔñÈÎÎñ
+    Group_One_Handle = Group_One_Handle;
+    
+    // æŒ‚æœºä»»åŠ¡ï¼Œç­‰å¾…é€‰æ‹©ä»»åŠ¡
     //  vTaskSuspend(Task__ONE_Handle);
     vTaskSuspend(Task__TWO_Handle);
-    vTaskDelete(AppTaskCreate_Handle); // É¾³ıAppTaskCreateÈÎÎñ
+    vTaskDelete(AppTaskCreate_Handle); // åˆ é™¤AppTaskCreateä»»åŠ¡
 
-    taskEXIT_CRITICAL(); // ÍË³öÁÙ½çÇø
+    taskEXIT_CRITICAL(); // é€€å‡ºä¸´ç•ŒåŒº
 }
 
 /**********************************************************************
- * @ º¯ÊıÃû  £º Timer_Task
- * @ ¹¦ÄÜËµÃ÷£º Timer_TaskÈÎÎñÖ÷Ìå
- * @ ²ÎÊı    £º
- * @ ·µ»ØÖµ  £º ÎŞ
+ * @ å‡½æ•°å  ï¼š Timer_Task
+ * @ åŠŸèƒ½è¯´æ˜ï¼š Timer_Taskä»»åŠ¡ä¸»ä½“
+ * @ å‚æ•°    ï¼š
+ * @ è¿”å›å€¼  ï¼š æ— 
  ********************************************************************/
 
-static void Achieve_Distance_For_Right_Laser(void)
+/**
+ * @description: this function is the software callback function that achieve pan left base on encoder num
+ * @return {*}
+ */
+static void Pan_Left_Base_On_Encoder(void)
 {
     static int i = 0;
-    X_Speed = -(int32_t)PID_Realize(&X_Speed_PID, Distance.R_OUT);
-    if (fabs(Distance.R_OUT - X_Speed_PID.Target)<7)
+    int32_t distance = position_of_car[0];
+    int32_t speed = -(int32_t)PID_Realize(&X_Speed_PID, distance);
+	speed = speed > 400 ? 400 : speed;
+	speed = speed < -400 ? -400 : speed;
+    X_Speed = speed;
+    if (fabs(distance - X_Speed_PID.Target)<7)
     {
         i++;
         if(i > 4)
@@ -269,14 +325,19 @@ static void Achieve_Distance_For_Right_Laser(void)
     }
 }
 
-
-static void Achieve_Distance_Front_Head_Laser()
+/**
+ * @description: this function is the software callback function that achieve go forward base on encoder num
+ * @return {*}
+ */
+static void Go_Forward_Base_On_Encoder(void)
 {
     static int i = 0;
-    Y_Speed = -(int32_t)PID_Realize(&Y_Speed_PID, Distance.F_OUT);
-	Y_Speed = Y_Speed > 800 ? 800 : Y_Speed;
-	Y_Speed = Y_Speed < -800 ? -800 : Y_Speed;
-    if (fabs(Distance.F_OUT - Y_Speed_PID.Target)<10)
+    int32_t distance = position_of_car[1];
+    int32_t speed = (int32_t)PID_Realize(&Y_Speed_PID, distance);
+	speed = speed > 1000 ? 1000 : speed;
+	speed = speed < -1000 ? -1000 : speed;
+    Y_Speed = speed;
+    if (fabs(distance - Y_Speed_PID.Target)<10)
     {
         i++;
         if(i > 4)
@@ -288,7 +349,47 @@ static void Achieve_Distance_Front_Head_Laser()
     }
 }
 
-static void Car_Running()
+static void Achieve_Distance_For_Right_Laser(void)
+{
+    static int i = 0;
+    float distance = VOFA_Data[2];
+    int32_t speed = -(int32_t)PID_Realize(&X_Base_On_Laser_PID, distance);
+    speed = speed > 300 ? 300 : speed;
+	speed = speed < -300 ? -300 : speed;
+    X_Speed = speed;
+    if (fabs(distance - X_Base_On_Laser_PID.Target)<5)
+    {
+        i++;
+        if(i > 4)
+        {
+            i = 0;
+            xTimerStop(Achieve_Distance_For_Right_Laser_Handle, 0);
+            X_have_achieved = 1;
+        }
+    }
+}
+
+static void Achieve_Distance_Front_Head_Laser(void)
+{
+    static int i = 0;
+    float distance = VOFA_Data[3];
+    int32_t speed = -(int32_t)PID_Realize(&Y_Base_On_Laser_PID, distance);
+	speed = speed > 300 ? 300 : speed;
+	speed = speed < -300 ? -300 : speed;
+    Y_Speed = speed;
+    if (fabs(distance - Y_Base_On_Laser_PID.Target)<20)
+    {
+        i++;
+        if(i > 4)
+        {
+            i = 0;
+            xTimerStop(Achieve_Distance_For_Front_Laser_Handle, 0);
+            Y_have_achieved = 1;
+        }
+    }
+}
+
+static void Car_Running(void)
 {
     
     CCR_wheel[0] = Y_Speed;
@@ -312,57 +413,58 @@ static void Car_Running()
 	
 	angle_speed = 0;
     
-    if (CCR_wheel[0] > 0)
-    {
-        Advance(2);
-    }
-    else
-    {
-        Back(2);
-        CCR_wheel[0]=-CCR_wheel[0];
-    }
+    // if (CCR_wheel[0] > 0)
+    // {
+    //     Advance(2);
+    // }
+    // else
+    // {
+    //     Back(2);
+    //     CCR_wheel[0]=-CCR_wheel[0];
+    // }
 
-    if (CCR_wheel[1] > 0)
-    {
-        Advance(3);
-    }
-    else
-    {
-        Back(3);
-        CCR_wheel[1]=-CCR_wheel[1];
-    }
+    // if (CCR_wheel[1] > 0)
+    // {
+    //     Advance(3);
+    // }
+    // else
+    // {
+    //     Back(3);
+    //     CCR_wheel[1]=-CCR_wheel[1];
+    // }
 
-    if (CCR_wheel[2] > 0)
-    {
-        Advance(4);
-    }
-    else
-    {
-        Back(4);
-        CCR_wheel[2]=-CCR_wheel[2];
-    }
+    // if (CCR_wheel[2] > 0)
+    // {
+    //     Advance(4);
+    // }
+    // else
+    // {
+    //     Back(4);
+    //     CCR_wheel[2]=-CCR_wheel[2];
+    // }
 
-    if (CCR_wheel[3] > 0)
-    {
-        Advance(5);
-    }
-    else
-    {
-        Back(5);
-        CCR_wheel[3]=-CCR_wheel[3];
-    }
+    // if (CCR_wheel[3] > 0)
+    // {
+    //     Advance(5);
+    // }
+    // else
+    // {
+    //     Back(5);
+    //     CCR_wheel[3]=-CCR_wheel[3];
+    // }
     
-//    for (size_t i = 0; i < 4; i++)
-//    {
-//        if (CCR_wheel[i]>0)
-//        {
-//            Advance(i+2);
-//        }
-//        else
-//        {
-//            Back(i+2);
-//        }
-//    }
+   for (size_t i = 0; i < 4; i++)
+   {
+       if (CCR_wheel[i]>0)
+       {
+           Advance(i+2);
+       }
+       else
+       {
+           Back(i+2);
+           CCR_wheel[i] = -CCR_wheel[i];
+       }
+   }
     
     SetCompare1(TIM1, CCR_wheel[0], 1);
     SetCompare1(TIM1, CCR_wheel[1], 2);
@@ -371,8 +473,7 @@ static void Car_Running()
 
 }
 
-
-static void Turn_Angle()
+static void Turn_Angle(void)
 {
     float Angle, PIDOUT;
     Angle = (float)stcAngle.Angle[2] / 32768 * 180;
@@ -380,17 +481,18 @@ static void Turn_Angle()
     Allocation_PID((int)PIDOUT);
 }
 
-static void sendto_Upper()
+static void sendto_Upper(void)
 {
 
-    VOFA_Send_float(VOFA_Data, 3); //! ·¢ËÍÊı¾İ¸øVOFA
+    VOFA_Send_float(VOFA_Data, 3); //! å‘é€æ•°æ®ç»™VOFA
     VOFA_Data[0] = (float)stcAngle.Angle[2] / 32768 * 180;
 }
-static void line_walking()
+
+static void line_walking(void)
 {
     // float a, Angle;
     float Angle;
-    //?PID¿ªÊ¼Ñ²Ïß
+    //?PIDå¼€å§‹å·¡çº¿
     Angle = (float)stcAngle.Angle[2] / 32768 * 180;
     angle_speed = PID_Realize(&Coord, Angle);
     
@@ -398,32 +500,58 @@ static void line_walking()
     // Angle_Speed_X_PID_fun(0, (int)a);
 }
 
-void analyse_data()
+static void analyse_data(void)
 {
     u8 i = 0;
     const u8 VL53_Agreement_RX[] = {0x50, 0x03, 0x02};
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 5; i++)
     {
         VL53_Send_Agrement();
         Read_buff_Void(&VL53_USARTX_Buff, VL53_Agreement_RX, 3, &Distance.R[i], 1, 16, 1);
         Read_buff_Void(&U3_buffer, VL53_Agreement_RX, 3, &Distance.F[i], 1, 16, 1);
     }
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 5; i++)
     {
         Distance.R_OUT += Distance.R[i];
         Distance.F_OUT += Distance.F[i];
     }
     Distance.R_OUT /= 5;
     Distance.F_OUT /= 5;
-    VOFA_Data[2] = (float)Distance.R_OUT;
-    VOFA_Data[3] = (float)Distance.F_OUT;
+
+    static int32_t How_many_revolutions_of_the_motor[4] = {0,0,0,0};
+    How_many_revolutions_of_the_motor[0] = Read_Encoder(2);
+    How_many_revolutions_of_the_motor[1] = Read_Encoder(3);
+    How_many_revolutions_of_the_motor[2] = Read_Encoder(4);
+    How_many_revolutions_of_the_motor[3] = Read_Encoder(5);
+
+    int32_t The_distance_that_has_gone_forward = (How_many_revolutions_of_the_motor[0]
+                            +How_many_revolutions_of_the_motor[1]
+                            +How_many_revolutions_of_the_motor[2]
+                            +How_many_revolutions_of_the_motor[3])/4;
+    int32_t The_distance_that_has_gone_right_head_side = (-How_many_revolutions_of_the_motor[0]
+                            +How_many_revolutions_of_the_motor[1]
+                            +How_many_revolutions_of_the_motor[2]
+                            -How_many_revolutions_of_the_motor[3])/4;
+
+    taskENTER_CRITICAL();           //è¿›å…¥åŸºæœ¬ä¸´ç•ŒåŒº
+    VOFA_Data[2] = (float)Distance.R_OUT;           //å³è¾¹æ¿€å…‰æµ‹è·å¾—åˆ°çš„è·ç¦»
+    VOFA_Data[3] = (float)Distance.F_OUT;           //å‰é¢æ¿€å…‰æµ‹è·å¾—åˆ°çš„è·ç¦»
+    position_of_car[0] += The_distance_that_has_gone_forward;            //the distance that car have gone forward
+    position_of_car[1] += The_distance_that_has_gone_right_head_side;    //the distance that car have gone right hand side
     Read_RGB();
-    
+    taskEXIT_CRITICAL();            //é€€å‡ºåŸºæœ¬ä¸´ç•ŒåŒº
 }
 
 
 /**
- * @description: 
+ * the software timer callback function is end in here
+*/
+
+/**
+ * the following code is about open the software timer
+*/
+/**
+ * @description:    Follow the laser and go straight
  * @param {float} target        what is the distance of laser you want?
  * @param {int} which_laser     which is the laser that you want to refer to? When the value is equal to 1, it indicates the laser on the front of the reference
  * @return {*}
@@ -434,16 +562,16 @@ void startStraight_Line_For_Laser(float target, int which_laser)
 
     if (which_laser == 0)
     {
-        X_Speed_PID.Target = target;
-        X_Speed_PID.Cumulation_Error = 0;
+        X_Base_On_Laser_PID.Target = target;
+        X_Base_On_Laser_PID.Cumulation_Error = 0;
         X_have_achieved = 0;
         xTimerStart(Achieve_Distance_For_Right_Laser_Handle, 1);
         xTimerStart(Car_Running_Handle, 0);
     }
-    else if (which_laser == 1)  //¸ù¾İÇ°ÃæµÄ¼¤¹â¾àÀëÀ´µ÷Õû¾àÀë
+    else if (which_laser == 1)  //æ ¹æ®å‰é¢çš„æ¿€å…‰è·ç¦»æ¥è°ƒæ•´è·ç¦»
     {
-        Y_Speed_PID.Target = target;
-        Y_Speed_PID.Cumulation_Error = 0;
+        Y_Base_On_Laser_PID.Target = target;
+        Y_Base_On_Laser_PID.Cumulation_Error = 0;
         Y_have_achieved = 0;
         xTimerStart(Achieve_Distance_For_Front_Laser_Handle, 1);
         xTimerStart(Car_Running_Handle, 0);
@@ -453,12 +581,44 @@ void startStraight_Line_For_Laser(float target, int which_laser)
 
 }
 
+void startStraight_Line_Base_On_Encoder(float target, int forwardOrPan)
+{
+    if (forwardOrPan == 0)
+    {
+        X_Speed_PID.Target = target;
+        X_Speed_PID.Cumulation_Error = 0;
+        X_have_achieved = 0;
+        position_of_car[0] = 0;
+        xTimerStart(Pan_Left_Base_On_Encoder_Handle, 1);
+        xTimerStart(Car_Running_Handle, 0);
+    }
+    else if (forwardOrPan == 1)  //æ ¹æ®ç¼–ç å™¨å‘å‰èµ°
+    {
+        Y_Speed_PID.Target = target;
+        Y_Speed_PID.Cumulation_Error = 0;
+        Y_have_achieved = 0;
+        position_of_car[1] = 0;
+        xTimerStart(Go_Forward_Base_On_Encoder_Handle, 1);
+        xTimerStart(Car_Running_Handle, 0);
+    }
+    return;
+}
+/**
+ * @description: start to Keep the direction Angle of the car
+ * @param {float} target_angle  :the angle that you want to keep 
+ * @return {*}
+ */
 void startgostraight(float target_angle)
 {
 	Coord.Target = target_angle;
 	xTimerStart(line_walking_Handle, 1);
 }
 
+/**
+ * @description: start to turn left or turn right 
+ * @param {int} i car only turn left when the value of its only param "i" is equal to 1,turn right when it's equal to zero
+ * @return {*}
+ */
 void start_trun(int i)
 {
 	float Angle;
@@ -471,12 +631,30 @@ void start_trun(int i)
 	xTimerStart(Turn_Angle_Handle, 0);
 }
 
+/**
+ * the code that open the software timer is end in here
+*/
+
+bool check_rgb()
+{
+    if (RGB.R > 40 && RGB.R < 65)
+    {
+        if (RGB.G > 25 && RGB.G < 55)
+        {
+            if (RGB.B > 25 && RGB.B < 55)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 //void start
 /**********************************************************************
- * @ º¯ÊıÃû  £º Test_Task
- * @ ¹¦ÄÜËµÃ÷£º Test_TaskÈÎÎñÖ÷Ìå
- * @ ²ÎÊı    £º
- * @ ·µ»ØÖµ  £º ÎŞ
+ * @ å‡½æ•°å  ï¼š Test_Task
+ * @ åŠŸèƒ½è¯´æ˜ï¼š Test_Taskä»»åŠ¡ä¸»ä½“
+ * @ å‚æ•°    ï¼š
+ * @ è¿”å›å€¼  ï¼š æ— 
  ********************************************************************/
 
 
@@ -489,6 +667,11 @@ static void OLED_SHOW(void *pvParameters)
         OLED_SHOW_TASK();
     }
 }
+/**
+ * @description: this task is including the main logic of the program
+ * @param {void} *parameter :this param is necessary for freertos task
+ * @return {*}
+ */
 static void Task__ONE(void *parameter)
 {
 
@@ -498,7 +681,11 @@ static void Task__ONE(void *parameter)
     while (1)
     {
         
-
+        while (1)
+        {
+            vTaskDelay(2000);
+        }
+        
         // startStraight_Line_For_Laser(150,0);
         // startStraight_Line_For_Laser(150,1);
         // while((!X_have_achieved)&&(!Y_have_achieved))
@@ -507,53 +694,71 @@ static void Task__ONE(void *parameter)
 		// xTimerStop(line_walking_Handle, 1);
         
 
-
-        //xEventGroupWaitBits(Group_One_Handle, 0x01, pdTRUE, pdTRUE, portMAX_DELAY); //! ¿ªÊ¼±ÈÈü
-        //-¿ªÏä ¹·½Ğ
+        //xEventGroupWaitBits(Group_One_Handle, 0x01, pdTRUE, pdTRUE, portMAX_DELAY); //! å¼€å§‹æ¯”èµ›
+        //-å¼€ç®± ç‹—å«
         // float Angle;
 		// Angle = (float)stcAngle.Angle[2] / 32768 * 180;
 		// Turn_Angle_PID.Target = Angle + 90;
 		// already_turned = 0;
 		// xTimerStart(Turn_Angle_Handle, 0);
-        startStraight_Line_For_Laser(150,1);
-		startgostraight((float)stcAngle.Angle[2] / 32768 * 180);
+        startStraight_Line_Base_On_Encoder(12500,1);
+        startgostraight(0);
         while(!Y_have_achieved)
-            vTaskDelay(10);
-		xTimerStop(Car_Running_Handle, 1);
-		xTimerStop(line_walking_Handle, 1);
+            vTaskDelay(20);
+        xTimerStop(Car_Running_Handle, 1);
+        xTimerStop(line_walking_Handle, 1);
 		float currentangle = (float)stcAngle.Angle[2] / 32768 * 180;
-		start_trun(1);//×ó×ª
+		start_trun(1);//å·¦è½¬
 		while(!already_turned)
             vTaskDelay(10);
+		currentangle -= 90;
+        startStraight_Line_For_Laser(240,0);
+        while (!X_have_achieved)
+        {
+            vTaskDelay(20);
+        }
+        
+        startStraight_Line_Base_On_Encoder(5500,1);
+		startgostraight(-90);
 		
-        startStraight_Line_For_Laser(150,1);
-		startgostraight(currentangle-90);
-		
+
 		while(!Y_have_achieved)
             vTaskDelay(10);
 		
 		xTimerStop(Car_Running_Handle, 0);
 		// xTimerStop(line_walking_Handle, 1);
 		
-        startStraight_Line_For_Laser(150,0);
-        startStraight_Line_For_Laser(150,1);
+        startStraight_Line_For_Laser(240,0);
+        startStraight_Line_For_Laser(190,1);
         while((!X_have_achieved)||(!Y_have_achieved))
             vTaskDelay(10);
 		xTimerStop(Car_Running_Handle, 1);
-		xTimerStop(line_walking_Handle, 1);
-        PULL_High();
 
-        while(1)
-        vTaskDelay(10);
+        startStraight_Line_Base_On_Encoder(-22500,1);
+
+        startgostraight(-90);
+        vTaskDelay(1500);
+        while(!check_rgb())
+        vTaskDelay(20);
+
+        xTimerStop(Car_Running_Handle, 1);
+		xTimerStop(line_walking_Handle, 1);
+        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);;
+
+        PULL_High();
+        while (1)
+        {
+            vTaskDelay(1000);
+        }
         
-        //-¹ØÏä
+        //-å…³ç®±
         Forward();
         //xTimerStart(line_walking_Handle, 0);
         vTaskDelay(300);
-        //È¥Ê®×ÖÂ·¿Ú
+        //å»åå­—è·¯å£
         while (1)
 		{
-			if (Distance.F_OUT<600 & Distance.F_OUT> 100)
+			if (Distance.F_OUT < 600 & Distance.F_OUT > 100)
             {
                 PULL_High();
                 //xTimerStop(line_walking_Handle, 0);
@@ -561,17 +766,17 @@ static void Task__ONE(void *parameter)
                 break;
             }
 		}
-        //µ½´ïÊ®×ÖÂ·¿Ú
+        //åˆ°è¾¾åå­—è·¯å£
 
-        //µÈ´ıÊ¶±ğ¶şÎ¬Âë
+        //ç­‰å¾…è¯†åˆ«äºŒç»´ç 
         while(1)
         {
 
         }
-        //Ê¶±ğ¶şÎ¬Âë³É¹¦
+        //è¯†åˆ«äºŒç»´ç æˆåŠŸ
 
         /*
-        ¸ù¾İ¶şÎ¬ÂëÈ¥Ö¸¶¨µÄÊÕ»õµã
+        æ ¹æ®äºŒç»´ç å»æŒ‡å®šçš„æ”¶è´§ç‚¹
         */
        //Go to the first pickup point
         
@@ -582,11 +787,12 @@ static void Task__ONE(void *parameter)
 		xTimerStart(Turn_Angle_Handle, 0);
         
 
-        while(!already_turned)//µÈ´ı×ªÍäÍê³É
+        while(!already_turned)//ç­‰å¾…è½¬å¼¯å®Œæˆ
         {
             
         }
 		
+        
         while(1)
         {
             
@@ -604,7 +810,36 @@ static void Task__TWO(void *parameter)
 {
     while (1)
     {
+        startStraight_Line_Base_On_Encoder(12500,1);
+        startgostraight(0);
+        while(!Y_have_achieved)
+            vTaskDelay(20);
+        xTimerStop(Car_Running_Handle, 1);
+        xTimerStop(line_walking_Handle, 1);
+		float currentangle = (float)stcAngle.Angle[2] / 32768 * 180;
+		start_trun(1);//å·¦è½¬
+		while(!already_turned)
+            vTaskDelay(10);
+		currentangle -= 90;
+        startStraight_Line_For_Laser(240,0);
+        while (!X_have_achieved)
+        {
+            vTaskDelay(20);
+        }
 
+        startStraight_Line_Base_On_Encoder(-22500,1);
+
+        startgostraight(-90);
+        vTaskDelay(1500);
+        while(!check_rgb())
+        vTaskDelay(20);
+
+        xTimerStop(Car_Running_Handle, 1);
+		xTimerStop(line_walking_Handle, 1);
+        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);
+
+        
+        while(1)
         vTaskDelay(1000);
     }
 }
@@ -613,7 +848,7 @@ static void Task__THREE(void)
     while (1)
     {
 
-        vTaskDelay(1000); /* ÑÓÊ±500¸ötick */
+        vTaskDelay(1000); /* å»¶æ—¶500ä¸ªtick */
     }
 }
 static void Task__FOUR(void)
@@ -626,17 +861,17 @@ static void Task__FOUR(void)
     }
 }
 /***********************************************************************
- * @ º¯ÊıÃû  £º BSP_Init
- * @ ¹¦ÄÜËµÃ÷£º °å¼¶ÍâÉè³õÊ¼»¯£¬ËùÓĞ°å×ÓÉÏµÄ³õÊ¼»¯¾ù¿É·ÅÔÚÕâ¸öº¯ÊıÀïÃæ
- * @ ²ÎÊı    £º
- * @ ·µ»ØÖµ  £º ÎŞ
+ * @ å‡½æ•°å  ï¼š BSP_Init
+ * @ åŠŸèƒ½è¯´æ˜ï¼š æ¿çº§å¤–è®¾åˆå§‹åŒ–ï¼Œæ‰€æœ‰æ¿å­ä¸Šçš„åˆå§‹åŒ–å‡å¯æ”¾åœ¨è¿™ä¸ªå‡½æ•°é‡Œé¢
+ * @ å‚æ•°    ï¼š
+ * @ è¿”å›å€¼  ï¼š æ— 
  ***********************************************************************/
 static void BSP_Init(void)
 {
     /*
-     * STM32ÖĞ¶ÏÓÅÏÈ¼¶·Ö×éÎª4£¬¼´4bit¶¼ÓÃÀ´±íÊ¾ÇÀÕ¼ÓÅÏÈ¼¶£¬·¶Î§Îª£º0~15
-     * ÓÅÏÈ¼¶·Ö×éÖ»ĞèÒª·Ö×éÒ»´Î¼´¿É£¬ÒÔºóÈç¹ûÓĞÆäËûµÄÈÎÎñĞèÒªÓÃµ½ÖĞ¶Ï£¬
-     * ¶¼Í³Ò»ÓÃÕâ¸öÓÅÏÈ¼¶·Ö×é£¬Ç§Íò²»ÒªÔÙ·Ö×é£¬ÇĞ¼É¡£
+     * STM32ä¸­æ–­ä¼˜å…ˆçº§åˆ†ç»„ä¸º4ï¼Œå³4bitéƒ½ç”¨æ¥è¡¨ç¤ºæŠ¢å ä¼˜å…ˆçº§ï¼ŒèŒƒå›´ä¸ºï¼š0~15
+     * ä¼˜å…ˆçº§åˆ†ç»„åªéœ€è¦åˆ†ç»„ä¸€æ¬¡å³å¯ï¼Œä»¥åå¦‚æœæœ‰å…¶ä»–çš„ä»»åŠ¡éœ€è¦ç”¨åˆ°ä¸­æ–­ï¼Œ
+     * éƒ½ç»Ÿä¸€ç”¨è¿™ä¸ªä¼˜å…ˆçº§åˆ†ç»„ï¼Œåƒä¸‡ä¸è¦å†åˆ†ç»„ï¼Œåˆ‡å¿Œã€‚
      */
     RCC_ClocksTypeDef get_rcc_clock;
     RCC_GetClocksFreq(&get_rcc_clock);
@@ -645,18 +880,21 @@ static void BSP_Init(void)
     PWM_TIM1_config(2000, 3, Initial_Speed, Initial_Speed, Initial_Speed, Initial_Speed);
     TIMX_Delay_Init(RCC_APB1Periph_TIM6, 65530, 72, TIM6);
     Encoder_Init();
-    USART3_Config();      //*USART3Ç°¼¤¹â²â¾à
-    USART4_Config_JY62(); //*UART4ÍÓÂİÒÇ
-    USART1_Config();      //*µ÷ÊÔĞÅÏ¢Êä³ö
+    USART3_Config();      //*USART3å‰æ¿€å…‰æµ‹è·
+    USART4_Config_JY62(); //*UART4é™€èºä»ª
+    USART1_Config();      //*è°ƒè¯•ä¿¡æ¯è¾“å‡º
     Iinitial_BUFF(&U3_buffer);
-    VL53_Initial(); //*USART2ÓÒ¼¤¹â²â¾à
+    VL53_Initial(); //*USART2å³æ¿€å…‰æµ‹è·
     Initial_Control_PIN();
     PULL_High();
-    //pid³õÊ¼»¯
-    PID_Initialize(&Coord, 10, 0, 0, 0, 100, -100);
-    PID_Initialize(&Turn_Angle_PID, 20, 0, 0, 0, 25, -25);
-    PID_Initialize(&X_Speed_PID, 3.5, 0, .5, 0, 100, -100);
-    PID_Initialize(&Y_Speed_PID, 3, 0, .5, 0, 100, -100);
+
+    //pidåˆå§‹åŒ–
+    PID_Initialize(&Coord, 20, 0, 0, 0, 100, -100);         //å¾®è°ƒå·¡çº¿çš„pidåˆå§‹åŒ–
+    PID_Initialize(&Turn_Angle_PID, 17.5, 0, 0, 0, 25, -25);  //è½¬å¼¯çš„pidåˆå§‹åŒ–
+    PID_Initialize(&X_Speed_PID, 3.5, 0, .5, 0, 100, -100); //xæ–¹å‘çš„è¿œè·ç¦»åŸºäºç¼–ç å™¨çš„pid
+    PID_Initialize(&Y_Speed_PID, 3, 0, .5, 0, 100, -100);   //yæ–¹å‘çš„è¿œè·ç¦»åŸºäºç¼–ç å™¨çš„pid
+    PID_Initialize(&X_Base_On_Laser_PID, 1.5, 0, .5, 0, 100, -100);
+    PID_Initialize(&Y_Base_On_Laser_PID, 1.5, 0, .5, 0, 100, -100);
 
     LED_GPIO_Config();
     KEY_ONE();
@@ -809,7 +1047,7 @@ void Allocation_PID(int PIDOUT)
         }
     }
 	static int i;
-    if (PIDOUT<200 & PIDOUT> -200)
+    if (PIDOUT<35 & PIDOUT> -35)
     {
 		i++;
 		if( i > 3 )

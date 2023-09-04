@@ -3,8 +3,8 @@
  * @Date: 2023-01-07 15:08:35
  * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @LastEditTime: 2023-07-28 12:07:26
- * @FilePath: \RVMDK£¨uv5£©i:\electroni_file\STM32\¹¤³ÌÄ£°å£¨freertos£© - ¸±±¾\User\Led\bsp_led.c
- * @Description: ÕâÊÇÄ¬ÈÏÉèÖÃ,ÇëÉèÖÃ`customMade`, ´ò¿ªkoroFileHeader²é¿´ÅäÖÃ ½øĞĞÉèÖÃ: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @FilePath: \RVMDKï¼ˆuv5ï¼‰i:\electroni_file\STM32\å·¥ç¨‹æ¨¡æ¿ï¼ˆfreertosï¼‰ - å‰¯æœ¬\User\Led\bsp_led.c
+ * @Description: è¿™æ˜¯é»˜è®¤è®¾ç½®,è¯·è®¾ç½®`customMade`, æ‰“å¼€koroFileHeaderæŸ¥çœ‹é…ç½® è¿›è¡Œè®¾ç½®: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 /**
  ******************************************************************************
@@ -12,13 +12,13 @@
  * @author  fire
  * @version V1.0
  * @date    2013-xx-xx
- * @brief   ledÓ¦ÓÃº¯Êı½Ó¿Ú
+ * @brief   ledåº”ç”¨å‡½æ•°æ¥å£
  ******************************************************************************
  * @attention
  *
- * ÊµÑéÆ½Ì¨:±ü»ğ F103-°ÔµÀ STM32 ¿ª·¢°å
- * ÂÛÌ³    :http://www.firebbs.cn
- * ÌÔ±¦    :http://firestm32.taobao.com
+ * å®éªŒå¹³å°:ç§‰ç« F103-éœ¸é“ STM32 å¼€å‘æ¿
+ * è®ºå›    :http://www.firebbs.cn
+ * æ·˜å®    :http://firestm32.taobao.com
  *
  ******************************************************************************
  */
@@ -26,9 +26,9 @@
 #include "bsp_led.h"
 
 /**
- * @brief  ³õÊ¼»¯¿ØÖÆLEDµÄIO
- * @param  ÎŞ
- * @retval ÎŞ
+ * @brief  åˆå§‹åŒ–æ§åˆ¶LEDçš„IO
+ * @param  æ— 
+ * @retval æ— 
  */
 void LED_GPIO_Config(void)
 {

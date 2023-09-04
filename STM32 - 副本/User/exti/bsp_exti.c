@@ -4,85 +4,85 @@
  * @LastEditTime: 2023-01-14 21:23:20
  * @LastEditors: error: git config user.name && git config user.email & please set dead value or install git
  * @Description: In User Settings Edit
- * @FilePath: \RVMDK£¨uv5£©i:\electroni_file\STM32\¹¤³ÌÄ£°å£¨freertos£© - ¸±±¾\User\exti\bsp_exti.c
+ * @FilePath: \RVMDKï¼ˆuv5ï¼‰i:\electroni_file\STM32\å·¥ç¨‹æ¨¡æ¿ï¼ˆfreertosï¼‰ - å‰¯æœ¬\User\exti\bsp_exti.c
  */
 
 #include "bsp_exti.h"
 
 #if KEY_ENABLE
 /**
- * @description: ³õÊ¼»¯°´¼ü
+ * @description: åˆå§‹åŒ–æŒ‰é”®
  * @param {*}
  * @return {*}
  */
 void Key_GPIO_Config(uint32_t KET_GPION_CLOCK, uint16_t GPIO_PIN, GPIO_TypeDef *GPIOX)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
-    /*¿ªÆô°´¼ü¶Ë¿ÚµÄÊ±ÖÓ*/
+    /*å¼€å¯æŒ‰é”®ç«¯å£çš„æ—¶é’Ÿ*/
     RCC_APB2PeriphClockCmd(KET_GPION_CLOCK, ENABLE);
-    // Ñ¡Ôñ°´¼üµÄÒı½Å
+    // é€‰æ‹©æŒ‰é”®çš„å¼•è„š
     GPIO_InitStructure.GPIO_Pin = GPIO_PIN;
-    // ÉèÖÃ°´¼üµÄÒı½ÅÎª¸¡¿ÕÊäÈë
+    // è®¾ç½®æŒ‰é”®çš„å¼•è„šä¸ºæµ®ç©ºè¾“å…¥
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    // Ê¹ÓÃ½á¹¹Ìå³õÊ¼»¯°´¼ü
+    // ä½¿ç”¨ç»“æ„ä½“åˆå§‹åŒ–æŒ‰é”®
     GPIO_Init(GPIOX, &GPIO_InitStructure);
 }
 
 /**
- * @brief  ÅäÖÃÇ¶Ì×ÏòÁ¿ÖĞ¶Ï¿ØÖÆÆ÷NVIC
- * @param  NVIC_IRQChANNEL:ÖĞ¶ÏÍ¨µÀ£¬PREEMPTIONPRIORIT
- * @param  PREEMPTIONPRIORIT£ºÇÀÕ¼ÓÅÏÈ¼¶
- * @param  SUBPRIORIT£º×ÓÓÅÏÈ¼¶
- * @retval ÎŞ
+ * @brief  é…ç½®åµŒå¥—å‘é‡ä¸­æ–­æ§åˆ¶å™¨NVIC
+ * @param  NVIC_IRQChANNEL:ä¸­æ–­é€šé“ï¼ŒPREEMPTIONPRIORIT
+ * @param  PREEMPTIONPRIORITï¼šæŠ¢å ä¼˜å…ˆçº§
+ * @param  SUBPRIORITï¼šå­ä¼˜å…ˆçº§
+ * @retval æ— 
  */
 static void NVIC_KEY_Configuration(enum IRQn NVIC_IRQChANNEL, uint8_t PREEMPTIONPRIORIT, uint8_t SUBPRIORIT)
 {
     NVIC_InitTypeDef NVIC_InitStructure;
-    /* ÅäÖÃNVICÎªÓÅÏÈ¼¶×é1 */
+    /* é…ç½®NVICä¸ºä¼˜å…ˆçº§ç»„1 */
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-    /* ÅäÖÃÖĞ¶ÏÔ´£º°´¼ü1 */
+    /* é…ç½®ä¸­æ–­æºï¼šæŒ‰é”®1 */
     NVIC_InitStructure.NVIC_IRQChannel = NVIC_IRQChANNEL;
-    /* ÅäÖÃÇÀÕ¼ÓÅÏÈ¼¶ */
+    /* é…ç½®æŠ¢å ä¼˜å…ˆçº§ */
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PREEMPTIONPRIORIT;
-    /* ÅäÖÃ×ÓÓÅÏÈ¼¶ */
+    /* é…ç½®å­ä¼˜å…ˆçº§ */
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = SUBPRIORIT;
-    /* Ê¹ÄÜÖĞ¶ÏÍ¨µÀ */
+    /* ä½¿èƒ½ä¸­æ–­é€šé“ */
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 }
 
 /**
- * @brief  ÅäÖÃ IOÎªEXTIÖĞ¶Ï¿Ú£¬²¢ÉèÖÃÖĞ¶ÏÓÅÏÈ¼¶
- * @param  ÎŞ
- * @retval ÎŞ
+ * @brief  é…ç½® IOä¸ºEXTIä¸­æ–­å£ï¼Œå¹¶è®¾ç½®ä¸­æ–­ä¼˜å…ˆçº§
+ * @param  æ— 
+ * @retval æ— 
  */
 void EXTI_Key_Config(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     EXTI_InitTypeDef EXTI_InitStructure;
 
-    /*¿ªÆô°´¼üGPIO¿ÚµÄÊ±ÖÓ*/
+    /*å¼€å¯æŒ‰é”®GPIOå£çš„æ—¶é’Ÿ*/
     RCC_APB2PeriphClockCmd(KEY1_INT_GPIO_CLK, ENABLE);
 
-    /* ÅäÖÃ NVIC ÖĞ¶Ï*/
+    /* é…ç½® NVIC ä¸­æ–­*/
     // NVIC_KEY_Configuration();
 
-    /*--------------------------KEY1ÅäÖÃ-----------------------------*/
-    /* Ñ¡Ôñ°´¼üÓÃµ½µÄGPIO */
+    /*--------------------------KEY1é…ç½®-----------------------------*/
+    /* é€‰æ‹©æŒ‰é”®ç”¨åˆ°çš„GPIO */
     GPIO_InitStructure.GPIO_Pin = KEY1_INT_GPIO_PIN;
-    /* ÅäÖÃÎª¸¡¿ÕÊäÈë */
+    /* é…ç½®ä¸ºæµ®ç©ºè¾“å…¥ */
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_Init(KEY1_INT_GPIO_PORT, &GPIO_InitStructure);
 
-    /* Ñ¡ÔñEXTIµÄĞÅºÅÔ´ */
+    /* é€‰æ‹©EXTIçš„ä¿¡å·æº */
     GPIO_EXTILineConfig(KEY1_INT_EXTI_PORTSOURCE, KEY1_INT_EXTI_PINSOURCE);
     EXTI_InitStructure.EXTI_Line = KEY1_INT_EXTI_LINE;
 
-    /* EXTIÎªÖĞ¶ÏÄ£Ê½ */
+    /* EXTIä¸ºä¸­æ–­æ¨¡å¼ */
     EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-    /* ÉÏÉıÑØÖĞ¶Ï */
+    /* ä¸Šå‡æ²¿ä¸­æ–­ */
     EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-    /* Ê¹ÄÜÖĞ¶Ï */
+    /* ä½¿èƒ½ä¸­æ–­ */
     EXTI_InitStructure.EXTI_LineCmd = ENABLE;
     EXTI_Init(&EXTI_InitStructure);
 }

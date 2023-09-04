@@ -4,7 +4,7 @@
   * @author  fire
   * @version V1.0
   * @date    2018-xx-xx
-  * @brief   °´¼üÓ¦ÓÃbsp£¨É¨ÃèÄ£Ê½£©
+  * @brief   æŒ‰é”®åº”ç”¨bspï¼ˆæ‰«ææ¨¡å¼ï¼‰
   ******************************************************************************
 */
   
@@ -13,29 +13,29 @@
 void Key_GPIO_Config(uint32_t KET_GPION_CLOCK, uint16_t GPIO_PIN, GPIO_TypeDef* GPIOX)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
-	/*¿ªÆô°´¼ü¶Ë¿ÚµÄÊ±ÖÓ*/
+	/*å¼€å¯æŒ‰é”®ç«¯å£çš„æ—¶é’Ÿ*/
 	RCC_APB2PeriphClockCmd(KET_GPION_CLOCK, ENABLE);
-	//Ñ¡Ôñ°´¼üµÄÒý½Å
+	//é€‰æ‹©æŒ‰é”®çš„å¼•è„š
 	GPIO_InitStructure.GPIO_Pin = GPIO_PIN;
-	// ÉèÖÃ°´¼üµÄÒý½ÅÎª¸¡¿ÕÊäÈë
+	// è®¾ç½®æŒ‰é”®çš„å¼•è„šä¸ºæµ®ç©ºè¾“å…¥
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING; 
-	//Ê¹ÓÃ½á¹¹Ìå³õÊ¼»¯°´¼ü
+	//ä½¿ç”¨ç»“æž„ä½“åˆå§‹åŒ–æŒ‰é”®
 	GPIO_Init(GPIOX, &GPIO_InitStructure);
 }
 
  /*
- * º¯ÊýÃû£ºKey_Scan
- * ÃèÊö  £º¼ì²âÊÇ·ñÓÐ°´¼ü°´ÏÂ
- * ÊäÈë  £ºGPIOx£ºx ¿ÉÒÔÊÇ A£¬B£¬C£¬D»òÕß E
- *		     GPIO_Pin£º´ý¶ÁÈ¡µÄ¶Ë¿ÚÎ» 	
- * Êä³ö  £ºKEY_OFF(Ã»°´ÏÂ°´¼ü)¡¢KEY_ON£¨°´ÏÂ°´¼ü£©
+ * å‡½æ•°åï¼šKey_Scan
+ * æè¿°  ï¼šæ£€æµ‹æ˜¯å¦æœ‰æŒ‰é”®æŒ‰ä¸‹
+ * è¾“å…¥  ï¼šGPIOxï¼šx å¯ä»¥æ˜¯ Aï¼ŒBï¼ŒCï¼ŒDæˆ–è€… E
+ *		     GPIO_Pinï¼šå¾…è¯»å–çš„ç«¯å£ä½ 	
+ * è¾“å‡º  ï¼šKEY_OFF(æ²¡æŒ‰ä¸‹æŒ‰é”®)ã€KEY_ONï¼ˆæŒ‰ä¸‹æŒ‰é”®ï¼‰
  */
 uint8_t Key_Scan(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin)
 {			
-	/*¼ì²âÊÇ·ñÓÐ°´¼ü°´ÏÂ */
+	/*æ£€æµ‹æ˜¯å¦æœ‰æŒ‰é”®æŒ‰ä¸‹ */
 	if(GPIO_ReadInputDataBit(GPIOx,GPIO_Pin) == KEY_ON )  
 	{	 
-		/*µÈ´ý°´¼üÊÍ·Å */
+		/*ç­‰å¾…æŒ‰é”®é‡Šæ”¾ */
 		while(GPIO_ReadInputDataBit(GPIOx,GPIO_Pin) == KEY_ON);   
 		return 	KEY_ON;	 
 	}

@@ -4,17 +4,17 @@
 
 
 /*
-*ÒÔÏÂ²ÎÊıĞèÒªÓÃ»§×ÔĞĞĞŞ¸Ä²ÅÄÜ²âÊÔÓÃ¹ı
+*ä»¥ä¸‹å‚æ•°éœ€è¦ç”¨æˆ·è‡ªè¡Œä¿®æ”¹æ‰èƒ½æµ‹è¯•ç”¨è¿‡
 */
 
-#define User_ESP8266_SSID     "miot_default"          //wifiÃû
-#define User_ESP8266_PWD      "123456789x"      //wifiÃÜÂë
+#define User_ESP8266_SSID     "miot_default"          //wifiå
+#define User_ESP8266_PWD      "123456789x"      //wifiå¯†ç 
 
-#define User_ESP8266_TCPServer_IP     "192.168.31.16"     //·şÎñÆ÷IP
-#define User_ESP8266_TCPServer_PORT   "8888"      //·şÎñÆ÷¶Ë¿ÚºÅ
+#define User_ESP8266_TCPServer_IP     "192.168.31.16"     //æœåŠ¡å™¨IP
+#define User_ESP8266_TCPServer_PORT   "8888"      //æœåŠ¡å™¨ç«¯å£å·
 
 
-extern volatile uint8_t TcpClosedFlag;  //Á¬½Ó×´Ì¬±êÖ¾
+extern volatile uint8_t TcpClosedFlag;  //è¿æ¥çŠ¶æ€æ ‡å¿—
 
 void ESP8266_STA_TCPClient_Test(void);
 

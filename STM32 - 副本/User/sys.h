@@ -9,7 +9,7 @@ void Turn_Left_Founction(void);
 void Walking_Right(void);
 void Walking_Left(void);
 extern struct COLOR RGB;
-typedef struct COLOR
+struct COLOR
 {
     u8 R;
     u8 G;

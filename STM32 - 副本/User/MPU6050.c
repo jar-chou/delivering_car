@@ -3,10 +3,10 @@
 #include "Delay.h"
 #if 0
 /**********************************************
-º¯ÊýÃû³Æ£ºMPU_Init
-º¯Êý¹¦ÄÜ£º³õÊ¼»¯MPU6050
-º¯Êý²ÎÊý£ºÎÞ
-º¯Êý·µ»ØÖµ£º0,³õÊ¼»¯³É¹¦  ÆäËû,³õÊ¼»¯Ê§°Ü
+å‡½æ•°åç§°ï¼šMPU_Init
+å‡½æ•°åŠŸèƒ½ï¼šåˆå§‹åŒ–MPU6050
+å‡½æ•°å‚æ•°ï¼šæ— 
+å‡½æ•°è¿”å›žå€¼ï¼š0,åˆå§‹åŒ–æˆåŠŸ  å…¶ä»–,åˆå§‹åŒ–å¤±è´¥
 **********************************************/
 u8 MPU_Init(void)
 { 
@@ -14,66 +14,66 @@ u8 MPU_Init(void)
 //  
 //	GPIO_InitTypeDef  GPIO_InitStructure;
 //	
-//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);		//Ê¹ÄÜAFIOÊ±ÖÓ 
-//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);	//ÏÈÊ¹ÄÜÍâÉèIO PORTAÊ±ÖÓ 
+//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);		//ä½¿èƒ½AFIOæ—¶é’Ÿ 
+//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);	//å…ˆä½¿èƒ½å¤–è®¾IO PORTAæ—¶é’Ÿ 
 //	
-//  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;					  //¶Ë¿ÚÅäÖÃ
-//  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 		 	//ÍÆÍìÊä³ö
-//  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;		  //IO¿ÚËÙ¶ÈÎª50MHz
-//  GPIO_Init(GPIOA, &GPIO_InitStructure);					      //¸ù¾ÝÉè¶¨²ÎÊý³õÊ¼»¯GPIOA
+//  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;					  //ç«¯å£é…ç½®
+//  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 		 	//æŽ¨æŒ½è¾“å‡º
+//  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;		  //IOå£é€Ÿåº¦ä¸º50MHz
+//  GPIO_Init(GPIOA, &GPIO_InitStructure);					      //æ ¹æ®è®¾å®šå‚æ•°åˆå§‹åŒ–GPIOA
 
-//	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable,ENABLE);//½ûÖ¹JTAG,´Ó¶øPA15¿ÉÒÔ×öÆÕÍ¨IOÊ¹ÓÃ,·ñÔòPA15²»ÄÜ×öÆÕÍ¨IO!!!
+//	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable,ENABLE);//ç¦æ­¢JTAG,ä»Žè€ŒPA15å¯ä»¥åšæ™®é€šIOä½¿ç”¨,å¦åˆ™PA15ä¸èƒ½åšæ™®é€šIO!!!
 	
-//	MPU_AD0_CTRL=0;			//¿ØÖÆMPU6050µÄAD0½ÅÎªµÍµçÆ½,´Ó»úµØÖ·Îª:0X68
+//	MPU_AD0_CTRL=0;			//æŽ§åˆ¶MPU6050çš„AD0è„šä¸ºä½Žç”µå¹³,ä»Žæœºåœ°å€ä¸º:0X68
 	IIC_Init();
-	MPU_Write_Byte(MPU_PWR_MGMT1_REG,0X80);	//¸´Î»MPU6050
+	MPU_Write_Byte(MPU_PWR_MGMT1_REG,0X80);	//å¤ä½MPU6050
   Delayms(100);
-	MPU_Write_Byte(MPU_PWR_MGMT1_REG,0X00);	//»½ÐÑMPU6050 
-	MPU_Set_Gyro_Fsr(3);										//ÍÓÂÝÒÇ´«¸ÐÆ÷,¡À2000dps
-	MPU_Set_Accel_Fsr(0);										//¼ÓËÙ¶È´«¸ÐÆ÷,¡À2g
-	MPU_Set_Rate(50);												//ÉèÖÃ²ÉÑùÂÊ50Hz
-	MPU_Write_Byte(MPU_INT_EN_REG,0X00);		//¹Ø±ÕËùÓÐÖÐ¶Ï
-	MPU_Write_Byte(MPU_USER_CTRL_REG,0X00);	//I2CÖ÷Ä£Ê½¹Ø±Õ
-	MPU_Write_Byte(MPU_FIFO_EN_REG,0X00);		//¹Ø±ÕFIFO
-	MPU_Write_Byte(MPU_INTBP_CFG_REG,0X80);	//INTÒý½ÅµÍµçÆ½ÓÐÐ§
+	MPU_Write_Byte(MPU_PWR_MGMT1_REG,0X00);	//å”¤é†’MPU6050 
+	MPU_Set_Gyro_Fsr(3);										//é™€èžºä»ªä¼ æ„Ÿå™¨,Â±2000dps
+	MPU_Set_Accel_Fsr(0);										//åŠ é€Ÿåº¦ä¼ æ„Ÿå™¨,Â±2g
+	MPU_Set_Rate(50);												//è®¾ç½®é‡‡æ ·çŽ‡50Hz
+	MPU_Write_Byte(MPU_INT_EN_REG,0X00);		//å…³é—­æ‰€æœ‰ä¸­æ–­
+	MPU_Write_Byte(MPU_USER_CTRL_REG,0X00);	//I2Cä¸»æ¨¡å¼å…³é—­
+	MPU_Write_Byte(MPU_FIFO_EN_REG,0X00);		//å…³é—­FIFO
+	MPU_Write_Byte(MPU_INTBP_CFG_REG,0X80);	//INTå¼•è„šä½Žç”µå¹³æœ‰æ•ˆ
 	
 	res=MPU_Read_Byte(MPU_DEVICE_ID_REG);
-	if(res==MPU_ADDR)												//Æ÷¼þIDÕýÈ·,¼´res = MPU_ADDR = 0x68
+	if(res==MPU_ADDR)												//å™¨ä»¶IDæ­£ç¡®,å³res = MPU_ADDR = 0x68
 	{
-		MPU_Write_Byte(MPU_PWR_MGMT1_REG,0X01);		//ÉèÖÃCLKSEL,PLL XÖáÎª²Î¿¼
-		MPU_Write_Byte(MPU_PWR_MGMT2_REG,0X00);		//¼ÓËÙ¶ÈÓëÍÓÂÝÒÇ¶¼¹¤×÷
-		MPU_Set_Rate(50);													//ÉèÖÃ²ÉÑùÂÊÎª50Hz
- 	}else return 1;    //µØÖ·ÉèÖÃ´íÎó,·µ»Ø1
-	return 0;					 //µØÖ·ÉèÖÃÕýÈ·,·µ»Ø0
+		MPU_Write_Byte(MPU_PWR_MGMT1_REG,0X01);		//è®¾ç½®CLKSEL,PLL Xè½´ä¸ºå‚è€ƒ
+		MPU_Write_Byte(MPU_PWR_MGMT2_REG,0X00);		//åŠ é€Ÿåº¦ä¸Žé™€èžºä»ªéƒ½å·¥ä½œ
+		MPU_Set_Rate(50);													//è®¾ç½®é‡‡æ ·çŽ‡ä¸º50Hz
+ 	}else return 1;    //åœ°å€è®¾ç½®é”™è¯¯,è¿”å›ž1
+	return 0;					 //åœ°å€è®¾ç½®æ­£ç¡®,è¿”å›ž0
 }
 
 /**********************************************
-º¯ÊýÃû³Æ£ºMPU_Set_Gyro_Fsr
-º¯Êý¹¦ÄÜ£ºÉèÖÃMPU6050ÍÓÂÝÒÇ´«¸ÐÆ÷ÂúÁ¿³Ì·¶Î§
-º¯Êý²ÎÊý£ºfsr:0,¡À250dps;1,¡À500dps;2,¡À1000dps;3,¡À2000dps
-º¯Êý·µ»ØÖµ£º0,ÉèÖÃ³É¹¦  ÆäËû,ÉèÖÃÊ§°Ü
+å‡½æ•°åç§°ï¼šMPU_Set_Gyro_Fsr
+å‡½æ•°åŠŸèƒ½ï¼šè®¾ç½®MPU6050é™€èžºä»ªä¼ æ„Ÿå™¨æ»¡é‡ç¨‹èŒƒå›´
+å‡½æ•°å‚æ•°ï¼šfsr:0,Â±250dps;1,Â±500dps;2,Â±1000dps;3,Â±2000dps
+å‡½æ•°è¿”å›žå€¼ï¼š0,è®¾ç½®æˆåŠŸ  å…¶ä»–,è®¾ç½®å¤±è´¥
 **********************************************/
 u8 MPU_Set_Gyro_Fsr(u8 fsr)
 {
-	return MPU_Write_Byte(MPU_GYRO_CFG_REG,fsr<<3); //ÉèÖÃÍÓÂÝÒÇÂúÁ¿³Ì·¶Î§
+	return MPU_Write_Byte(MPU_GYRO_CFG_REG,fsr<<3); //è®¾ç½®é™€èžºä»ªæ»¡é‡ç¨‹èŒƒå›´
 }
 
 /**********************************************
-º¯ÊýÃû³Æ£ºMPU_Set_Accel_Fsr
-º¯Êý¹¦ÄÜ£ºÉèÖÃMPU6050¼ÓËÙ¶È´«¸ÐÆ÷ÂúÁ¿³Ì·¶Î§
-º¯Êý²ÎÊý£ºfsr:0,¡À2g;1,¡À4g;2,¡À8g;3,¡À16g
-º¯Êý·µ»ØÖµ£º0,ÉèÖÃ³É¹¦  ÆäËû,ÉèÖÃÊ§°Ü
+å‡½æ•°åç§°ï¼šMPU_Set_Accel_Fsr
+å‡½æ•°åŠŸèƒ½ï¼šè®¾ç½®MPU6050åŠ é€Ÿåº¦ä¼ æ„Ÿå™¨æ»¡é‡ç¨‹èŒƒå›´
+å‡½æ•°å‚æ•°ï¼šfsr:0,Â±2g;1,Â±4g;2,Â±8g;3,Â±16g
+å‡½æ•°è¿”å›žå€¼ï¼š0,è®¾ç½®æˆåŠŸ  å…¶ä»–,è®¾ç½®å¤±è´¥
 **********************************************/
 u8 MPU_Set_Accel_Fsr(u8 fsr)
 {
-	return MPU_Write_Byte(MPU_ACCEL_CFG_REG,fsr<<3); //ÉèÖÃ¼ÓËÙ¶È´«¸ÐÆ÷ÂúÁ¿³Ì·¶Î§  
+	return MPU_Write_Byte(MPU_ACCEL_CFG_REG,fsr<<3); //è®¾ç½®åŠ é€Ÿåº¦ä¼ æ„Ÿå™¨æ»¡é‡ç¨‹èŒƒå›´  
 }
 
 /**********************************************
-º¯ÊýÃû³Æ£ºMPU_Set_LPF
-º¯Êý¹¦ÄÜ£ºÉèÖÃMPU6050µÄÊý×ÖµÍÍ¨ÂË²¨Æ÷
-º¯Êý²ÎÊý£ºlpf:Êý×ÖµÍÍ¨ÂË²¨ÆµÂÊ(Hz)
-º¯Êý·µ»ØÖµ£º0,ÉèÖÃ³É¹¦  ÆäËû,ÉèÖÃÊ§°Ü
+å‡½æ•°åç§°ï¼šMPU_Set_LPF
+å‡½æ•°åŠŸèƒ½ï¼šè®¾ç½®MPU6050çš„æ•°å­—ä½Žé€šæ»¤æ³¢å™¨
+å‡½æ•°å‚æ•°ï¼šlpf:æ•°å­—ä½Žé€šæ»¤æ³¢é¢‘çŽ‡(Hz)
+å‡½æ•°è¿”å›žå€¼ï¼š0,è®¾ç½®æˆåŠŸ  å…¶ä»–,è®¾ç½®å¤±è´¥
 **********************************************/
 u8 MPU_Set_LPF(u16 lpf)
 {
@@ -85,14 +85,14 @@ u8 MPU_Set_LPF(u16 lpf)
 	else if(lpf>=20)data=4;
 	else if(lpf>=10)data=5;
 	else data=6; 
-	return MPU_Write_Byte(MPU_CFG_REG,data);//ÉèÖÃÊý×ÖµÍÍ¨ÂË²¨Æ÷  
+	return MPU_Write_Byte(MPU_CFG_REG,data);//è®¾ç½®æ•°å­—ä½Žé€šæ»¤æ³¢å™¨  
 }
 
 /**********************************************
-º¯ÊýÃû³Æ£ºMPU_Set_Rate
-º¯Êý¹¦ÄÜ£ºÉèÖÃMPU6050µÄ²ÉÑùÂÊ(¼Ù¶¨Fs=1KHz)
-º¯Êý²ÎÊý£ºrate:4~1000(Hz)  ³õÊ¼»¯ÖÐrateÈ¡50
-º¯Êý·µ»ØÖµ£º0,ÉèÖÃ³É¹¦  ÆäËû,ÉèÖÃÊ§°Ü
+å‡½æ•°åç§°ï¼šMPU_Set_Rate
+å‡½æ•°åŠŸèƒ½ï¼šè®¾ç½®MPU6050çš„é‡‡æ ·çŽ‡(å‡å®šFs=1KHz)
+å‡½æ•°å‚æ•°ï¼šrate:4~1000(Hz)  åˆå§‹åŒ–ä¸­rateå–50
+å‡½æ•°è¿”å›žå€¼ï¼š0,è®¾ç½®æˆåŠŸ  å…¶ä»–,è®¾ç½®å¤±è´¥
 **********************************************/
 u8 MPU_Set_Rate(u16 rate)
 {
@@ -100,15 +100,15 @@ u8 MPU_Set_Rate(u16 rate)
 	if(rate>1000)rate=1000;
 	if(rate<4)rate=4;
 	data=1000/rate-1;
-	data=MPU_Write_Byte(MPU_SAMPLE_RATE_REG,data);	//ÉèÖÃÊý×ÖµÍÍ¨ÂË²¨Æ÷
- 	return MPU_Set_LPF(rate/2);											//×Ô¶¯ÉèÖÃLPFÎª²ÉÑùÂÊµÄÒ»°ë
+	data=MPU_Write_Byte(MPU_SAMPLE_RATE_REG,data);	//è®¾ç½®æ•°å­—ä½Žé€šæ»¤æ³¢å™¨
+ 	return MPU_Set_LPF(rate/2);											//è‡ªåŠ¨è®¾ç½®LPFä¸ºé‡‡æ ·çŽ‡çš„ä¸€åŠ
 }
 
 /**********************************************
-º¯ÊýÃû³Æ£ºMPU_Get_Temperature
-º¯Êý¹¦ÄÜ£ºµÃµ½ÎÂ¶È´«¸ÐÆ÷Öµ
-º¯Êý²ÎÊý£ºÎÞ
-º¯Êý·µ»ØÖµ£ºÎÂ¶ÈÖµ(À©´óÁË100±¶)
+å‡½æ•°åç§°ï¼šMPU_Get_Temperature
+å‡½æ•°åŠŸèƒ½ï¼šå¾—åˆ°æ¸©åº¦ä¼ æ„Ÿå™¨å€¼
+å‡½æ•°å‚æ•°ï¼šæ— 
+å‡½æ•°è¿”å›žå€¼ï¼šæ¸©åº¦å€¼(æ‰©å¤§äº†100å€)
 **********************************************/
 short MPU_Get_Temperature(void)
 {
@@ -123,10 +123,10 @@ short MPU_Get_Temperature(void)
 }
 
 /**********************************************
-º¯ÊýÃû³Æ£ºMPU_Get_Gyroscope
-º¯Êý¹¦ÄÜ£ºµÃµ½ÍÓÂÝÒÇÖµ(Ô­Ê¼Öµ)
-º¯Êý²ÎÊý£ºgx,gy,gz:ÍÓÂÝÒÇx,y,zÖáµÄÔ­Ê¼¶ÁÊý(´ø·ûºÅ)
-º¯Êý·µ»ØÖµ£º0,¶ÁÈ¡³É¹¦  ÆäËû,¶ÁÈ¡Ê§°Ü
+å‡½æ•°åç§°ï¼šMPU_Get_Gyroscope
+å‡½æ•°åŠŸèƒ½ï¼šå¾—åˆ°é™€èžºä»ªå€¼(åŽŸå§‹å€¼)
+å‡½æ•°å‚æ•°ï¼šgx,gy,gz:é™€èžºä»ªx,y,zè½´çš„åŽŸå§‹è¯»æ•°(å¸¦ç¬¦å·)
+å‡½æ•°è¿”å›žå€¼ï¼š0,è¯»å–æˆåŠŸ  å…¶ä»–,è¯»å–å¤±è´¥
 **********************************************/
 u8 MPU_Get_Gyroscope(short *gx,short *gy,short *gz)
 {
@@ -143,10 +143,10 @@ u8 MPU_Get_Gyroscope(short *gx,short *gy,short *gz)
 }
 
 /**********************************************
-º¯ÊýÃû³Æ£ºMPU_Get_Accelerometer
-º¯Êý¹¦ÄÜ£ºµÃµ½¼ÓËÙ¶ÈÖµ(Ô­Ê¼Öµ)
-º¯Êý²ÎÊý£ºax,ay,az:¼ÓËÙ¶È´«¸ÐÆ÷x,y,zÖáµÄÔ­Ê¼¶ÁÊý(´ø·ûºÅ)
-º¯Êý·µ»ØÖµ£º0,¶ÁÈ¡³É¹¦  ÆäËû,¶ÁÈ¡Ê§°Ü
+å‡½æ•°åç§°ï¼šMPU_Get_Accelerometer
+å‡½æ•°åŠŸèƒ½ï¼šå¾—åˆ°åŠ é€Ÿåº¦å€¼(åŽŸå§‹å€¼)
+å‡½æ•°å‚æ•°ï¼šax,ay,az:åŠ é€Ÿåº¦ä¼ æ„Ÿå™¨x,y,zè½´çš„åŽŸå§‹è¯»æ•°(å¸¦ç¬¦å·)
+å‡½æ•°è¿”å›žå€¼ï¼š0,è¯»å–æˆåŠŸ  å…¶ä»–,è¯»å–å¤±è´¥
 **********************************************/
 u8 MPU_Get_Accelerometer(short *ax,short *ay,short *az)
 {
@@ -162,29 +162,29 @@ u8 MPU_Get_Accelerometer(short *ax,short *ay,short *az)
 }
 
 /**********************************************
-º¯ÊýÃû³Æ£ºMPU_Write_Len
-º¯Êý¹¦ÄÜ£ºIICÁ¬ÐøÐ´(Ð´Æ÷¼þµØÖ·¡¢¼Ä´æÆ÷µØÖ·¡¢Êý¾Ý)
-º¯Êý²ÎÊý£ºaddr:Æ÷¼þµØÖ·      reg:¼Ä´æÆ÷µØÖ·
-				 len:Ð´ÈëÊý¾ÝµÄ³¤¶È  buf:Êý¾ÝÇø
-º¯Êý·µ»ØÖµ£º0,Ð´Èë³É¹¦  ÆäËû,Ð´ÈëÊ§°Ü
+å‡½æ•°åç§°ï¼šMPU_Write_Len
+å‡½æ•°åŠŸèƒ½ï¼šIICè¿žç»­å†™(å†™å™¨ä»¶åœ°å€ã€å¯„å­˜å™¨åœ°å€ã€æ•°æ®)
+å‡½æ•°å‚æ•°ï¼šaddr:å™¨ä»¶åœ°å€      reg:å¯„å­˜å™¨åœ°å€
+				 len:å†™å…¥æ•°æ®çš„é•¿åº¦  buf:æ•°æ®åŒº
+å‡½æ•°è¿”å›žå€¼ï¼š0,å†™å…¥æˆåŠŸ  å…¶ä»–,å†™å…¥å¤±è´¥
 **********************************************/
 u8 MPU_Write_Len(u8 addr,u8 reg,u8 len,u8 *buf)
 {
 	u8 i;
 	
 	IIC_Start();
-	IIC_Send_Byte((addr<<1)|0);      //·¢ËÍÆ÷¼þµØÖ·+Ð´ÃüÁî(0ÎªÐ´,1Îª¶Á)	
-	if(IIC_Wait_Ack())							 //µÈ´ýÓ¦´ð
+	IIC_Send_Byte((addr<<1)|0);      //å‘é€å™¨ä»¶åœ°å€+å†™å‘½ä»¤(0ä¸ºå†™,1ä¸ºè¯»)	
+	if(IIC_Wait_Ack())							 //ç­‰å¾…åº”ç­”
 	{
 		IIC_Stop();
 		return 1;
 	}
-    IIC_Send_Byte(reg);						 //Ð´¼Ä´æÆ÷µØÖ·
-    IIC_Wait_Ack();		             //µÈ´ýÓ¦´ð
+    IIC_Send_Byte(reg);						 //å†™å¯„å­˜å™¨åœ°å€
+    IIC_Wait_Ack();		             //ç­‰å¾…åº”ç­”
 	for(i=0;i<len;i++)
 	{
-		IIC_Send_Byte(buf[i]);	       //·¢ËÍÊý¾Ý
-		if(IIC_Wait_Ack())		         //µÈ´ýACK
+		IIC_Send_Byte(buf[i]);	       //å‘é€æ•°æ®
+		if(IIC_Wait_Ack())		         //ç­‰å¾…ACK
 		{
 			IIC_Stop();
 			return 1;
@@ -195,54 +195,54 @@ u8 MPU_Write_Len(u8 addr,u8 reg,u8 len,u8 *buf)
 }
 
 /**********************************************
-º¯ÊýÃû³Æ£ºMPU_Read_Len
-º¯Êý¹¦ÄÜ£ºIICÁ¬Ðø¶Á(Ð´ÈëÆ÷¼þµØÖ·ºó,¶Á¼Ä´æÆ÷µØÖ·¡¢Êý¾Ý)
-º¯Êý²ÎÊý£ºaddr:Æ÷¼þµØÖ·        reg:Òª¶ÁµÄ¼Ä´æÆ÷µØÖ·
-				 len:Òª¶ÁÈ¡µÄÊý¾Ý³¤¶È  buf:¶ÁÈ¡µ½µÄÊý¾Ý´æ´¢Çø
-º¯Êý·µ»ØÖµ£º0,¶ÁÈ¡³É¹¦  ÆäËû,¶ÁÈ¡Ê§°Ü
+å‡½æ•°åç§°ï¼šMPU_Read_Len
+å‡½æ•°åŠŸèƒ½ï¼šIICè¿žç»­è¯»(å†™å…¥å™¨ä»¶åœ°å€åŽ,è¯»å¯„å­˜å™¨åœ°å€ã€æ•°æ®)
+å‡½æ•°å‚æ•°ï¼šaddr:å™¨ä»¶åœ°å€        reg:è¦è¯»çš„å¯„å­˜å™¨åœ°å€
+				 len:è¦è¯»å–çš„æ•°æ®é•¿åº¦  buf:è¯»å–åˆ°çš„æ•°æ®å­˜å‚¨åŒº
+å‡½æ•°è¿”å›žå€¼ï¼š0,è¯»å–æˆåŠŸ  å…¶ä»–,è¯»å–å¤±è´¥
 **********************************************/
 u8 MPU_Read_Len(u8 addr,u8 reg,u8 len,u8 *buf)
 {
 		IIC_Start();
-		IIC_Send_Byte((addr<<1)|0);		//·¢ËÍÆ÷¼þµØÖ·+Ð´ÃüÁî
-		if(IIC_Wait_Ack())						//µÈ´ýÓ¦´ð
+		IIC_Send_Byte((addr<<1)|0);		//å‘é€å™¨ä»¶åœ°å€+å†™å‘½ä»¤
+		if(IIC_Wait_Ack())						//ç­‰å¾…åº”ç­”
 		{
 			IIC_Stop();		 
 			return 1;
 		}
-    IIC_Send_Byte(reg);						//Ð´¼Ä´æÆ÷µØÖ·
-    IIC_Wait_Ack();								//µÈ´ýÓ¦´ð
+    IIC_Send_Byte(reg);						//å†™å¯„å­˜å™¨åœ°å€
+    IIC_Wait_Ack();								//ç­‰å¾…åº”ç­”
     IIC_Start();
-		IIC_Send_Byte((addr<<1)|1);		//·¢ËÍÆ÷¼þµØÖ·+¶ÁÃüÁî	
-    IIC_Wait_Ack();								//µÈ´ýÓ¦´ð 
+		IIC_Send_Byte((addr<<1)|1);		//å‘é€å™¨ä»¶åœ°å€+è¯»å‘½ä»¤	
+    IIC_Wait_Ack();								//ç­‰å¾…åº”ç­” 
 		while(len)
 		{
-			if(len==1) *buf=IIC_Read_Byte(0);   //¶ÁÊý¾Ý,·¢ËÍnACK 
-			else 			 *buf=IIC_Read_Byte(1);		//¶ÁÊý¾Ý,·¢ËÍACK  
+			if(len==1) *buf=IIC_Read_Byte(0);   //è¯»æ•°æ®,å‘é€nACK 
+			else 			 *buf=IIC_Read_Byte(1);		//è¯»æ•°æ®,å‘é€ACK  
 			len--;
 			buf++;
 		}
-    IIC_Stop();	//²úÉúÒ»¸öÍ£Ö¹Ìõ¼þ 
+    IIC_Stop();	//äº§ç”Ÿä¸€ä¸ªåœæ­¢æ¡ä»¶ 
 		return 0;	
 }
 
 /**********************************************
-º¯ÊýÃû³Æ£ºMPU_Write_Byte
-º¯Êý¹¦ÄÜ£ºIICÐ´Ò»¸ö×Ö½Ú
-º¯Êý²ÎÊý£ºdata:Ð´ÈëµÄÊý¾Ý    reg:ÒªÐ´µÄ¼Ä´æÆ÷µØÖ·
-º¯Êý·µ»ØÖµ£º0,Ð´Èë³É¹¦  ÆäËû,Ð´ÈëÊ§°Ü
+å‡½æ•°åç§°ï¼šMPU_Write_Byte
+å‡½æ•°åŠŸèƒ½ï¼šIICå†™ä¸€ä¸ªå­—èŠ‚
+å‡½æ•°å‚æ•°ï¼šdata:å†™å…¥çš„æ•°æ®    reg:è¦å†™çš„å¯„å­˜å™¨åœ°å€
+å‡½æ•°è¿”å›žå€¼ï¼š0,å†™å…¥æˆåŠŸ  å…¶ä»–,å†™å…¥å¤±è´¥
 **********************************************/
 u8 MPU_Write_Byte(u8 reg,u8 data)
 {
 	u8 addr;
   IIC_Start();
 	addr = (MPU_ADDR<<1);
-	IIC_Send_Byte(addr);//·¢ËÍÆ÷¼þµØÖ·+Ð´ÃüÁî
+	IIC_Send_Byte(addr);//å‘é€å™¨ä»¶åœ°å€+å†™å‘½ä»¤
 	IIC_Wait_Ack();
-  IIC_Send_Byte(reg);		//Ð´¼Ä´æÆ÷µØÖ·
-  IIC_Wait_Ack();				//µÈ´ýÓ¦´ð
-	IIC_Send_Byte(data);	//·¢ËÍÊý¾Ý
-	if(IIC_Wait_Ack())	  //µÈ´ýACK
+  IIC_Send_Byte(reg);		//å†™å¯„å­˜å™¨åœ°å€
+  IIC_Wait_Ack();				//ç­‰å¾…åº”ç­”
+	IIC_Send_Byte(data);	//å‘é€æ•°æ®
+	if(IIC_Wait_Ack())	  //ç­‰å¾…ACK
 	{
 		IIC_Stop();
 		return 1;
@@ -252,10 +252,10 @@ u8 MPU_Write_Byte(u8 reg,u8 data)
 }
 
 /**********************************************
-º¯ÊýÃû³Æ£ºMPU_Read_Byte
-º¯Êý¹¦ÄÜ£ºIIC¶ÁÒ»¸ö×Ö½Ú
-º¯Êý²ÎÊý£ºreg:Òª¶ÁµÄ¼Ä´æÆ÷µØÖ·
-º¯Êý·µ»ØÖµ£ºres:¶ÁÈ¡µ½µÄÊý¾Ý
+å‡½æ•°åç§°ï¼šMPU_Read_Byte
+å‡½æ•°åŠŸèƒ½ï¼šIICè¯»ä¸€ä¸ªå­—èŠ‚
+å‡½æ•°å‚æ•°ï¼šreg:è¦è¯»çš„å¯„å­˜å™¨åœ°å€
+å‡½æ•°è¿”å›žå€¼ï¼šres:è¯»å–åˆ°çš„æ•°æ®
 **********************************************/
 u8 MPU_Read_Byte(u8 reg)
 {
@@ -263,15 +263,15 @@ u8 MPU_Read_Byte(u8 reg)
 	
   IIC_Start(); 
 	addr = (MPU_ADDR<<1);
-	IIC_Send_Byte(addr);		//·¢ËÍÆ÷¼þµØÖ·+Ð´ÃüÁî	
-	IIC_Wait_Ack();										//µÈ´ýÓ¦´ð 
-  IIC_Send_Byte(reg);								//Ð´¼Ä´æÆ÷µØÖ·
-  IIC_Wait_Ack();										//µÈ´ýÓ¦´ð
+	IIC_Send_Byte(addr);		//å‘é€å™¨ä»¶åœ°å€+å†™å‘½ä»¤	
+	IIC_Wait_Ack();										//ç­‰å¾…åº”ç­” 
+  IIC_Send_Byte(reg);								//å†™å¯„å­˜å™¨åœ°å€
+  IIC_Wait_Ack();										//ç­‰å¾…åº”ç­”
   IIC_Start();
-	IIC_Send_Byte(addr +1);		//·¢ËÍÆ÷¼þµØÖ·+¶ÁÃüÁî	
-  IIC_Wait_Ack();										//µÈ´ýÓ¦´ð 
-	res=IIC_Read_Byte(0);							//¶ÁÈ¡Êý¾Ý,·¢ËÍnACK 
-  IIC_Stop();												//²úÉúÒ»¸öÍ£Ö¹Ìõ¼þ 
+	IIC_Send_Byte(addr +1);		//å‘é€å™¨ä»¶åœ°å€+è¯»å‘½ä»¤	
+  IIC_Wait_Ack();										//ç­‰å¾…åº”ç­” 
+	res=IIC_Read_Byte(0);							//è¯»å–æ•°æ®,å‘é€nACK 
+  IIC_Stop();												//äº§ç”Ÿä¸€ä¸ªåœæ­¢æ¡ä»¶ 
 	return res;		
 }
 

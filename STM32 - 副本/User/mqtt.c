@@ -6,18 +6,18 @@
 void ESP8266_STA_MQTTClient_Test(void)
 {
 	  char str[1024];
-		printf("ÕıÔÚÅäÖÃESP8266²ÎÊı\r\n");
-    ESP8266_AT_Test();//»Ö¸´³ö³§Ä¬ÈÏÄ£Ê½
+		printf("æ­£åœ¨é…ç½®ESP8266å‚æ•°\r\n");
+    ESP8266_AT_Test();//æ¢å¤å‡ºå‚é»˜è®¤æ¨¡å¼
     ESP8266_Net_Mode_Choose(STA);
     while(!ESP8266_JoinAP(User_ESP8266_SSID, User_ESP8266_PWD));
 	  ESP8266_MQTTUSERCFG(User_ESP8266_client_id,User_ESP8266_username,User_ESP8266_password);
 	  ESP8266_MQTTCONN( User_ESP8266_MQTTServer_IP, User_ESP8266_MQTTServer_PORT);
 	  ESP8266_MQTTSUB( User_ESP8266_MQTTServer_Topic);
-		printf("\r\nMQTTÅäÖÃÍê³É");
+		printf("\r\nMQTTé…ç½®å®Œæˆ");
 		while(1)
 		{
-			  sprintf(str,"aithinker");//¸ñÊ½»¯·¢ËÍ×Ö·û´®µ½MQTT·şÎñÆ÷
-			  MQTT_SendString (User_ESP8266_MQTTServer_Topic,str);//·¢ËÍÊı¾İµ½MQTT·şÎñÆ÷
+			  sprintf(str,"aithinker");//æ ¼å¼åŒ–å‘é€å­—ç¬¦ä¸²åˆ°MQTTæœåŠ¡å™¨
+			  MQTT_SendString (User_ESP8266_MQTTServer_Topic,str);//å‘é€æ•°æ®åˆ°MQTTæœåŠ¡å™¨
 		}
 }
 #endif

@@ -4,18 +4,18 @@
 
 
 /*
-*ÒÔÏÂ²ÎÊıĞèÒªÓÃ»§×ÔĞĞĞŞ¸Ä²ÅÄÜ²âÊÔÓÃ¹ı
+*ä»¥ä¸‹å‚æ•°éœ€è¦ç”¨æˆ·è‡ªè¡Œä¿®æ”¹æ‰èƒ½æµ‹è¯•ç”¨è¿‡
 */
 
 
 
 
-#define User_ESP8266_client_id    "aithinker"   //MQTTclientID ÓÃÓÚ±êÖ¾clientÉí·İ  ×î³¤256×Ö½Ú
-#define User_ESP8266_username     "admin"						//ÓÃÓÚµÇÂ¼ MQTT ·şÎñÆ÷ µÄ username, ×î³¤ 64 ×Ö½Ú	
-#define User_ESP8266_password			"public"          //ÓÃÓÚµÇÂ¼ MQTT ·şÎñÆ÷ µÄ password, ×î³¤ 64 ×Ö½Ú
-#define User_ESP8266_MQTTServer_IP     "192.168.31.16"     //MQTT±¾µØ·şÎñÆ÷IP
-#define User_ESP8266_MQTTServer_PORT   1883     //·şÎñÆ÷¶Ë¿ÚºÅ
-#define User_ESP8266_MQTTServer_Topic  "topic"    //¶©ÔÄMQTTÖ÷Ìâ
+#define User_ESP8266_client_id    "aithinker"   //MQTTclientID ç”¨äºæ ‡å¿—clientèº«ä»½  æœ€é•¿256å­—èŠ‚
+#define User_ESP8266_username     "admin"						//ç”¨äºç™»å½• MQTT æœåŠ¡å™¨ çš„ username, æœ€é•¿ 64 å­—èŠ‚	
+#define User_ESP8266_password			"public"          //ç”¨äºç™»å½• MQTT æœåŠ¡å™¨ çš„ password, æœ€é•¿ 64 å­—èŠ‚
+#define User_ESP8266_MQTTServer_IP     "192.168.31.16"     //MQTTæœ¬åœ°æœåŠ¡å™¨IP
+#define User_ESP8266_MQTTServer_PORT   1883     //æœåŠ¡å™¨ç«¯å£å·
+#define User_ESP8266_MQTTServer_Topic  "topic"    //è®¢é˜…MQTTä¸»é¢˜
 
 void ESP8266_STA_MQTTClient_Test(void);
 
