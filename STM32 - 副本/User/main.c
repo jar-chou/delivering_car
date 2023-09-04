@@ -184,7 +184,7 @@ static void AppTaskCreate(void)
     /* 创建Test_Task任务 */
     xReturn = xTaskCreate((TaskFunction_t)Task__TWO,          /* 任务入口函数 */
                           (const char *)"Task__TWO",          /* 任务名字 */
-                          (uint16_t)256,                      /* 任务栈大小 */
+                          (uint16_t)1024,                      /* 任务栈大小 */
                           (void *)NULL,                       /* 任务入口函数参数 */
                           (UBaseType_t)10,                    /* 任务的优先级 */
                           (TaskHandle_t *)&Task__TWO_Handle); /* 任务控制块指针 */
@@ -287,8 +287,8 @@ static void AppTaskCreate(void)
     Group_One_Handle = Group_One_Handle;
     
     // 挂机任务，等待选择任务
-    //  vTaskSuspend(Task__ONE_Handle);
-    vTaskSuspend(Task__TWO_Handle);
+    vTaskSuspend(Task__ONE_Handle);
+    // vTaskSuspend(Task__TWO_Handle);
     vTaskDelete(AppTaskCreate_Handle); // 删除AppTaskCreate任务
 
     taskEXIT_CRITICAL(); // 退出临界区
