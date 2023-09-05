@@ -6,6 +6,9 @@
 #include "JY62.h"
 #include "PID.h"
 #include "Driver.h"
+#include "Software_iic.h"
+#include <math.h>
+
 struct COLOR RGB;
 int count = 0;
 extern float VOFA_Data[4];
@@ -36,7 +39,7 @@ void OLED_SHOW_TASK()
 }
 void Read_RGB()
 {
-    IIC_Read_Len(0X5A, 0X0C, 3, &RGB);
+    IIC_Read_Len(0X5A, 0X0C, 3, (u8*)&RGB);
 }
 void Forward()
 {

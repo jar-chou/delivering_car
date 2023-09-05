@@ -23,7 +23,11 @@
  * 
  *            佛祖保佑     永不宕机     永无BUG
  */
-
+/**
+ * @projectName   2023_Robot_car_for_gongxunsai
+ * @author jar_chou and zhaojianchao
+ * @brief 
+*/
 
 /*
 *************************************************************************
@@ -138,6 +142,8 @@ static void Car_Running(void);
 static void Go_Forward_Base_On_Encoder(void);
 static void Pan_Left_Base_On_Encoder(void);
 void Allocation_PID(int PIDOUT);
+
+
 /*****************************************************************
   * @brief  主函数
   * @param  无
@@ -184,7 +190,7 @@ static void AppTaskCreate(void)
     /* 创建Test_Task任务 */
     xReturn = xTaskCreate((TaskFunction_t)Task__TWO,          /* 任务入口函数 */
                           (const char *)"Task__TWO",          /* 任务名字 */
-                          (uint16_t)1024,                      /* 任务栈大小 */
+                          (uint16_t)512,                      /* 任务栈大小 */
                           (void *)NULL,                       /* 任务入口函数参数 */
                           (UBaseType_t)10,                    /* 任务的优先级 */
                           (TaskHandle_t *)&Task__TWO_Handle); /* 任务控制块指针 */
@@ -192,7 +198,7 @@ static void AppTaskCreate(void)
         printf("Task__TWO任务创建成功\r\n");
     xReturn = xTaskCreate((TaskFunction_t)Task__ONE,          /* 任务入口函数 */
                           (const char *)"Task__ONE",          /* 任务名字 */
-                          (uint16_t)1024,                      /* 任务栈大小 */
+                          (uint16_t)512,                      /* 任务栈大小 */
                           (void *)NULL,                       /* 任务入口函数参数 */
                           (UBaseType_t)2,                     /* 任务的优先级 */
                           (TaskHandle_t *)&Task__ONE_Handle); /* 任务控制块指针 */
@@ -349,6 +355,10 @@ static void Go_Forward_Base_On_Encoder(void)
     }
 }
 
+/**
+ * @description: this function is the software callback function that achieve reach the target distance for right laser
+ * @return {*}
+*/
 static void Achieve_Distance_For_Right_Laser(void)
 {
     static int i = 0;
@@ -369,6 +379,10 @@ static void Achieve_Distance_For_Right_Laser(void)
     }
 }
 
+/**
+ * @description: this function is the software callback function that achieve reach the target distance for front laser
+ * @return {*}
+*/
 static void Achieve_Distance_Front_Head_Laser(void)
 {
     static int i = 0;
@@ -389,6 +403,10 @@ static void Achieve_Distance_Front_Head_Laser(void)
     }
 }
 
+/**
+ * @description: this function is the software callback function that calculates the ccr register value of the wheel
+ * @return {*}
+*/
 static void Car_Running(void)
 {
     
@@ -473,6 +491,10 @@ static void Car_Running(void)
 
 }
 
+/**
+ * @description: this function is the software callback function that achieve turn angle
+ * @return {*}
+*/
 static void Turn_Angle(void)
 {
     float Angle, PIDOUT;
@@ -481,6 +503,10 @@ static void Turn_Angle(void)
     Allocation_PID((int)PIDOUT);
 }
 
+/**
+ * @description: this function is the software callback function that send data to upper computer
+ * @return {*}
+*/
 static void sendto_Upper(void)
 {
 
@@ -488,6 +514,10 @@ static void sendto_Upper(void)
     VOFA_Data[0] = (float)stcAngle.Angle[2] / 32768 * 180;
 }
 
+/**
+ * @description: this function is the software callback function that keep the car walking straightly
+ * @return {*}
+*/
 static void line_walking(void)
 {
     // float a, Angle;
@@ -500,6 +530,10 @@ static void line_walking(void)
     // Angle_Speed_X_PID_fun(0, (int)a);
 }
 
+/**
+ * @description: this function is the software callback function that analyse data
+ * @return {*}
+*/
 static void analyse_data(void)
 {
     u8 i = 0;
@@ -542,14 +576,18 @@ static void analyse_data(void)
     taskEXIT_CRITICAL();            //退出基本临界区
 }
 
-
 /**
  * the software timer callback function is end in here
 */
 
+
+
 /**
  * the following code is about open the software timer
 */
+// there are some define about the secord param of the function "startStraight_Line_For_Laser" and "startStraight_Line_Base_On_Encoder"
+#define forward 1
+#define pan 0
 /**
  * @description:    Follow the laser and go straight
  * @param {float} target        what is the distance of laser you want?
@@ -581,6 +619,12 @@ void startStraight_Line_For_Laser(float target, int which_laser)
 
 }
 
+/**
+ * @description:    Follow the encoder and go straight
+ * @param {float} target        what is the distance of encoder you want?
+ * @param {int} forwardOrPan    which is the encoder that you want to refer to? When the value is equal to 1, it indicates the encoder on the front of the reference
+ * @return {*}
+*/
 void startStraight_Line_Base_On_Encoder(float target, int forwardOrPan)
 {
     if (forwardOrPan == 0)
@@ -603,6 +647,7 @@ void startStraight_Line_Base_On_Encoder(float target, int forwardOrPan)
     }
     return;
 }
+
 /**
  * @description: start to Keep the direction Angle of the car
  * @param {float} target_angle  :the angle that you want to keep 
@@ -635,30 +680,64 @@ void start_trun(int i)
  * the code that open the software timer is end in here
 */
 
-bool check_rgb()
+
+
+/**
+ * the following code is about the definition of the first param the function "check_rgb" 
+*/
+#define red_color 1
+#define yellow_color 2
+/**
+ * @description: this function is used to check the color of the ground below the drop
+*/
+bool check_rgb(int color)
 {
-    if (RGB.R > 40 && RGB.R < 65)
+    if (color == red_color)
     {
-        if (RGB.G > 25 && RGB.G < 55)
+        if (RGB.R > 40 && RGB.R < 65)
         {
-            if (RGB.B > 25 && RGB.B < 55)
+            if (RGB.G > 25 && RGB.G < 55)
             {
-                return true;
+                if (RGB.B > 25 && RGB.B < 55)
+                {
+                    return true;
+                }
             }
         }
+        return false;
     }
-    return false;
+    else if (color == yellow_color)
+    {
+        if (RGB.R > 145 && RGB.R < 115)
+        {
+            if (RGB.G > 130 && RGB.G < 100)
+            {
+                if (RGB.B > 85 && RGB.B < 55)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    else
+    {
+        return false;
+    }
+    
+    
 }
-//void start
-/**********************************************************************
- * @ 函数名  ： Test_Task
- * @ 功能说明： Test_Task任务主体
- * @ 参数    ：
- * @ 返回值  ： 无
- ********************************************************************/
 
 
+/**
+ * the following code is about the task that we create
+*/
 
+/**
+ * @description: this task is is used to show necessary information on the OLED
+ * @param {void} *parameter :this param is necessary for freertos task
+ * @return {*}
+*/
 static void OLED_SHOW(void *pvParameters)
 {
     while (1)
@@ -667,6 +746,7 @@ static void OLED_SHOW(void *pvParameters)
         OLED_SHOW_TASK();
     }
 }
+
 /**
  * @description: this task is including the main logic of the program
  * @param {void} *parameter :this param is necessary for freertos task
@@ -686,12 +766,6 @@ static void Task__ONE(void *parameter)
             vTaskDelay(2000);
         }
         
-        // startStraight_Line_For_Laser(150,0);
-        // startStraight_Line_For_Laser(150,1);
-        // while((!X_have_achieved)&&(!Y_have_achieved))
-        //     vTaskDelay(10);
-		// xTimerStop(Car_Running_Handle, 1);
-		// xTimerStop(line_walking_Handle, 1);
         
 
         //xEventGroupWaitBits(Group_One_Handle, 0x01, pdTRUE, pdTRUE, portMAX_DELAY); //! 开始比赛
@@ -701,24 +775,24 @@ static void Task__ONE(void *parameter)
 		// Turn_Angle_PID.Target = Angle + 90;
 		// already_turned = 0;
 		// xTimerStart(Turn_Angle_Handle, 0);
-        startStraight_Line_Base_On_Encoder(12500,1);
-        startgostraight(0);
-        while(!Y_have_achieved)
+        startStraight_Line_Base_On_Encoder(12500,forward);	//直走
+        startgostraight(0);								//保证走直线
+        while(!Y_have_achieved)							//检测到达位置
             vTaskDelay(20);
-        xTimerStop(Car_Running_Handle, 1);
-        xTimerStop(line_walking_Handle, 1);
-		float currentangle = (float)stcAngle.Angle[2] / 32768 * 180;
-		start_trun(1);//左转
+        xTimerStop(Car_Running_Handle, 1);				//小车停止移动
+        xTimerStop(line_walking_Handle, 1);				//停止走直线
+		//float currentangle = (float)stcAngle.Angle[2] / 32768 * 180;
+		start_trun(1);                                  //左转
 		while(!already_turned)
             vTaskDelay(10);
-		currentangle -= 90;
-        startStraight_Line_For_Laser(240,0);
+		//currentangle -= 90;
+        startStraight_Line_For_Laser(240,pan);
         while (!X_have_achieved)
         {
             vTaskDelay(20);
         }
         
-        startStraight_Line_Base_On_Encoder(5500,1);
+        startStraight_Line_Base_On_Encoder(5500, forward);
 		startgostraight(-90);
 		
 
@@ -728,17 +802,17 @@ static void Task__ONE(void *parameter)
 		xTimerStop(Car_Running_Handle, 0);
 		// xTimerStop(line_walking_Handle, 1);
 		
-        startStraight_Line_For_Laser(240,0);
-        startStraight_Line_For_Laser(190,1);
+        startStraight_Line_For_Laser(240, pan);
+        startStraight_Line_For_Laser(190, forward);
         while((!X_have_achieved)||(!Y_have_achieved))
             vTaskDelay(10);
 		xTimerStop(Car_Running_Handle, 1);
 
-        startStraight_Line_Base_On_Encoder(-22500,1);
+        startStraight_Line_Base_On_Encoder(-22500, forward);
 
         startgostraight(-90);
         vTaskDelay(1500);
-        while(!check_rgb())
+        while(!check_rgb(red_color))
         vTaskDelay(20);
 
         xTimerStop(Car_Running_Handle, 1);
@@ -746,57 +820,57 @@ static void Task__ONE(void *parameter)
         xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);;
 
         PULL_High();
-        while (1)
-        {
-            vTaskDelay(1000);
-        }
+    //     while (1)
+    //     {
+    //         vTaskDelay(1000);
+    //     }
         
-        //-关箱
-        Forward();
-        //xTimerStart(line_walking_Handle, 0);
-        vTaskDelay(300);
-        //去十字路口
-        while (1)
-		{
-			if (Distance.F_OUT < 600 & Distance.F_OUT > 100)
-            {
-                PULL_High();
-                //xTimerStop(line_walking_Handle, 0);
-				vTaskDelay(15);
-                break;
-            }
-		}
-        //到达十字路口
+    //     //-关箱
+    //     Forward();
+    //     //xTimerStart(line_walking_Handle, 0);
+    //     vTaskDelay(300);
+    //     //去十字路口
+    //     while (1)
+	// 	{
+	// 		if (Distance.F_OUT < 600 & Distance.F_OUT > 100)
+    //         {
+    //             PULL_High();
+    //             //xTimerStop(line_walking_Handle, 0);
+	// 			vTaskDelay(15);
+    //             break;
+    //         }
+	// 	}
+    //     //到达十字路口
 
-        //等待识别二维码
-        while(1)
-        {
+    //     //等待识别二维码
+    //     while(1)
+    //     {
 
-        }
-        //识别二维码成功
+    //     }
+    //     //识别二维码成功
 
-        /*
-        根据二维码去指定的收货点
-        */
-       //Go to the first pickup point
+    //     /*
+    //     根据二维码去指定的收货点
+    //     */
+    //    //Go to the first pickup point
         
-		float Angle;
-		Angle = (float)stcAngle.Angle[2] / 32768 * 180;
-		Turn_Angle_PID.Target = Angle - 90;
-		already_turned = 0;
-		xTimerStart(Turn_Angle_Handle, 0);
+	// 	float Angle;
+	// 	Angle = (float)stcAngle.Angle[2] / 32768 * 180;
+	// 	Turn_Angle_PID.Target = Angle - 90;
+	// 	already_turned = 0;
+	// 	xTimerStart(Turn_Angle_Handle, 0);
         
 
-        while(!already_turned)//等待转弯完成
-        {
+    //     while(!already_turned)//等待转弯完成
+    //     {
             
-        }
+    //     }
 		
         
-        while(1)
-        {
+    //     while(1)
+    //     {
             
-        }
+    //     }
         
         
         
@@ -806,41 +880,46 @@ static void Task__ONE(void *parameter)
     }
 }
 
+/**
+ * @description: this task is used to control the car
+ * @param {void} *parameter :this param is necessary for freertos task
+ * @return {*}
+ */
 static void Task__TWO(void *parameter)
 {
     while (1)
     {
-        startStraight_Line_Base_On_Encoder(12500,1);
-        startgostraight(0);
-        while(!Y_have_achieved)
+        startStraight_Line_Base_On_Encoder(12500, forward);    //向前走到t字路口
+        startgostraight(0);                             //保证走直线
+        while(!Y_have_achieved)                         //检测到达位置
             vTaskDelay(20);
-        xTimerStop(Car_Running_Handle, 1);
-        xTimerStop(line_walking_Handle, 1);
-		float currentangle = (float)stcAngle.Angle[2] / 32768 * 180;
-		start_trun(1);//左转
-		while(!already_turned)
+        xTimerStop(Car_Running_Handle, 1);              //小车停止移动
+        xTimerStop(line_walking_Handle, 1);             //停止走直线
+		start_trun(1);                                  //左转
+		while(!already_turned)                          //等待转弯完成
             vTaskDelay(10);
-		currentangle -= 90;
-        startStraight_Line_For_Laser(240,0);
-        while (!X_have_achieved)
+		
+        startStraight_Line_For_Laser(240, pan);            //根据右边激光测距调整距离
+
+        while (!X_have_achieved)                        //检测到达位置
         {
             vTaskDelay(20);
         }
 
-        startStraight_Line_Base_On_Encoder(-22500,1);
-
-        startgostraight(-90);
-        vTaskDelay(1500);
-        while(!check_rgb())
+        startStraight_Line_Base_On_Encoder(-22500, forward);   //向后走到右边红色区域
+        startgostraight(-90);                           //保证走直线
+        while(!check_rgb(red_color))                    //用rgb颜色识别检测到达红色区域
         vTaskDelay(20);
 
-        xTimerStop(Car_Running_Handle, 1);
-		xTimerStop(line_walking_Handle, 1);
-        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);
+        xTimerStop(Car_Running_Handle, 1);              //小车停止移动
+		xTimerStop(line_walking_Handle, 1);             //停止走直线
+        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);   //停止前后走
 
         
-        while(1)
-        vTaskDelay(1000);
+        while(1)                                        //任务完成，挂机
+        {
+            vTaskDelay(1000);
+        }
     }
 }
 static void Task__THREE(void)
@@ -860,6 +939,10 @@ static void Task__FOUR(void)
         vTaskDelay(1000);
     }
 }
+/**
+ * the code that create the task is end in here
+*/
+
 /***********************************************************************
  * @ 函数名  ： BSP_Init
  * @ 功能说明： 板级外设初始化，所有板子上的初始化均可放在这个函数里面
@@ -906,6 +989,7 @@ static void BSP_Init(void)
     Delayms(2000);
     GPIO_SetBits(GPIOE, GPIO_Pin_1);
 }
+
 
 void Angle_Speed_X_PID_fun(u8 EN, int Coordinate_PID)
 {
@@ -957,6 +1041,7 @@ void Angle_Speed_X_PID_fun(u8 EN, int Coordinate_PID)
         }
     }
 }
+
 
 void Allocation_PID(int PIDOUT)
 {

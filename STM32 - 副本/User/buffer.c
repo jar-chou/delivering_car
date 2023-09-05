@@ -250,7 +250,7 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
         else
             return 0;
     }
-    if (size == 16)
+    else if (size == 16)
     {
         for (i = 0; i < head_number; i++)
         {
@@ -289,8 +289,10 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
             }
             return 1;
         }
+        else
+            return 0;
     }
-    if (size == 32)
+    else if (size == 32)
     {
         for (i = 0; i < head_number; i++)
         {
@@ -335,7 +337,10 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
             }
             return 1;
         }
-				return 0;
+		else
+            return 0;
     }
+    else
+        return 0;
 }
 
