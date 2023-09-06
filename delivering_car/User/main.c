@@ -408,6 +408,12 @@ static void Achieve_Distance_Front_Head_Laser(void)
 */
 static void Car_Running(void)
 {
+    taskENTER_CRITICAL();   //enter critical zone and operate global variable
+
+    int32_t Local_Y_Speed = Y_Speed;
+    int32_t
+
+    taskEXIT_CRITICAL();
     
     CCR_wheel[0] = Y_Speed;
     CCR_wheel[1] = Y_Speed;
@@ -733,11 +739,9 @@ static void Task__ONE(void *parameter)
             vTaskDelay(20);
         xTimerStop(Car_Running_Handle, 1);				//小车停止移动
         xTimerStop(line_walking_Handle, 1);				//停止走直线
-		//float currentangle = (float)stcAngle.Angle[2] / 32768 * 180;
 		start_trun(1);                                  //左转
-		while(!already_turned)
-            vTaskDelay(10);
-		//currentangle -= 90;
+		while(!already_turned)                          //等待转弯完成
+            vTaskDelay(20);
         startStraight_Line_For_Laser(240,pan);
         while (!X_have_achieved)
         {
@@ -824,6 +828,12 @@ static void Task__TWO(void *parameter)
         }
     }
 }
+
+
+/**
+ * @description: this task is used to control loudspeaker
+ * @return {*}
+ */
 static void Task__THREE(void)
 {
     while (1)
