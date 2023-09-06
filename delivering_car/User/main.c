@@ -410,46 +410,50 @@ static void Car_Running(void)
 {
     taskENTER_CRITICAL();   //enter critical zone and operate global variable
 
+    //get the value of global variable
     int32_t Local_Y_Speed = Y_Speed;
-    int32_t
+    int32_t Local_X_Speed = X_Speed;
+    int32_t Local_angle_speed = angle_speed;
 
-    taskEXIT_CRITICAL();
+    //clear the value of global variable
+    Y_Speed = 0;
+    X_Speed = 0;
+    angle_speed = 0;
     
-    CCR_wheel[0] = Y_Speed;
-    CCR_wheel[1] = Y_Speed;
-    CCR_wheel[2] = Y_Speed;
-    CCR_wheel[3] = Y_Speed;
-	
-	Y_Speed = 0;
+    taskEXIT_CRITICAL();    //exit critical zone
+    
+    //calculate the ccr register value of the wheel
+    CCR_wheel[0] = Local_Y_Speed;
+    CCR_wheel[1] = Local_Y_Speed;
+    CCR_wheel[2] = Local_Y_Speed;
+    CCR_wheel[3] = Local_Y_Speed;
 
-    CCR_wheel[0] += X_Speed;
-    CCR_wheel[1] -= X_Speed;
-    CCR_wheel[2] += X_Speed;
-    CCR_wheel[3] -= X_Speed;
-	
-	X_Speed = 0;
+    CCR_wheel[0] += Local_X_Speed;
+    CCR_wheel[1] -= Local_X_Speed;
+    CCR_wheel[2] += Local_X_Speed;
+    CCR_wheel[3] -= Local_X_Speed;
 
-    CCR_wheel[0] -= angle_speed;
-    CCR_wheel[1] += angle_speed;
-    CCR_wheel[2] += angle_speed;
-    CCR_wheel[3] -= angle_speed;
-	
-	angle_speed = 0;
+    CCR_wheel[0] -= Local_angle_speed;
+    CCR_wheel[1] += Local_angle_speed;
+    CCR_wheel[2] += Local_angle_speed;
+    CCR_wheel[3] -= Local_angle_speed;
+
     
-    
+    //change the direction of the wheel
    for (size_t i = 0; i < 4; i++)
    {
-       if (CCR_wheel[i]>0)
+       if (CCR_wheel[i]>0)  //forward
        {
-           Advance(i+2);
+           Advance(i+2);    //it is because the wheel is from 2 to 5
        }
-       else
+       else //backward
        {
-           Back(i+2);
-           CCR_wheel[i] = -CCR_wheel[i];
+           Back(i+2);       //it is because the wheel is from 2 to 5
+           CCR_wheel[i] = -CCR_wheel[i];    //change the value to positive, because the function "SetCompare1" need a positive value
        }
    }
     
+    //set the ccr register value of the wheel
     SetCompare1(TIM1, CCR_wheel[0], 1);
     SetCompare1(TIM1, CCR_wheel[1], 2);
     SetCompare1(TIM1, CCR_wheel[2], 3);
