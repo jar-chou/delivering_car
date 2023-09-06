@@ -223,6 +223,7 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
     n = BUFFER_SIZE;
     if (size == 8)
     {
+        u8 *p = data;
         for (i = 0; i < head_number; i++)
         {
             while (n--)
@@ -242,8 +243,9 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
         {
             for (i = 0; i < data_number; i++)
             {
-                *(u8 *)data = (u8)Read_BUFF(BUFF);
-                ((u8 *)data)++;
+                *(u8 *)p = (u8)Read_BUFF(BUFF);
+                p++;
+                // ((u8 *)data)++;
             }
             return 1;
         }
@@ -252,6 +254,7 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
     }
     else if (size == 16)
     {
+        u16 *p = data;
         for (i = 0; i < head_number; i++)
         {
             while (n--)
@@ -274,17 +277,19 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
             {
                 if (bigfron == 1)
                 {
-                    (*(u16 *)data) = (u8)Read_BUFF(BUFF);
-                    (*(u16 *)data) = ((*(u16 *)data) << 8) + (u8)Read_BUFF(BUFF);
-                    ((u16 *)data)++;
+                    (*(u16 *)p) = (u8)Read_BUFF(BUFF);
+                    (*(u16 *)p) = ((*(u16 *)p) << 8) + (u8)Read_BUFF(BUFF);
+                    p++;
+                    // ((u16 *)data)++;
                 }
                 else
                 {
 
-                    (*(u16 *)data) = (u8)Read_BUFF(BUFF);
+                    (*(u16 *)p) = (u8)Read_BUFF(BUFF);
                     big = (u8)Read_BUFF(BUFF);
-                    (*(u16 *)data) = (big << 8) + (*(u16 *)data);
-                    ((u16 *)data)++;
+                    (*(u16 *)p) = (big << 8) + (*(u16 *)p);
+                    p++;
+                    // ((u16 *)data)++;
                 }
             }
             return 1;
@@ -294,6 +299,7 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
     }
     else if (size == 32)
     {
+        u32 *p = data;
         for (i = 0; i < head_number; i++)
         {
             while (n--)
@@ -320,8 +326,10 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
                     two = (u8)Read_BUFF(BUFF);
                     three = (u8)Read_BUFF(BUFF);
                     four = (u8)Read_BUFF(BUFF);
-                    (*(u32 *)data) = four + (three << 8) + (two << 16) + (one << 24);
-                    ((u32 *)data)++;
+                    (*(u32 *)p) = four + (three << 8) + (two << 16) + (one << 24);
+                    p++;
+                    // ((uint32_t *)data)++;
+                    
                 }
                 else
                 {
@@ -330,9 +338,8 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
                     two = (u8)Read_BUFF(BUFF);
                     three = (u8)Read_BUFF(BUFF);
                     four = (u8)Read_BUFF(BUFF);
-                    (*(u32 *)data) = one + (two << 8) ; 
-                    (*(u32 *)data) +=(three << 16) + (four << 24);
-                    ((u32 *)data)++;
+                    (*(u32 *)p) = one + (two << 8) + (three << 16) + (four << 24);
+                    p++;
                 }
             }
             return 1;

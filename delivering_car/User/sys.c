@@ -8,6 +8,7 @@
 #include "Driver.h"
 #include "Software_iic.h"
 #include <math.h>
+#include <stdbool.h>
 
 struct COLOR RGB;
 int count = 0;
@@ -20,6 +21,9 @@ extern int32_t angle_speed;
 extern struct PID Coord, Turn_Angle_PID;
 extern int32_t position_of_car[3];
 extern int32_t CCR_wheel[4];
+
+extern bool check_rgb(int color);
+
 
 void OLED_SHOW_TASK()
 {
@@ -34,7 +38,7 @@ void OLED_SHOW_TASK()
     OLED_ShowString(3, 1, buff);
     sprintf(buff, "FD:%.1f", VOFA_Data[3]);
     OLED_ShowString(3, 9, buff);
-    sprintf(buff, "%.2f  %.2f", Turn_Angle_PID.Target, current_angle);
+    sprintf(buff, "%d", check_rgb(1));
     OLED_ShowString(4,1,buff);
 }
 void Read_RGB()
@@ -85,14 +89,14 @@ void Walking_Left()
 }
 
 
-//-------ÒÔÏÂÊÇHSVÑÕÉ«¿Õ¼äºÍRGBÑÕÉ«¿Õ¼äÏà»¥×ª»»½Ó¿Ú------------
+//-------ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½RGBï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½à»¥×ªï¿½ï¿½ï¿½Ó¿ï¿½------------
 /**
- * @brief HSVÑÕÉ«¿Õ¼ä
+ * @brief HSVï¿½ï¿½É«ï¿½Õ¼ï¿½
 */
 typedef struct {
-    float h;    // É«µ÷H(hue)  0~360¡ã {R(0¡ã),G(120¡ã),B(240¡ã)}
-    float s;    // ±¥ºÍ¶ÈS(saturation)  0~1.0
-    float v;    // Ã÷¶ÈV(value)  0~1.0  
+    float h;    // É«ï¿½ï¿½H(hue)  0~360ï¿½ï¿½ {R(0ï¿½ï¿½),G(120ï¿½ï¿½),B(240ï¿½ï¿½)}
+    float s;    // ï¿½ï¿½ï¿½Í¶ï¿½S(saturation)  0~1.0
+    float v;    // ï¿½ï¿½ï¿½ï¿½V(value)  0~1.0  
 }color_hsv_t;
 
 typedef struct {
@@ -104,58 +108,58 @@ typedef struct {
 
 
 /**
- * @brief   RGBÑÕÉ«¿Õ¼ä ×ª  HSVÑÕÉ«¿Õ¼ä 
- * @param   rgb:RGBÑÕÉ«¿Õ¼ä²ÎÊý
- * @param   hsv:HSVÑÕÉ«¿Õ¼ä²ÎÊý
+ * @brief   RGBï¿½ï¿½É«ï¿½Õ¼ï¿½ ×ª  HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ 
+ * @param   rgb:RGBï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
+ * @param   hsv:HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
  * @return  none
 */
 void rgb2hsv(color_rgb_t *rgb, color_hsv_t *hsv);
 
 /**
- * @brief   HSVÑÕÉ«¿Õ¼ä ×ª RGBÑÕÉ«¿Õ¼ä
- * @param   hsv:HSVÑÕÉ«¿Õ¼ä²ÎÊý
- * @param   rgb:RGBÑÕÉ«¿Õ¼ä²ÎÊý
+ * @brief   HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ ×ª RGBï¿½ï¿½É«ï¿½Õ¼ï¿½
+ * @param   hsv:HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
+ * @param   rgb:RGBï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
  * @return  none
 */
 void hsv2rgb(color_hsv_t *hsv, color_rgb_t *rgb);
 
 /**
- * @brief   µ÷½ÚHSVÑÕÉ«¿Õ¼ä HÖµ(0.0~360.0)
- * @param   hsv:HSVÑÕÉ«¿Õ¼ä²ÎÊý
- * @param   h_offset:µ÷½Ú²ÎÊý Ôö¼Ó>0.0£¬¼õÐ¡<0.0
+ * @brief   ï¿½ï¿½ï¿½ï¿½HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ HÖµ(0.0~360.0)
+ * @param   hsv:HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
+ * @param   h_offset:ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½>0.0ï¿½ï¿½ï¿½ï¿½Ð¡<0.0
  * @return  none
 */
 void hsv_adjust_h(color_hsv_t *hsv, float h_offset);
 
 /**
- * @brief   µ÷½ÚHSVÑÕÉ«¿Õ¼ä SÖµ(0.0~1.0)
- * @param   hsv:HSVÑÕÉ«¿Õ¼ä²ÎÊý
- * @param   s_offset:µ÷½Ú²ÎÊý Ôö¼Ó>0.0£¬¼õÐ¡<0.0
+ * @brief   ï¿½ï¿½ï¿½ï¿½HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ SÖµ(0.0~1.0)
+ * @param   hsv:HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
+ * @param   s_offset:ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½>0.0ï¿½ï¿½ï¿½ï¿½Ð¡<0.0
  * @return  none
 */
 void hsv_adjust_s(color_hsv_t *hsv, float s_offset);
 
 /**
- * @brief   µ÷½ÚHSVÑÕÉ«¿Õ¼ä VÖµ(0.0~1.0)
- * @param   hsv:HSVÑÕÉ«¿Õ¼ä²ÎÊý
- * @param   v_offset:µ÷½Ú²ÎÊý Ôö¼Ó>0.0£¬¼õÐ¡<0.0
+ * @brief   ï¿½ï¿½ï¿½ï¿½HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ VÖµ(0.0~1.0)
+ * @param   hsv:HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
+ * @param   v_offset:ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½>0.0ï¿½ï¿½ï¿½ï¿½Ð¡<0.0
  * @return  none
 */
 void hsv_adjust_v(color_hsv_t *hsv, float v_offset);
 
 
 
-// ÒÔÏÂÊÇHSVÑÕÉ«¿Õ¼äºÍRGBÑÕÉ«¿Õ¼äÏà»¥×ª»»½Ó¿Ú
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½RGBï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½à»¥×ªï¿½ï¿½ï¿½Ó¿ï¿½
 /*********************************************************************************************
-ºì£º    
+ï¿½ì£º    
     R   255         H:0
     G   0           S:100
     B   0           V:100    
-ÂÌ£º
+ï¿½Ì£ï¿½
     R   0           H:120   
     G   255         S:100
     B   0           V:100    
-À¶£º
+ï¿½ï¿½ï¿½ï¿½
     R   0           H:240   
     G   0           S:100
     B   255         V:100    
@@ -168,21 +172,21 @@ void hsv_adjust_v(color_hsv_t *hsv, float v_offset);
 
 
 /*********************************************************************************************
-RGB×ª»¯µ½HSVµÄËã·¨:
-    max=max(R,G,B)£»
-    min=min(R,G,B)£»
-    V=max(R,G,B)£»
-    S=(max-min)/max£»
-    if (R = max) H =(G-B)/(max-min)* 60£»
-    if (G = max) H = 120+(B-R)/(max-min)* 60£»
-    if (B = max) H = 240 +(R-G)/(max-min)* 60£»
-    if (H < 0) H = H + 360£»
+RGB×ªï¿½ï¿½ï¿½ï¿½HSVï¿½ï¿½ï¿½ã·¨:
+    max=max(R,G,B)ï¿½ï¿½
+    min=min(R,G,B)ï¿½ï¿½
+    V=max(R,G,B)ï¿½ï¿½
+    S=(max-min)/maxï¿½ï¿½
+    if (R = max) H =(G-B)/(max-min)* 60ï¿½ï¿½
+    if (G = max) H = 120+(B-R)/(max-min)* 60ï¿½ï¿½
+    if (B = max) H = 240 +(R-G)/(max-min)* 60ï¿½ï¿½
+    if (H < 0) H = H + 360ï¿½ï¿½
 ***********************************************************************************************/
 
 /**
- * @brief   RGBÑÕÉ«¿Õ¼ä ×ª  HSVÑÕÉ«¿Õ¼ä 
- * @param   rgb:RGBÑÕÉ«¿Õ¼ä²ÎÊý
- * @param   hsv:HSVÑÕÉ«¿Õ¼ä²ÎÊý
+ * @brief   RGBï¿½ï¿½É«ï¿½Õ¼ï¿½ ×ª  HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ 
+ * @param   rgb:RGBï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
+ * @param   hsv:HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
  * @note    The R,G,B values are divided by 255 to change the range from 0..255 to 0..1:
  * @return  none
 */
@@ -228,7 +232,7 @@ void rgb2hsv(color_rgb_t *rgb, color_hsv_t *hsv)
 
 
 /*************************************************************************
-HSV×ª»¯µ½RGBµÄËã·¨:
+HSV×ªï¿½ï¿½ï¿½ï¿½RGBï¿½ï¿½ï¿½ã·¨:
     if (s = 0)
     R=G=B=V;
     else
@@ -248,10 +252,10 @@ HSV×ª»¯µ½RGBµÄËã·¨:
 *******************************************************************************/
 
 /**
- * @brief   HSVÑÕÉ«¿Õ¼ä ×ª RGBÑÕÉ«¿Õ¼ä
- * @param   hsv:HSVÑÕÉ«¿Õ¼ä²ÎÊý
- * @param   rgb:RGBÑÕÉ«¿Õ¼ä²ÎÊý
- * @note    When 0 ¡Ü H < 360, 0 ¡Ü S ¡Ü 1 and 0 ¡Ü V ¡Ü 1:
+ * @brief   HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ ×ª RGBï¿½ï¿½É«ï¿½Õ¼ï¿½
+ * @param   hsv:HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
+ * @param   rgb:RGBï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
+ * @note    When 0 ï¿½ï¿½ H < 360, 0 ï¿½ï¿½ S ï¿½ï¿½ 1 and 0 ï¿½ï¿½ V ï¿½ï¿½ 1:
  * @return  none
 */
 void hsv2rgb(color_hsv_t *hsv, color_rgb_t *rgb)
@@ -316,9 +320,9 @@ void hsv2rgb(color_hsv_t *hsv, color_rgb_t *rgb)
 }
 
 /**
- * @brief   µ÷½ÚHSVÑÕÉ«¿Õ¼ä HÖµ(0.0~360.0)
- * @param   hsv:HSVÑÕÉ«¿Õ¼ä²ÎÊý
- * @param   h_offset:µ÷½Ú²ÎÊý Ôö¼Ó>0.0£¬¼õÐ¡<0.0
+ * @brief   ï¿½ï¿½ï¿½ï¿½HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ HÖµ(0.0~360.0)
+ * @param   hsv:HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
+ * @param   h_offset:ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½>0.0ï¿½ï¿½ï¿½ï¿½Ð¡<0.0
  * @return  none
 */
 void hsv_adjust_h(color_hsv_t *hsv, float h_offset)
@@ -333,9 +337,9 @@ void hsv_adjust_h(color_hsv_t *hsv, float h_offset)
 
 
 /**
- * @brief   µ÷½ÚHSVÑÕÉ«¿Õ¼ä SÖµ(0.0~1.0)
- * @param   hsv:HSVÑÕÉ«¿Õ¼ä²ÎÊý
- * @param   s_offset:µ÷½Ú²ÎÊý Ôö¼Ó>0.0£¬¼õÐ¡<0.0
+ * @brief   ï¿½ï¿½ï¿½ï¿½HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ SÖµ(0.0~1.0)
+ * @param   hsv:HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
+ * @param   s_offset:ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½>0.0ï¿½ï¿½ï¿½ï¿½Ð¡<0.0
  * @return  none
 */
 void hsv_adjust_s(color_hsv_t *hsv, float s_offset)
@@ -350,9 +354,9 @@ void hsv_adjust_s(color_hsv_t *hsv, float s_offset)
 
 
 /**
- * @brief   µ÷½ÚHSVÑÕÉ«¿Õ¼ä VÖµ(0.0~1.0)
- * @param   hsv:HSVÑÕÉ«¿Õ¼ä²ÎÊý
- * @param   v_offset:µ÷½Ú²ÎÊý Ôö¼Ó>0.0£¬¼õÐ¡<0.0
+ * @brief   ï¿½ï¿½ï¿½ï¿½HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ VÖµ(0.0~1.0)
+ * @param   hsv:HSVï¿½ï¿½É«ï¿½Õ¼ï¿½ï¿½ï¿½ï¿½
+ * @param   v_offset:ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½>0.0ï¿½ï¿½ï¿½ï¿½Ð¡<0.0
  * @return  none
 */
 void hsv_adjust_v(color_hsv_t *hsv, float v_offset)

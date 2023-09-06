@@ -109,7 +109,7 @@ struct PID Coord, Turn_Angle_PID, X_Speed_PID, Y_Speed_PID, X_Base_On_Laser_PID,
 u8 already_turned = 0, Y_have_achieved = 0, X_have_achieved = 0;   //是否达到定时器目的的信号量
 int32_t CCR_wheel[4]={0,0,0,0};
 int32_t position_of_car[3]={0,0,0};
-
+u8 voice[3][6] = {0xaa,0x07,0x02,0x00,0x01,0xb4,0xaa,0x07,0x02,0x00,0x02,0xb5,0xaa,0x07,0x02,0x00,0x03,0xb6};
 struct distance
 {
     u16 F[5];
@@ -125,7 +125,6 @@ struct distance
 */
 static void
 analyse_data(void);
-void Angle_Speed_X_PID_fun(u8 EN, int Coordinate_PID);
 static void line_walking(void);
 static void AppTaskCreate(void);           	/* 用于创建任务 */
 static void Task__TWO(void *pvParameters); 	/* Test_Task任务实现 */
@@ -192,7 +191,7 @@ static void AppTaskCreate(void)
                           (const char *)"Task__TWO",          /* 任务名字 */
                           (uint16_t)512,                      /* 任务栈大小 */
                           (void *)NULL,                       /* 任务入口函数参数 */
-                          (UBaseType_t)10,                    /* 任务的优先级 */
+                          (UBaseType_t)2,                    /* 任务的优先级 */
                           (TaskHandle_t *)&Task__TWO_Handle); /* 任务控制块指针 */
     if (xReturn == pdPASS)
         printf("Task__TWO任务创建成功\r\n");
@@ -431,45 +430,6 @@ static void Car_Running(void)
 	
 	angle_speed = 0;
     
-    // if (CCR_wheel[0] > 0)
-    // {
-    //     Advance(2);
-    // }
-    // else
-    // {
-    //     Back(2);
-    //     CCR_wheel[0]=-CCR_wheel[0];
-    // }
-
-    // if (CCR_wheel[1] > 0)
-    // {
-    //     Advance(3);
-    // }
-    // else
-    // {
-    //     Back(3);
-    //     CCR_wheel[1]=-CCR_wheel[1];
-    // }
-
-    // if (CCR_wheel[2] > 0)
-    // {
-    //     Advance(4);
-    // }
-    // else
-    // {
-    //     Back(4);
-    //     CCR_wheel[2]=-CCR_wheel[2];
-    // }
-
-    // if (CCR_wheel[3] > 0)
-    // {
-    //     Advance(5);
-    // }
-    // else
-    // {
-    //     Back(5);
-    //     CCR_wheel[3]=-CCR_wheel[3];
-    // }
     
    for (size_t i = 0; i < 4; i++)
    {
@@ -520,14 +480,11 @@ static void sendto_Upper(void)
 */
 static void line_walking(void)
 {
-    // float a, Angle;
     float Angle;
     //?PID开始巡线
     Angle = (float)stcAngle.Angle[2] / 32768 * 180;
     angle_speed = PID_Realize(&Coord, Angle);
-    
-    // VOFA_Data[1] = a;
-    // Angle_Speed_X_PID_fun(0, (int)a);
+    return;
 }
 
 /**
@@ -689,6 +646,8 @@ void start_trun(int i)
 #define yellow_color 2
 /**
  * @description: this function is used to check the color of the ground below the drop
+ * @param {int} color :the color that you want to check 
+ * @return {bool} :if the color is right,return true,else return false
 */
 bool check_rgb(int color)
 {
@@ -708,11 +667,11 @@ bool check_rgb(int color)
     }
     else if (color == yellow_color)
     {
-        if (RGB.R > 145 && RGB.R < 115)
+        if (RGB.R > 120 && RGB.R < 155)
         {
-            if (RGB.G > 130 && RGB.G < 100)
+            if (RGB.G > 110 && RGB.G < 140)
             {
-                if (RGB.B > 85 && RGB.B < 55)
+                if (RGB.B > 55 && RGB.B < 90)
                 {
                     return true;
                 }
@@ -760,13 +719,6 @@ static void Task__ONE(void *parameter)
     // char qrcode=0x07;
     while (1)
     {
-        
-        while (1)
-        {
-            vTaskDelay(2000);
-        }
-        
-        
 
         //xEventGroupWaitBits(Group_One_Handle, 0x01, pdTRUE, pdTRUE, portMAX_DELAY); //! 开始比赛
         //-开箱 狗叫
@@ -812,7 +764,7 @@ static void Task__ONE(void *parameter)
 
         startgostraight(-90);
         vTaskDelay(1500);
-        while(!check_rgb(red_color))
+        while(!check_rgb(1))
         vTaskDelay(20);
 
         xTimerStop(Car_Running_Handle, 1);
@@ -820,63 +772,11 @@ static void Task__ONE(void *parameter)
         xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);;
 
         PULL_High();
-    //     while (1)
-    //     {
-    //         vTaskDelay(1000);
-    //     }
-        
-    //     //-关箱
-    //     Forward();
-    //     //xTimerStart(line_walking_Handle, 0);
-    //     vTaskDelay(300);
-    //     //去十字路口
-    //     while (1)
-	// 	{
-	// 		if (Distance.F_OUT < 600 & Distance.F_OUT > 100)
-    //         {
-    //             PULL_High();
-    //             //xTimerStop(line_walking_Handle, 0);
-	// 			vTaskDelay(15);
-    //             break;
-    //         }
-	// 	}
-    //     //到达十字路口
+        while(1)
+        {
+            vTaskDelay(1000);
+        }
 
-    //     //等待识别二维码
-    //     while(1)
-    //     {
-
-    //     }
-    //     //识别二维码成功
-
-    //     /*
-    //     根据二维码去指定的收货点
-    //     */
-    //    //Go to the first pickup point
-        
-	// 	float Angle;
-	// 	Angle = (float)stcAngle.Angle[2] / 32768 * 180;
-	// 	Turn_Angle_PID.Target = Angle - 90;
-	// 	already_turned = 0;
-	// 	xTimerStart(Turn_Angle_Handle, 0);
-        
-
-    //     while(!already_turned)//等待转弯完成
-    //     {
-            
-    //     }
-		
-        
-    //     while(1)
-    //     {
-            
-    //     }
-        
-        
-        
-        
-        // printf("HHHHHHH");
-        vTaskDelay(100);
     }
 }
 
@@ -889,6 +789,8 @@ static void Task__TWO(void *parameter)
 {
     while (1)
     {
+        
+        
         startStraight_Line_Base_On_Encoder(12500, forward);    //向前走到t字路口
         startgostraight(0);                             //保证走直线
         while(!Y_have_achieved)                         //检测到达位置
@@ -908,14 +810,14 @@ static void Task__TWO(void *parameter)
 
         startStraight_Line_Base_On_Encoder(-22500, forward);   //向后走到右边红色区域
         startgostraight(-90);                           //保证走直线
-        while(!check_rgb(red_color))                    //用rgb颜色识别检测到达红色区域
+        while(!check_rgb(1))                    //用rgb颜色识别检测到达红色区域
         vTaskDelay(20);
 
         xTimerStop(Car_Running_Handle, 1);              //小车停止移动
 		xTimerStop(line_walking_Handle, 1);             //停止走直线
         xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);   //停止前后走
 
-        
+        PULL_High();
         while(1)                                        //任务完成，挂机
         {
             vTaskDelay(1000);
@@ -927,7 +829,12 @@ static void Task__THREE(void)
     while (1)
     {
 
-        vTaskDelay(1000); /* 延时500个tick */
+        	USART_Send(voice[0],7);
+        vTaskDelay(5000); /* 延时500个tick */
+			USART_Send(voice[1],7);
+        vTaskDelay(5000); /* 延时500个tick */
+			USART_Send(voice[2],7);
+        vTaskDelay(5000); /* 延时500个tick */
     }
 }
 static void Task__FOUR(void)
@@ -975,10 +882,10 @@ static void BSP_Init(void)
     PID_Initialize(&Coord, 20, 0, 0, 0, 100, -100);         //微调巡线的pid初始化
     PID_Initialize(&Turn_Angle_PID, 17.5, 0, 0, 0, 25, -25);  //转弯的pid初始化
     PID_Initialize(&X_Speed_PID, 3.5, 0, .5, 0, 100, -100); //x方向的远距离基于编码器的pid
-    PID_Initialize(&Y_Speed_PID, 3, 0, .5, 0, 100, -100);   //y方向的远距离基于编码器的pid
-    PID_Initialize(&X_Base_On_Laser_PID, 1.5, 0, .5, 0, 100, -100);
-    PID_Initialize(&Y_Base_On_Laser_PID, 1.5, 0, .5, 0, 100, -100);
-
+    PID_Initialize(&Y_Speed_PID, 3.5, 0, .5, 0, 100, -100);   //y方向的远距离基于编码器的pid
+    PID_Initialize(&X_Base_On_Laser_PID, 2, 0, .5, 0, 150, -150);
+    PID_Initialize(&Y_Base_On_Laser_PID, 2, 0, .5, 0, 150, -150);
+		Software_USART_IOConfig();
     LED_GPIO_Config();
     KEY_ONE();
     OLED_Init();
@@ -988,58 +895,6 @@ static void BSP_Init(void)
     sendcmd(YAWCMD);
     Delayms(2000);
     GPIO_SetBits(GPIOE, GPIO_Pin_1);
-}
-
-
-void Angle_Speed_X_PID_fun(u8 EN, int Coordinate_PID)
-{
-
-    if (EN == 1)
-    {
-    }
-
-    if (Coordinate_PID >= 0)
-    {
-        /* code */
-
-        if (Coordinate_PID >= 600)
-        {
-            /* code */
-            Coordinate_PID = 600;
-            SetCompare1(TIM1, Initial_Speed + Coordinate_PID, 2);
-            SetCompare1(TIM1, Initial_Speed + Coordinate_PID, 3);
-            SetCompare1(TIM1, Initial_Speed - Coordinate_PID, 1);
-            SetCompare1(TIM1, Initial_Speed - Coordinate_PID, 4);
-        }
-        else
-        {
-            SetCompare1(TIM1, Initial_Speed + Coordinate_PID, 2);
-            SetCompare1(TIM1, Initial_Speed + Coordinate_PID, 3);
-            SetCompare1(TIM1, Initial_Speed - Coordinate_PID, 1);
-            SetCompare1(TIM1, Initial_Speed - Coordinate_PID, 4);
-        }
-    }
-    if (Coordinate_PID <= 0)
-    {
-        /* code */
-
-        if (Coordinate_PID < -600)
-        {
-            /* code */
-            Coordinate_PID = -600;
-            SetCompare1(TIM1, Initial_Speed + Coordinate_PID, 2);
-            SetCompare1(TIM1, Initial_Speed + Coordinate_PID, 3);
-            SetCompare1(TIM1, Initial_Speed - Coordinate_PID, 1);
-            SetCompare1(TIM1, Initial_Speed - Coordinate_PID, 4);
-        }
-        else
-        {
-            SetCompare1(TIM1, Initial_Speed + Coordinate_PID, 2);
-            SetCompare1(TIM1, Initial_Speed + Coordinate_PID, 3);
-            SetCompare1(TIM1, Initial_Speed - Coordinate_PID, 1);
-            SetCompare1(TIM1, Initial_Speed - Coordinate_PID, 4);
-        }
-    }
 }
 
 

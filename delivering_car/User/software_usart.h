@@ -1,7 +1,7 @@
 #ifndef software_usart__
 #define software_usart__
 #include "stm32f10x.h"
-#define BAUDRATE 8
+#define BAUDRATE 104
 //!  3 -> 256000  8->115200
 void Software_USART_TXD(u8 Data);
 void USART_Send(u8 *buf, u8 len);
