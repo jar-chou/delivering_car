@@ -1,11 +1,12 @@
 /*
- * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @Date: 2023-07-18 23:25:24
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2023-08-01 17:18:59
- * @FilePath: \RVMDK（uv5）f:\Desktop\送药小车\STM32 - 副本\User\buffer.h
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @Author: jar-chou 2722642511@qq.com
+ * @Date: 2023-09-06 13:02:19
+ * @LastEditors: jar-chou 2722642511@qq.com
+ * @LastEditTime: 2023-09-07 11:47:09
+ * @FilePath: \delivering_car\User\buffer.h
+ * @Description: 杩欐槸榛樿璁剧疆,璇疯缃甡customMade`, 鎵撳紑koroFileHeader鏌ョ湅閰嶇疆 杩涜璁剧疆: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
+
 #ifndef buffer__
 #define buffer__
 #include "stm32f10x.h"

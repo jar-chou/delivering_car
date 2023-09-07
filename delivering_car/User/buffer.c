@@ -221,6 +221,17 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
 {
     u8 i, n, count = 0;
     n = BUFFER_SIZE;
+    //判断环形缓冲区是否有足够数据
+    // if (BUFF->write_p > BUFF->read_p)
+    // {
+    //     if ((BUFF->write_p - BUFF->read_p) > (head_number + data_number * size / 8))
+    //         return 0;
+    // }
+    // else
+    // {
+    //     if ((BUFF->end_p - BUFF->read_p + 1 + BUFF->write_p - BUFF->head_p) > (head_number + data_number * size / 8))
+    //         return 0;
+    // }
     if (size == 8)
     {
         u8 *p = data;

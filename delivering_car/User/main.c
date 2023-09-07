@@ -1,33 +1,61 @@
 /*
- *                        _oo0oo_
- *                       o8888888o
- *                       88" . "88
- *                       (| -_- |)
- *                       0\  =  /0
- *                     ___/`---'\___
- *                   .' \\|     |// '.
- *                  / \\|||  :  |||// \
- *                 / _||||| -:- |||||- \
- *                |   | \\\  - /// |   |
- *                | \_|  ''\---/''  |_/ |
- *                \  .-\__  '-'  ___/-. /
- *              ___'. .'  /--.--\  `. .'___
- *           ."" '<  `.___\_<|>_/___.' >' "".
- *          | | :  `- \`.;`\ _ /`;.`/ - ` : | |
- *          \  \ `_.   \_ __\ /__ _/   .-` /  /
- *      =====`-.____`.___ \_____/___.-`___.-'=====
- *                        `=---='
+ * ......................................&&.........................
+ * ....................................&&&..........................
+ * .................................&&&&............................
+ * ...............................&&&&..............................
+ * .............................&&&&&&..............................
+ * ...........................&&&&&&....&&&..&&&&&&&&&&&&&&&........
+ * ..................&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&..............
+ * ................&...&&&&&&&&&&&&&&&&&&&&&&&&&&&&.................
+ * .......................&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&.........
+ * ...................&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&...............
+ * ..................&&&   &&&&&&&&&&&&&&&&&&&&&&&&&&&&&............
+ * ...............&&&&&@  &&&&&&&&&&..&&&&&&&&&&&&&&&&&&&...........
+ * ..............&&&&&&&&&&&&&&&.&&....&&&&&&&&&&&&&..&&&&&.........
+ * ..........&&&&&&&&&&&&&&&&&&...&.....&&&&&&&&&&&&&...&&&&........
+ * ........&&&&&&&&&&&&&&&&&&&.........&&&&&&&&&&&&&&&....&&&.......
+ * .......&&&&&&&&.....................&&&&&&&&&&&&&&&&.....&&......
+ * ........&&&&&.....................&&&&&&&&&&&&&&&&&&.............
+ * ..........&...................&&&&&&&&&&&&&&&&&&&&&&&............
+ * ................&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&............
+ * ..................&&&&&&&&&&&&&&&&&&&&&&&&&&&&..&&&&&............
+ * ..............&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&....&&&&&............
+ * ...........&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&......&&&&............
+ * .........&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&.........&&&&............
+ * .......&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&...........&&&&............
+ * ......&&&&&&&&&&&&&&&&&&&...&&&&&&...............&&&.............
+ * .....&&&&&&&&&&&&&&&&............................&&..............
+ * ....&&&&&&&&&&&&&&&.................&&...........................
+ * ...&&&&&&&&&&&&&&&.....................&&&&......................
+ * ...&&&&&&&&&&.&&&........................&&&&&...................
+ * ..&&&&&&&&&&&..&&..........................&&&&&&&...............
+ * ..&&&&&&&&&&&&...&............&&&.....&&&&...&&&&&&&.............
+ * ..&&&&&&&&&&&&&.................&&&.....&&&&&&&&&&&&&&...........
+ * ..&&&&&&&&&&&&&&&&..............&&&&&&&&&&&&&&&&&&&&&&&&.........
+ * ..&&.&&&&&&&&&&&&&&&&&.........&&&&&&&&&&&&&&&&&&&&&&&&&&&.......
+ * ...&&..&&&&&&&&&&&&.........&&&&&&&&&&&&&&&&...&&&&&&&&&&&&......
+ * ....&..&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&...........&&&&&&&&.....
+ * .......&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&..............&&&&&&&....
+ * .......&&&&&.&&&&&&&&&&&&&&&&&&..&&&&&&&&...&..........&&&&&&....
+ * ........&&&.....&&&&&&&&&&&&&.....&&&&&&&&&&...........&..&&&&...
+ * .......&&&........&&&.&&&&&&&&&.....&&&&&.................&&&&...
+ * .......&&&...............&&&&&&&.......&&&&&&&&............&&&...
+ * ........&&...................&&&&&&.........................&&&..
+ * .........&.....................&&&&........................&&....
+ * ...............................&&&.......................&&......
+ * ................................&&......................&&.......
+ * .................................&&..............................
+ * ..................................&..............................
  * 
- * 
- *      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * 
- *            佛祖保佑     永不宕机     永无BUG
+ * @Author: zhaojianchao jar-chou 2722642511@qq.com 
+ * @Date: 2023-09-06 13:02:19
+ * @LastEditors: jar-chou 2722642511@qq.com
+ * @LastEditTime: 2023-09-07 13:50:25
+ * @FilePath: \delivering_car\User\main.c
+ * @Description: 龙王保佑此文件无bug！！！
  */
-/**
- * @projectName   2023_Robot_car_for_gongxunsai
- * @author jar_chou and zhaojianchao
- * @brief 
-*/
+
+
 
 /*
 *************************************************************************
@@ -92,7 +120,7 @@ static TaskHandle_t Task__THREE_Handle = NULL;     			//+任务3句柄
 static TaskHandle_t Task__FOUR_Handle = NULL;      			//+任务4句柄
 static EventGroupHandle_t Group_One_Handle = NULL; 			//+事件组句柄
 
-/******************************* 全局变量声明 ************************************/
+/******************************* Global variable declaration ************************************/
 /*
  * 当我们在写应用程序的时候，可能需要用到一些全局变量。
  */
@@ -109,6 +137,7 @@ struct PID Coord, Turn_Angle_PID, X_Speed_PID, Y_Speed_PID, X_Base_On_Laser_PID,
 u8 already_turned = 0, Y_have_achieved = 0, X_have_achieved = 0;   //是否达到定时器目的的信号量
 int32_t CCR_wheel[4]={0,0,0,0};
 int32_t position_of_car[3]={0,0,0};
+u8 dataFromLinux[2] = {0, 0};       //the data get from linux
 u8 voice[3][6] = {0xaa,0x07,0x02,0x00,0x01,0xb4,0xaa,0x07,0x02,0x00,0x02,0xb5,0xaa,0x07,0x02,0x00,0x03,0xb6};
 struct distance
 {
@@ -123,8 +152,7 @@ struct distance
 *                             函数声明
 *************************************************************************
 */
-static void
-analyse_data(void);
+static void analyse_data(void);
 static void line_walking(void);
 static void AppTaskCreate(void);           	/* 用于创建任务 */
 static void Task__TWO(void *pvParameters); 	/* Test_Task任务实现 */
@@ -292,8 +320,9 @@ static void AppTaskCreate(void)
     Group_One_Handle = Group_One_Handle;
     
     // 挂机任务，等待选择任务
-    vTaskSuspend(Task__ONE_Handle);
-    // vTaskSuspend(Task__TWO_Handle);
+    vTaskSuspend(Task__THREE_Handle);
+    vTaskSuspend(Task__TWO_Handle);
+    vTaskSuspend(Task__FOUR_Handle);
     vTaskDelete(AppTaskCreate_Handle); // 删除AppTaskCreate任务
 
     taskEXIT_CRITICAL(); // 退出临界区
@@ -438,7 +467,7 @@ static void Car_Running(void)
     CCR_wheel[2] += Local_angle_speed;
     CCR_wheel[3] -= Local_angle_speed;
 
-    
+
     //change the direction of the wheel
    for (size_t i = 0; i < 4; i++)
    {
@@ -729,7 +758,7 @@ static void Task__ONE(void *parameter)
     // char qrcode=0x07;
     while (1)
     {
-
+        
         //xEventGroupWaitBits(Group_One_Handle, 0x01, pdTRUE, pdTRUE, portMAX_DELAY); //! 开始比赛
         //-开箱 狗叫
         // float Angle;
@@ -746,50 +775,64 @@ static void Task__ONE(void *parameter)
 		start_trun(1);                                  //左转
 		while(!already_turned)                          //等待转弯完成
             vTaskDelay(20);
-        startStraight_Line_For_Laser(240,pan);
+        startStraight_Line_For_Laser(240,pan);      //!the distance need to be changed,it is because only the center of road do not have barrier
+        startgostraight(-90);       //保证车的方向不变
         while (!X_have_achieved)
         {
             vTaskDelay(20);
         }
+        xTimerStop(line_walking_Handle, 1);				//停止走直线
+        // here we need to switch the task that first go to the red area in the right hand side or in the left hand side
+
         
-        startStraight_Line_Base_On_Encoder(5500, forward);
-		startgostraight(-90);
-		
-
-		while(!Y_have_achieved)
-            vTaskDelay(10);
-		
-		xTimerStop(Car_Running_Handle, 0);
-		// xTimerStop(line_walking_Handle, 1);
-		
-        startStraight_Line_For_Laser(240, pan);
-        startStraight_Line_For_Laser(190, forward);
-        while((!X_have_achieved)||(!Y_have_achieved))
-            vTaskDelay(10);
-		xTimerStop(Car_Running_Handle, 1);
-
-        startStraight_Line_Base_On_Encoder(-22500, forward);
-
-        startgostraight(-90);
-        vTaskDelay(1500);
-        while(!check_rgb(1))
-        vTaskDelay(20);
-
-        xTimerStop(Car_Running_Handle, 1);
-		xTimerStop(line_walking_Handle, 1);
-        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);;
-
-        PULL_High();
+        if(1)        //!the code in here is unfinished,we need to judge the value of the dataFromLinux[0] to decide which task we should switch to
+            vTaskResume(Task__TWO_Handle);
+        else
+            vTaskResume(Task__FOUR_Handle);
+        
         while(1)
         {
             vTaskDelay(1000);
         }
 
+        // startStraight_Line_Base_On_Encoder(5500, forward);
+		// startgostraight(-90);
+		
+
+		// while(!Y_have_achieved)
+        //     vTaskDelay(10);
+		
+		// xTimerStop(Car_Running_Handle, 0);
+		// // xTimerStop(line_walking_Handle, 1);
+		
+        // startStraight_Line_For_Laser(240, pan);
+        // startStraight_Line_For_Laser(190, forward);
+        // while((!X_have_achieved)||(!Y_have_achieved))
+        //     vTaskDelay(10);
+		// xTimerStop(Car_Running_Handle, 1);
+
+        // startStraight_Line_Base_On_Encoder(-22500, forward);
+
+        // startgostraight(-90);
+        // vTaskDelay(1500);
+        // while(!check_rgb(1))
+        // vTaskDelay(20);
+
+        // xTimerStop(Car_Running_Handle, 1);
+		// xTimerStop(line_walking_Handle, 1);
+        // xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);;
+
+        // PULL_High();
+        // while(1)
+        // {
+        //     vTaskDelay(1000);
+        // }
+
     }
 }
 
 /**
- * @description: this task is used to control the car
+ * @description: this task is used to control the car,make it go to the red area in the right hand side firstly,then go to the red area in the left hand side
  * @param {void} *parameter :this param is necessary for freertos task
  * @return {*}
  */
@@ -797,24 +840,6 @@ static void Task__TWO(void *parameter)
 {
     while (1)
     {
-        
-        
-        startStraight_Line_Base_On_Encoder(12500, forward);    //向前走到t字路口
-        startgostraight(0);                             //保证走直线
-        while(!Y_have_achieved)                         //检测到达位置
-            vTaskDelay(20);
-        xTimerStop(Car_Running_Handle, 1);              //小车停止移动
-        xTimerStop(line_walking_Handle, 1);             //停止走直线
-		start_trun(1);                                  //左转
-		while(!already_turned)                          //等待转弯完成
-            vTaskDelay(10);
-		
-        startStraight_Line_For_Laser(240, pan);            //根据右边激光测距调整距离
-
-        while (!X_have_achieved)                        //检测到达位置
-        {
-            vTaskDelay(20);
-        }
 
         startStraight_Line_Base_On_Encoder(-22500, forward);   //向后走到右边红色区域
         startgostraight(-90);                           //保证走直线
@@ -824,6 +849,50 @@ static void Task__TWO(void *parameter)
         xTimerStop(Car_Running_Handle, 1);              //小车停止移动
 		xTimerStop(line_walking_Handle, 1);             //停止走直线
         xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);   //停止前后走
+
+        //!打开仓库，取出物品，这是后面需要加的代码
+        //播报到达二号仓库
+        USART_Send(voice[2],6);
+        //向前走到左边红色区域
+        startStraight_Line_Base_On_Encoder(11000, forward);     //!code is unfinished,the first param need to be changed
+
+        startgostraight(-90);                           //保证走直线
+        while(!Y_have_achieved)                         //检测到达位置
+            vTaskDelay(20);
+        startStraight_Line_For_Laser(240, pan);       //根据右边激光测距调整距离
+        startStraight_Line_For_Laser(190, forward);     //根据前面激光测距调整距离
+        while((!X_have_achieved)||(!Y_have_achieved))    //检测到达位置
+            vTaskDelay(20);
+        
+        //!打开仓库，取出物品，这是后面需要加的代码
+        //播报到达一号仓库
+        USART_Send(voice[1],6);
+
+        startStraight_Line_Base_On_Encoder(-6800, forward);    //!向后走到t字路口 code is unfinished,the first param need to be changed
+        startgostraight(-90);                    //保证走直线
+        while(!Y_have_achieved)             //检测到达位置
+            vTaskDelay(20);
+        
+        xTimerStop(line_walking_Handle, 1);     //停止走直线
+        xTimerStop(Car_Running_Handle, 1);      //小车停止移动
+
+        //开始右转
+        start_trun(0);                                  //右转
+        while(!already_turned)                          //等待转弯完成
+            vTaskDelay(20);
+        
+        startStraight_Line_For_Laser(240, forward);     //根据前面激光测距调整距离
+        while(!Y_have_achieved)                         //检测到达位置
+            vTaskDelay(20);
+        
+        startStraight_Line_Base_On_Encoder(-22500, forward);   //向后走到右边黄色区域
+        startgostraight(0);                             //保证走直线
+        while(!check_rgb(2))                    //用rgb颜色识别检测到达黄色区域
+            vTaskDelay(20);
+        //小车停止移动
+        xTimerStop(Car_Running_Handle, 1);
+        xTimerStop(line_walking_Handle, 1);
+
 
         PULL_High();
         while(1)                                        //任务完成，挂机
@@ -843,21 +912,83 @@ static void Task__THREE(void)
     while (1)
     {
 
-        	USART_Send(voice[0],7);
+        	USART_Send(voice[0],6);     //播报打开仓库门
         vTaskDelay(5000); /* 延时500个tick */
-			USART_Send(voice[1],7);
+			USART_Send(voice[1],6);     //播报到一号仓库
         vTaskDelay(5000); /* 延时500个tick */
-			USART_Send(voice[2],7);
+			USART_Send(voice[2],6);     //播报到达二号仓库
         vTaskDelay(5000); /* 延时500个tick */
     }
 }
+/**
+ * @description: this task is used to control the car,make it go to the red area in the left hand side firstly,then go to the red area in the right hand side
+ * @param {void} *parameter :this param is necessary for freertos task
+ * @return {*}
+ */
 static void Task__FOUR(void)
 {
     while (1)
     {
-        // xEventGroupSetBits(Group_One_Handle, 0x01);
-        // printf("angle:%.2f",(float)stcAngle.Angle[2] / 32768 * 180);
-        vTaskDelay(1000);
+        startStraight_Line_Base_On_Encoder(5500, forward);      //向前走到左边红色区域
+		startgostraight(-90);                           //保证走直线
+
+		while(!Y_have_achieved)         //检测到达左边红色区域
+            vTaskDelay(10);
+		
+        startStraight_Line_For_Laser(240, pan);       //根据右边激光测距调整距离
+        startStraight_Line_For_Laser(190, forward);     //根据前面激光测距调整距离
+        while((!X_have_achieved)||(!Y_have_achieved))    //检测到达位置
+            vTaskDelay(10);
+		xTimerStop(Car_Running_Handle, 1);      //小车停止移动
+        //!打开仓库，取出物品，这是后面需要加的代码
+
+
+        startStraight_Line_Base_On_Encoder(-22500, forward);    //向后走到左边红色区域
+        startgostraight(-90);                    //保证走直线
+        vTaskDelay(1500);             //延时1.5s，否则会检测到左边红色区域
+        while(!check_rgb(1))            //用rgb颜色识别检测到达右边红色区域
+        vTaskDelay(20);                 //延时20ms
+
+		xTimerStop(line_walking_Handle, 1);     //停止走直线
+        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);   //停止前后走
+        PULL_High();
+
+        startStraight_Line_For_Laser(240, pan);       //根据右边激光测距调整距离
+        while(!X_have_achieved)         //检测到达位置
+            vTaskDelay(20);
+
+        //!打开仓库，取出物品，这是后面需要加的代码
+
+
+        startStraight_Line_Base_On_Encoder(5500, forward);    //!向前走到十字t字路口 code is unfinished,the first param need to be changed
+        startgostraight(-90);               //保证走直线
+        while(!Y_have_achieved)             //检测到达位置
+            vTaskDelay(20);
+        
+        xTimerStop(line_walking_Handle, 1);     //停止走直线
+        //开始右转
+        start_trun(0);                                  //右转
+        while(!already_turned)                          //等待转弯完成
+            vTaskDelay(20);
+
+        startStraight_Line_For_Laser(240, forward);     //根据前面激光测距调整距离
+        while(!Y_have_achieved)                         //检测到达位置
+            vTaskDelay(20);
+        
+        startStraight_Line_Base_On_Encoder(-22500, forward);   //向后走到右边黄色区域
+        startgostraight(0);                             //保证走直线
+        while(!check_rgb(2))                    //用rgb颜色识别检测到达黄色区域
+        vTaskDelay(20);
+        //小车停止移动
+        xTimerStop(Car_Running_Handle, 1);
+        xTimerStop(line_walking_Handle, 1);
+        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);
+
+        PULL_High();        //挂机 it is necessary to add the code that make the direction pin of the motor high
+        while(1)
+        {
+            vTaskDelay(1000);
+        }
     }
 }
 /**
@@ -893,12 +1024,12 @@ static void BSP_Init(void)
     PULL_High();
 
     //pid初始化
-    PID_Initialize(&Coord, 20, 0, 0, 0, 100, -100);         //微调巡线的pid初始化
+    PID_Initialize(&Coord, 30, 0, 0, 0, 100, -100);         //微调巡线的pid初始化
     PID_Initialize(&Turn_Angle_PID, 17.5, 0, 0, 0, 25, -25);  //转弯的pid初始化
     PID_Initialize(&X_Speed_PID, 3.5, 0, .5, 0, 100, -100); //x方向的远距离基于编码器的pid
     PID_Initialize(&Y_Speed_PID, 3.5, 0, .5, 0, 100, -100);   //y方向的远距离基于编码器的pid
-    PID_Initialize(&X_Base_On_Laser_PID, 2, 0, .5, 0, 150, -150);
-    PID_Initialize(&Y_Base_On_Laser_PID, 2, 0, .5, 0, 150, -150);
+    PID_Initialize(&X_Base_On_Laser_PID, 3.5, 0, 1., 0, 150, -150);
+    PID_Initialize(&Y_Base_On_Laser_PID, 3.5, 0, 1., 0, 150, -150);
 		Software_USART_IOConfig();
     LED_GPIO_Config();
     KEY_ONE();

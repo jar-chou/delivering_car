@@ -133,8 +133,7 @@ void VL53_Send_Agrement()
     for (i = 0; i < 8; i++)
     {
         USART_SendData(USART3, Agreement[i]);
-        while (USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET)
-            ;
+        while (USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
     }
 }
 

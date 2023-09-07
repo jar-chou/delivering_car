@@ -174,8 +174,7 @@ void USART2_IRQHandler()
 /******************/
 /***USART3初始化***/
 /*****************/
-static void
-NVIC_USART3_Configuration(void)
+static void NVIC_USART3_Configuration(void)
 {
     NVIC_InitTypeDef NVIC_InitStructure;
 
