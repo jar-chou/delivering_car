@@ -47,10 +47,10 @@
  * .................................&&..............................
  * ..................................&..............................
  * 
- * @Author: zhaojianchao jar-chou 2722642511@qq.com 
+ * @Author: zhaojianchao and jar-chou 2722642511@qq.com 
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-07 13:50:25
+ * @LastEditTime: 2023-09-08 19:50:41
  * @FilePath: \delivering_car\User\main.c
  * @Description: 龙王保佑此文件无bug！！！
  */
@@ -766,7 +766,7 @@ static void Task__ONE(void *parameter)
 		// Turn_Angle_PID.Target = Angle + 90;
 		// already_turned = 0;
 		// xTimerStart(Turn_Angle_Handle, 0);
-        startStraight_Line_Base_On_Encoder(12500,forward);	//直走
+        startStraight_Line_Base_On_Encoder(12500,forward);	//根据编码器向前走到t型路口
         startgostraight(0);								//保证走直线
         while(!Y_have_achieved)							//检测到达位置
             vTaskDelay(20);
@@ -775,6 +775,7 @@ static void Task__ONE(void *parameter)
 		start_trun(1);                                  //左转
 		while(!already_turned)                          //等待转弯完成
             vTaskDelay(20);
+        
         startStraight_Line_For_Laser(240,pan);      //!the distance need to be changed,it is because only the center of road do not have barrier
         startgostraight(-90);       //保证车的方向不变
         while (!X_have_achieved)
@@ -795,39 +796,7 @@ static void Task__ONE(void *parameter)
             vTaskDelay(1000);
         }
 
-        // startStraight_Line_Base_On_Encoder(5500, forward);
-		// startgostraight(-90);
-		
-
-		// while(!Y_have_achieved)
-        //     vTaskDelay(10);
-		
-		// xTimerStop(Car_Running_Handle, 0);
-		// // xTimerStop(line_walking_Handle, 1);
-		
-        // startStraight_Line_For_Laser(240, pan);
-        // startStraight_Line_For_Laser(190, forward);
-        // while((!X_have_achieved)||(!Y_have_achieved))
-        //     vTaskDelay(10);
-		// xTimerStop(Car_Running_Handle, 1);
-
-        // startStraight_Line_Base_On_Encoder(-22500, forward);
-
-        // startgostraight(-90);
-        // vTaskDelay(1500);
-        // while(!check_rgb(1))
-        // vTaskDelay(20);
-
-        // xTimerStop(Car_Running_Handle, 1);
-		// xTimerStop(line_walking_Handle, 1);
-        // xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);;
-
-        // PULL_High();
-        // while(1)
-        // {
-        //     vTaskDelay(1000);
-        // }
-
+        
     }
 }
 
