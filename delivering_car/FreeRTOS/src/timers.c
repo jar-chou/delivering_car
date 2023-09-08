@@ -416,8 +416,8 @@ static void prvInitialiseNewTimer(	const char * const pcTimerName,
 
 BaseType_t xTimerGenericCommand( TimerHandle_t xTimer, const BaseType_t xCommandID, const TickType_t xOptionalValue, BaseType_t * const pxHigherPriorityTaskWoken, const TickType_t xTicksToWait )
 {
-BaseType_t xReturn = pdFAIL;
-DaemonTaskMessage_t xMessage;
+	BaseType_t xReturn = pdFAIL;
+	DaemonTaskMessage_t xMessage;
 
 	configASSERT( xTimer );
 
