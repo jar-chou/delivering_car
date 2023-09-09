@@ -1,6 +1,15 @@
+/*
+ * @Author: jar-chou 2722642511@qq.com
+ * @Date: 2023-09-06 13:02:19
+ * @LastEditors: jar-chou 2722642511@qq.com
+ * @LastEditTime: 2023-09-09 19:12:22
+ * @FilePath: \delivering_car\User\sys.c
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 #include "sys.h"
 #include "stdio.h"
-#include "OLED.h"
+#include "oled_draw.h"
+#include "oled_buffer.h"
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "JY62.h"
@@ -24,22 +33,24 @@ extern int32_t CCR_wheel[4];
 
 extern bool check_rgb(int color);
 
+int i = 0;
 
 void OLED_SHOW_TASK()
 {
-    OLED_Clear();
+    ClearScreenBuffer(0x00);
     char buff[20];
 	float current_angle = (float)stcAngle.Angle[2] / 32768 * 180;
     sprintf(buff, "Angle_Z:%.2f", current_angle);
-    OLED_ShowString(1, 1, buff);
+    DrawString(0, 0, buff);
 	sprintf(buff, "R:%d G:%d B:%d", RGB.R,RGB.G,RGB.B);
-    OLED_ShowString(2, 1, buff);
+    DrawString(1, 0, buff);
     sprintf(buff, "RD:%.1f", VOFA_Data[2]);
-    OLED_ShowString(3, 1, buff);
+    DrawString(2, 0, buff);
     sprintf(buff, "FD:%.1f", VOFA_Data[3]);
-    OLED_ShowString(3, 9, buff);
-    sprintf(buff, "%.2f", Turn_Angle_PID.Target);
-    OLED_ShowString(4,1,buff);
+    DrawString(2, 8, buff);
+    sprintf(buff, "%.2f  %d", Turn_Angle_PID.Target, i++);
+    DrawString(3, 0, buff);
+    UpdateScreenDisplay();
 }
 void Read_RGB()
 {
@@ -89,14 +100,15 @@ void Walking_Left()
 }
 
 
-//-------������HSV��ɫ�ռ��RGB��ɫ�ռ��໥ת���ӿ�------------
+
+//-------以下是HSV颜色空间和RGB颜色空间相互转换接口------------
 /**
- * @brief HSV��ɫ�ռ�
+ * @brief HSV颜色空间
 */
 typedef struct {
-    float h;    // ɫ��H(hue)  0~360�� {R(0��),G(120��),B(240��)}
-    float s;    // ���Ͷ�S(saturation)  0~1.0
-    float v;    // ����V(value)  0~1.0  
+    float h;    // 色调H(hue)  0~360° {R(0°),G(120°),B(240°)}
+    float s;    // 饱和度S(saturation)  0~1.0
+    float v;    // 明度V(value)  0~1.0  
 }color_hsv_t;
 
 typedef struct {
@@ -108,58 +120,58 @@ typedef struct {
 
 
 /**
- * @brief   RGB��ɫ�ռ� ת  HSV��ɫ�ռ� 
- * @param   rgb:RGB��ɫ�ռ����
- * @param   hsv:HSV��ɫ�ռ����
+ * @brief   RGB颜色空间 转  HSV颜色空间 
+ * @param   rgb:RGB颜色空间参数
+ * @param   hsv:HSV颜色空间参数
  * @return  none
 */
 void rgb2hsv(color_rgb_t *rgb, color_hsv_t *hsv);
 
 /**
- * @brief   HSV��ɫ�ռ� ת RGB��ɫ�ռ�
- * @param   hsv:HSV��ɫ�ռ����
- * @param   rgb:RGB��ɫ�ռ����
+ * @brief   HSV颜色空间 转 RGB颜色空间
+ * @param   hsv:HSV颜色空间参数
+ * @param   rgb:RGB颜色空间参数
  * @return  none
 */
 void hsv2rgb(color_hsv_t *hsv, color_rgb_t *rgb);
 
 /**
- * @brief   ����HSV��ɫ�ռ� Hֵ(0.0~360.0)
- * @param   hsv:HSV��ɫ�ռ����
- * @param   h_offset:���ڲ��� ����>0.0����С<0.0
+ * @brief   调节HSV颜色空间 H值(0.0~360.0)
+ * @param   hsv:HSV颜色空间参数
+ * @param   h_offset:调节参数 增加>0.0，减小<0.0
  * @return  none
 */
 void hsv_adjust_h(color_hsv_t *hsv, float h_offset);
 
 /**
- * @brief   ����HSV��ɫ�ռ� Sֵ(0.0~1.0)
- * @param   hsv:HSV��ɫ�ռ����
- * @param   s_offset:���ڲ��� ����>0.0����С<0.0
+ * @brief   调节HSV颜色空间 S值(0.0~1.0)
+ * @param   hsv:HSV颜色空间参数
+ * @param   s_offset:调节参数 增加>0.0，减小<0.0
  * @return  none
 */
 void hsv_adjust_s(color_hsv_t *hsv, float s_offset);
 
 /**
- * @brief   ����HSV��ɫ�ռ� Vֵ(0.0~1.0)
- * @param   hsv:HSV��ɫ�ռ����
- * @param   v_offset:���ڲ��� ����>0.0����С<0.0
+ * @brief   调节HSV颜色空间 V值(0.0~1.0)
+ * @param   hsv:HSV颜色空间参数
+ * @param   v_offset:调节参数 增加>0.0，减小<0.0
  * @return  none
 */
 void hsv_adjust_v(color_hsv_t *hsv, float v_offset);
 
 
 
-// ������HSV��ɫ�ռ��RGB��ɫ�ռ��໥ת���ӿ�
+// 以下是HSV颜色空间和RGB颜色空间相互转换接口
 /*********************************************************************************************
-�죺    
+红：    
     R   255         H:0
     G   0           S:100
     B   0           V:100    
-�̣�
+绿：
     R   0           H:120   
     G   255         S:100
     B   0           V:100    
-����
+蓝：
     R   0           H:240   
     G   0           S:100
     B   255         V:100    
@@ -172,21 +184,21 @@ void hsv_adjust_v(color_hsv_t *hsv, float v_offset);
 
 
 /*********************************************************************************************
-RGBת����HSV���㷨:
-    max=max(R,G,B)��
-    min=min(R,G,B)��
-    V=max(R,G,B)��
-    S=(max-min)/max��
-    if (R = max) H =(G-B)/(max-min)* 60��
-    if (G = max) H = 120+(B-R)/(max-min)* 60��
-    if (B = max) H = 240 +(R-G)/(max-min)* 60��
-    if (H < 0) H = H + 360��
+RGB转化到HSV的算法:
+    max=max(R,G,B)；
+    min=min(R,G,B)；
+    V=max(R,G,B)；
+    S=(max-min)/max；
+    if (R = max) H =(G-B)/(max-min)* 60；
+    if (G = max) H = 120+(B-R)/(max-min)* 60；
+    if (B = max) H = 240 +(R-G)/(max-min)* 60；
+    if (H < 0) H = H + 360；
 ***********************************************************************************************/
 
 /**
- * @brief   RGB��ɫ�ռ� ת  HSV��ɫ�ռ� 
- * @param   rgb:RGB��ɫ�ռ����
- * @param   hsv:HSV��ɫ�ռ����
+ * @brief   RGB颜色空间 转  HSV颜色空间 
+ * @param   rgb:RGB颜色空间参数
+ * @param   hsv:HSV颜色空间参数
  * @note    The R,G,B values are divided by 255 to change the range from 0..255 to 0..1:
  * @return  none
 */
@@ -232,7 +244,7 @@ void rgb2hsv(color_rgb_t *rgb, color_hsv_t *hsv)
 
 
 /*************************************************************************
-HSVת����RGB���㷨:
+HSV转化到RGB的算法:
     if (s = 0)
     R=G=B=V;
     else
@@ -252,10 +264,10 @@ HSVת����RGB���㷨:
 *******************************************************************************/
 
 /**
- * @brief   HSV��ɫ�ռ� ת RGB��ɫ�ռ�
- * @param   hsv:HSV��ɫ�ռ����
- * @param   rgb:RGB��ɫ�ռ����
- * @note    When 0 �� H < 360, 0 �� S �� 1 and 0 �� V �� 1:
+ * @brief   HSV颜色空间 转 RGB颜色空间
+ * @param   hsv:HSV颜色空间参数
+ * @param   rgb:RGB颜色空间参数
+ * @note    When 0 ≤ H < 360, 0 ≤ S ≤ 1 and 0 ≤ V ≤ 1:
  * @return  none
 */
 void hsv2rgb(color_hsv_t *hsv, color_rgb_t *rgb)
@@ -320,9 +332,9 @@ void hsv2rgb(color_hsv_t *hsv, color_rgb_t *rgb)
 }
 
 /**
- * @brief   ����HSV��ɫ�ռ� Hֵ(0.0~360.0)
- * @param   hsv:HSV��ɫ�ռ����
- * @param   h_offset:���ڲ��� ����>0.0����С<0.0
+ * @brief   调节HSV颜色空间 H值(0.0~360.0)
+ * @param   hsv:HSV颜色空间参数
+ * @param   h_offset:调节参数 增加>0.0，减小<0.0
  * @return  none
 */
 void hsv_adjust_h(color_hsv_t *hsv, float h_offset)
@@ -337,9 +349,9 @@ void hsv_adjust_h(color_hsv_t *hsv, float h_offset)
 
 
 /**
- * @brief   ����HSV��ɫ�ռ� Sֵ(0.0~1.0)
- * @param   hsv:HSV��ɫ�ռ����
- * @param   s_offset:���ڲ��� ����>0.0����С<0.0
+ * @brief   调节HSV颜色空间 S值(0.0~1.0)
+ * @param   hsv:HSV颜色空间参数
+ * @param   s_offset:调节参数 增加>0.0，减小<0.0
  * @return  none
 */
 void hsv_adjust_s(color_hsv_t *hsv, float s_offset)
@@ -354,9 +366,9 @@ void hsv_adjust_s(color_hsv_t *hsv, float s_offset)
 
 
 /**
- * @brief   ����HSV��ɫ�ռ� Vֵ(0.0~1.0)
- * @param   hsv:HSV��ɫ�ռ����
- * @param   v_offset:���ڲ��� ����>0.0����С<0.0
+ * @brief   调节HSV颜色空间 V值(0.0~1.0)
+ * @param   hsv:HSV颜色空间参数
+ * @param   v_offset:调节参数 增加>0.0，减小<0.0
  * @return  none
 */
 void hsv_adjust_v(color_hsv_t *hsv, float v_offset)
@@ -368,6 +380,4 @@ void hsv_adjust_v(color_hsv_t *hsv, float v_offset)
         hsv->v = 0;
     }
 }
-
-
-
+//--------------------file end----------------------------

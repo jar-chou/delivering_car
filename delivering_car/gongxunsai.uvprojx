@@ -18,7 +18,7 @@
           <Vendor>STMicroelectronics</Vendor>
           <PackID>Keil.STM32F1xx_DFP.2.4.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
-          <Cpu>IRAM(0x20000000,0x10000) IROM(0x08000000,0x80000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
+          <Cpu>IRAM(0x20000000,0x00010000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
           <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F10x_512 -FS08000000 -FL080000 -FP0($$Device:STM32F103VE$Flash\STM32F10x_512.FLM))</FlashDriverDll>
@@ -340,7 +340,7 @@
               <MiscControls>--no-multibyte-chars</MiscControls>
               <Define>STM32F40X_HD, USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>.\User;.\User\exti;.\User\key;.\User\led;.\User\uart;.\Libraries\FWlib\inc;.\FreeRTOS\include;.\Libraries\CMSIS;.\FreeRTOS\port\RVDS\ARM_CM3;..\9.5 22h</IncludePath>
+              <IncludePath>.\User;.\User\exti;.\User\key;.\User\led;.\User\uart;.\Libraries\FWlib\inc;.\FreeRTOS\include;.\Libraries\CMSIS;.\FreeRTOS\port\RVDS\ARM_CM3;..\9.5 22h;.\User\oled</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -605,11 +605,6 @@
               <FilePath>.\User\MPU6050.c</FilePath>
             </File>
             <File>
-              <FileName>OLED.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\OLED.c</FilePath>
-            </File>
-            <File>
               <FileName>PID.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\PID.c</FilePath>
@@ -658,6 +653,26 @@
               <FileName>usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\uart\usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>OLED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\oled\OLED.c</FilePath>
+            </File>
+            <File>
+              <FileName>oled_buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\oled\oled_buffer.c</FilePath>
+            </File>
+            <File>
+              <FileName>oled_draw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\oled\oled_draw.c</FilePath>
+            </File>
+            <File>
+              <FileName>OLED_Font.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\oled\OLED_Font.c</FilePath>
             </File>
           </Files>
         </Group>

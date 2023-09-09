@@ -1,8 +1,14 @@
-#ifndef __OLED_FONT_H
-#define __OLED_FONT_H
+/*
+ * @Author: jar-chou 2722642511@qq.com
+ * @Date: 2023-09-09 18:12:20
+ * @LastEditors: jar-chou 2722642511@qq.com
+ * @LastEditTime: 2023-09-09 19:05:01
+ * @FilePath: \delivering_car\User\oled\OLED_Font.c
+ * @Description: this file is used to store the font of OLED
+ */
 
 /*OLED字模库，宽8像素，高16像素*/
-const uint8_t OLED_F8x16[][16]=
+const unsigned char OLED_F8x16[][16]=
 {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,//  0
@@ -289,5 +295,3 @@ const uint8_t OLED_F8x16[][16]=
 	0x00,0x06,0x01,0x01,0x02,0x02,0x04,0x04,
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,//~ 94
 };
-
-#endif

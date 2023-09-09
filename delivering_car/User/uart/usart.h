@@ -94,7 +94,7 @@
 
 
 //串口5-UART5
-#define  UART5_ENABLE                   0
+#define  UART5_ENABLE                   1
 #define  DEBUG_UART5                    UART5
 #define  DEBUG_UART5_CLK                RCC_APB1Periph_UART5
 #define  DEBUG_UART5_APBxClkCmd         RCC_APB1PeriphClockCmd
@@ -111,14 +111,14 @@
 
 #define  DEBUG_UART5_IRQ                UART5_IRQn
 #define  DEBUG_UART5_IRQHandler         UART5_IRQHandler
-void VOFA_Send_float(float *Data, u8 b);
+void VOFA_Send_float(const float *Data, u8 b);
 void USART1_Config(void);
 void USART2_Config(void);
 void USART3_Config(void);
 void USART4_Config(void);
 void USART5_Config(void);
 void Usart_SendByte( USART_TypeDef * pUSARTx, uint8_t ch);
-void Usart_SendString( USART_TypeDef * pUSARTx, char *str);
+void Usart_SendString( USART_TypeDef * pUSARTx, const char *str);
 void Usart_SendHalfWord( USART_TypeDef * pUSARTx, uint16_t ch);
 
 #endif /* __USART_H */

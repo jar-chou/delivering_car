@@ -45,6 +45,9 @@
         "codetab.h": "c",
         "string_view": "c",
         "task.h": "c",
-        "oled.h": "c"
+        "oled.h": "c",
+        "oled_font.h": "c",
+        "oled_buffer.h": "c",
+        "oled_draw.h": "c"
     }
 }

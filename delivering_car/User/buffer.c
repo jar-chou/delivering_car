@@ -1,7 +1,7 @@
 #include "buffer.h"
 #include "string.h"
 #include "stdio.h"
-struct Buff U3_buffer, U2_buffer, Soft_Usart, U1_buffer, U4_buffer, U5_buffer, U1_buffer,IIC_buff;
+struct Buff U3_buffer, U2_buffer, Soft_Usart, U1_buffer, U4_buffer, U5_buffer, IIC_buff;
 /**
  * @description: 初始化环形缓冲区
  * @param {Buff} *BUFF

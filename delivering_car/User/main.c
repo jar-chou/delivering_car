@@ -50,7 +50,7 @@
  * @Author: zhaojianchao and jar-chou 2722642511@qq.com 
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-09 14:20:13
+ * @LastEditTime: 2023-09-09 19:18:22
  * @FilePath: \delivering_car\User\main.c
  * @Description: 龙王保佑此文件无bug！！！
  */
@@ -137,7 +137,7 @@ struct PID Coord, Turn_Angle_PID, X_Speed_PID, Y_Speed_PID, X_Base_On_Laser_PID,
 u8 already_turned = 0, Y_have_achieved = 0, X_have_achieved = 0;   //是否达到定时器目的的信号量
 int32_t CCR_wheel[4]={0,0,0,0};
 int32_t position_of_car[3]={0,0,0};
-u8 dataFromLinux[2] = {0, 0};       //the data get from linux
+u8 dataFromLinux[4] = {0, 0};       //the data get from linux
 u8 voice[3][6] = {0xaa,0x07,0x02,0x00,0x01,0xb4,0xaa,0x07,0x02,0x00,0x02,0xb5,0xaa,0x07,0x02,0x00,0x03,0xb6};
 struct distance
 {
@@ -160,8 +160,8 @@ static void OLED_SHOW(void *pvParameters); 	/* Test_Task任务实现 */
 static void Task__ONE(void *pvParameters); 	/* Test_Task任务实现 */
 static void BSP_Init(void);                	/* 用于初始化板载相关资源 */
 static void sendto_Upper(void);            	/* 用于初始化板载相关资源 */
-static void Task__THREE(void);             	//
-static void Task__FOUR(void);              	//
+static void Task__THREE(void *pvParameters);             	//
+static void Task__FOUR(void *pvParameters);              	//
 static void Turn_Angle(void);              	//
 static void Achieve_Distance_Front_Head_Laser(void);
 static void Achieve_Distance_For_Right_Laser(void);
@@ -574,13 +574,24 @@ static void analyse_data(void)
                             +How_many_revolutions_of_the_motor[1]
                             +How_many_revolutions_of_the_motor[2]
                             -How_many_revolutions_of_the_motor[3])/4;
+    #if 0
+    //get data from upper computer
+    const u8 upper_head[] = {0x1C, 0x2C, 0x3C};
+    u8 local_dataFromLinux[4] = {0, 0};
+    Read_buff_Void(&U5_buffer, (u8 *)upper_head, 3, local_dataFromLinux, 4, 8, 1);
+    #endif
 
     taskENTER_CRITICAL();           //进入基本临界区
+
+    #if 0
+    memcpy(dataFromLinux, local_dataFromLinux, 4);   //copy the data from local variable to global variable
+    #endif
     VOFA_Data[2] = (float)Distance.R_OUT;           //右边激光测距得到的距离
     VOFA_Data[3] = (float)Distance.F_OUT;           //前面激光测距得到的距离
     position_of_car[0] += The_distance_that_has_gone_forward;            //the distance that car have gone forward
     position_of_car[1] += The_distance_that_has_gone_right_head_side;    //the distance that car have gone right hand side
     Read_RGB();
+    
     taskEXIT_CRITICAL();            //退出基本临界区
 }
 
@@ -886,9 +897,10 @@ static void Task__TWO(void *parameter)
 
 /**
  * @description: this task is used to control loudspeaker
+ * @param {void} *parameter :this param is necessary for freertos task
  * @return {*}
  */
-static void Task__THREE(void)
+static void Task__THREE(void *parameter)
 {
     while (1)
     {
@@ -906,7 +918,7 @@ static void Task__THREE(void)
  * @param {void} *parameter :this param is necessary for freertos task
  * @return {*}
  */
-static void Task__FOUR(void)
+static void Task__FOUR(void *parameter)
 {
     while (1)
     {
@@ -997,6 +1009,7 @@ static void BSP_Init(void)
     TIMX_Delay_Init(RCC_APB1Periph_TIM6, 65530, 72, TIM6);
     Encoder_Init();
     USART3_Config();      //*USART3前激光测距
+    USART5_Config();      //*USART5 responsible for the communication between the car and the upper computer Raspberry PI   负责和上位机树莓派通信
     USART4_Config_JY62(); //*UART4陀螺仪
     USART1_Config();      //*调试信息输出
     Iinitial_BUFF(&U3_buffer);
@@ -1005,13 +1018,13 @@ static void BSP_Init(void)
     PULL_High();
 
     //pid初始化
-    PID_Initialize(&Coord, 30, 0, 0, 0, 100, -100);         //微调巡线的pid初始化
-    PID_Initialize(&Turn_Angle_PID, 30, 0, 10, 0, 25, -25);  //转弯的pid初始化
-    PID_Initialize(&X_Speed_PID, 3.5, 0, .5, 0, 100, -100); //x方向的远距离基于编码器的pid
-    PID_Initialize(&Y_Speed_PID, 3.5, 0, .5, 0, 100, -100);   //y方向的远距离基于编码器的pid
+    PID_Initialize(&Coord, 45, 0, 0, 0, 25, -25);                   //微调巡线的pid初始化
+    PID_Initialize(&Turn_Angle_PID, 30, 0, 10, 0, 25, -25);         //转弯的pid初始化
+    PID_Initialize(&X_Speed_PID, 3.5, 0, .5, 0, 100, -100);         //x方向的远距离基于编码器的pid
+    PID_Initialize(&Y_Speed_PID, 3.5, 0, .5, 0, 100, -100);         //y方向的远距离基于编码器的pid
     PID_Initialize(&X_Base_On_Laser_PID, 3.5, 0, 1., 0, 150, -150);
     PID_Initialize(&Y_Base_On_Laser_PID, 3.5, 0, 1., 0, 150, -150);
-		Software_USART_IOConfig();
+	Software_USART_IOConfig();
     LED_GPIO_Config();
     KEY_ONE();
     OLED_Init();

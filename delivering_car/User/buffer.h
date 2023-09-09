@@ -24,7 +24,7 @@ struct Buff
 
 // extern struct Buff BUFF;
 
-extern struct Buff U3_buffer, U2_buffer, IIC_buff;
+extern struct Buff U5_buffer, U3_buffer, U2_buffer, IIC_buff;
 void Iinitial_BUFF(struct Buff *BUFF);
 void Write_BUFF(u8 *P, struct Buff *BUFF);
 u8 Read_BUFF(struct Buff *BUFF);

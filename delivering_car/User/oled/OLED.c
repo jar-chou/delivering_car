@@ -27,7 +27,7 @@ void OLED_I2C_Init(void)
   * @param  无
   * @retval 无
   */
-void OLED_I2C_Start(void)
+static inline void OLED_I2C_Start(void)
 {
 	OLED_W_SDA(1);
 	OLED_W_SCL(1);
@@ -40,7 +40,7 @@ void OLED_I2C_Start(void)
   * @param  无
   * @retval 无
   */
-void OLED_I2C_Stop(void)
+static inline void OLED_I2C_Stop(void)
 {
 	OLED_W_SDA(0);
 	OLED_W_SCL(1);
@@ -52,7 +52,7 @@ void OLED_I2C_Stop(void)
   * @param  Byte 要发送的一个字节
   * @retval 无
   */
-void OLED_I2C_SendByte(uint8_t Byte)
+static inline void OLED_I2C_SendByte(uint8_t Byte)
 {
 	uint8_t i;
 	for (i = 0; i < 8; i++)
@@ -70,7 +70,7 @@ void OLED_I2C_SendByte(uint8_t Byte)
   * @param  Command 要写入的命令
   * @retval 无
   */
-void OLED_WriteCommand(uint8_t Command)
+static inline void OLED_WriteCommand(uint8_t Command)
 {
 	OLED_I2C_Start();
 	OLED_I2C_SendByte(0x78);		//从机地址
@@ -99,7 +99,7 @@ void OLED_WriteData(uint8_t Data)
   * @param  len 要写入的数据长度
   * @retval 无
   */
-void OLED_WriteMultiData(u8 *dat, u8 len)
+static inline void OLED_WriteMultiData(const u8 *dat, u8 len)
 {
 	u8 i;
 	OLED_I2C_Start();		// 通信开始
@@ -117,7 +117,7 @@ void OLED_WriteMultiData(u8 *dat, u8 len)
   * @param  X 以左上角为原点，向右方向的坐标，范围：0~127
   * @retval 无
   */
-void OLED_SetCursor(uint8_t Y, uint8_t X)
+static inline void OLED_SetCursor(uint8_t Y, uint8_t X)
 {
 	OLED_WriteCommand(0xB0 | Y);					//设置Y位置
 	OLED_WriteCommand(0x10 | ((X & 0xF0) >> 4));	//设置X位置高4位
@@ -274,6 +274,24 @@ void OLED_ShowBinNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Leng
 	{
 		OLED_ShowChar(Line, Column + i, Number / OLED_Pow(2, Length - i - 1) % 2 + '0');
 	}
+}
+
+/**
+* @brief  OLED显示缓冲区的图片
+  * @param  BMP 要显示的图片数组
+  * @retval 无
+  */
+void OLED_FILL(const uint8_t BMP[8][128])
+{
+	uint8_t i;
+
+	for (i = 0; i < 8; i++)
+	{
+		OLED_SetCursor(i, 0);
+
+		OLED_WriteMultiData(BMP[i], 128);
+	}
+
 }
 
 /**

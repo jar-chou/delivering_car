@@ -1,6 +1,6 @@
 #include "usart.h"
 #include "buffer.h"
- extern struct Buff U3_buffer, U2_buffer;
+ extern struct Buff U3_buffer, U2_buffer, Soft_Usart, U1_buffer, U4_buffer, U5_buffer;
 /*
 way：1.调用USARTX_Config()函数初始化即可
 */
@@ -229,10 +229,10 @@ void USART3_Config(void)
 
     USART_Cmd(USART3, ENABLE);
 }
-u8 abn;
+
 void USART3_IRQHandler()
 {
-
+	u8 abn = 0;
     if (USART_GetFlagStatus(USART3, USART_FLAG_RXNE) == 1)
     {
         abn = USART_ReceiveData(USART3);
@@ -312,11 +312,11 @@ void USART4_Config(void)
 	USART_Cmd(DEBUG_USART1, ENABLE);
 }
 #endif
-#if 0
+#if UART5_ENABLE
 /******************/
 /***UART5初始化***/
 /*****************/
-static void NVIC_USART5_Configuration(void)
+static void NVIC_UART5_Configuration(void)
 {
 	NVIC_InitTypeDef NVIC_InitStructure;
 
@@ -324,7 +324,7 @@ static void NVIC_USART5_Configuration(void)
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
 	/* 配置USART为中断源 */
-	NVIC_InitStructure.NVIC_IRQChannel = DEBUG_USART1_IRQ;
+	NVIC_InitStructure.NVIC_IRQChannel = UART5_IRQn;
 	/* 抢断优先级*/
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 6;
 	/* 子优先级 */
@@ -341,25 +341,25 @@ void USART5_Config(void)
 	USART_InitTypeDef USART_InitStructure;
 
 	// 打开串口GPIO的时钟
-	DEBUG_UART5_GPIO_APBxClkCmd(DEBUG_USART1_GPIO_CLK, ENABLE);
+	DEBUG_UART5_GPIO_APBxClkCmd(DEBUG_UART5_GPIO_CLK, ENABLE);
 
 	// 打开串口外设的时钟
-	DEBUG_UART5_APBxClkCmd(DEBUG_USART1_CLK, ENABLE);
+	DEBUG_UART5_APBxClkCmd(DEBUG_UART5_CLK, ENABLE);
 
 	// 将USART Tx的GPIO配置为推挽复用模式
-	GPIO_InitStructure.GPIO_Pin = DEBUG_USART1_TX_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Pin = DEBUG_UART5_TX_GPIO_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(DEBUG_USART1_TX_GPIO_PORT, &GPIO_InitStructure);
+	GPIO_Init(DEBUG_UART5_TX_GPIO_PORT, &GPIO_InitStructure);
 
 	// 将USART Rx的GPIO配置为浮空输入模式
-	GPIO_InitStructure.GPIO_Pin = DEBUG_USART1_RX_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Pin = DEBUG_UART5_RX_GPIO_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_Init(DEBUG_USART1_RX_GPIO_PORT, &GPIO_InitStructure);
+	GPIO_Init(DEBUG_UART5_RX_GPIO_PORT, &GPIO_InitStructure);
 
 	// 配置串口的工作参数
 	// 配置波特率
-	USART_InitStructure.USART_BaudRate = DEBUG_USART1_BAUDRATE;
+	USART_InitStructure.USART_BaudRate = DEBUG_UART5_BAUDRATE;
 	// 配置 针数据字长
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
 	// 配置停止位
@@ -371,24 +371,38 @@ void USART5_Config(void)
 	// 配置工作模式，收发一起
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	// 完成串口的初始化配置
-	USART_Init(DEBUG_USART1, &USART_InitStructure);
+	USART_Init(DEBUG_UART5, &USART_InitStructure);
 
 	// 串口中断优先级配置
-	NVIC_USART5_Configuration();
+	NVIC_UART5_Configuration();
 
-	//	// 使能串口接收中断
-	//	USART_ITConfig(DEBUG_USARTx, USART_IT_RXNE, ENABLE);
+	// 使能串口接收中断
+	USART_ITConfig(DEBUG_UART5, USART_IT_RXNE, ENABLE);
 
 	// 使能串口
-	USART_Cmd(DEBUG_USART1, ENABLE);
+	USART_Cmd(DEBUG_UART5, ENABLE);
 }
+
+void DEBUG_UART5_IRQHandler()
+{
+	u8 res = 0;
+    if (USART_GetFlagStatus(UART5, USART_FLAG_RXNE) == 1)
+    {
+        res = USART_ReceiveData(UART5);
+        Write_BUFF(&res, &U5_buffer);
+    }
+    USART_ClearFlag(UART5, USART_FLAG_RXNE);
+}
+
 #endif
+
+/*****************  发送一个浮点数 **********************/
 union AH
 {
     float fdata;
     char ldata[4];
 } FloatLongType;
-void VOFA_Send_float(float *Data, u8 b)
+void VOFA_Send_float(const float *Data, u8 b)
 {
     u8 i;
     const u8 tail[4] = {0x00, 0x00, 0x80, 0x7f};
@@ -408,7 +422,7 @@ void VOFA_Send_float(float *Data, u8 b)
     }
 }
 /*****************  发送一个字节 **********************/
-void Usart_SendByte(USART_TypeDef *pUSARTx, uint8_t ch)
+void Usart_SendByte(USART_TypeDef *pUSARTx,const uint8_t ch)
 {
     /* 发送一个字节数据到USART */
     USART_SendData(pUSARTx, ch);
@@ -419,7 +433,7 @@ void Usart_SendByte(USART_TypeDef *pUSARTx, uint8_t ch)
 }
 
 /****************** 发送8位的数组 ************************/
-void Usart_SendArray(USART_TypeDef *pUSARTx, uint8_t *array, uint16_t num)
+void Usart_SendArray(USART_TypeDef *pUSARTx, const uint8_t *array, uint16_t num)
 {
     uint8_t i;
 
@@ -434,7 +448,7 @@ void Usart_SendArray(USART_TypeDef *pUSARTx, uint8_t *array, uint16_t num)
 }
 
 /*****************  发送字符串 **********************/
-void Usart_SendString(USART_TypeDef *pUSARTx, char *str)
+void Usart_SendString(USART_TypeDef *pUSARTx, const char *str)
 {
     unsigned int k = 0;
     do
