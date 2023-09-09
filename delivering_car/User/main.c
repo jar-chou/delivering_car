@@ -50,7 +50,7 @@
  * @Author: zhaojianchao and jar-chou 2722642511@qq.com 
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-08 19:50:41
+ * @LastEditTime: 2023-09-09 14:20:13
  * @FilePath: \delivering_car\User\main.c
  * @Description: 龙王保佑此文件无bug！！！
  */
@@ -256,7 +256,7 @@ static void AppTaskCreate(void)
     if (xReturn == pdPASS)
         printf("Task__FOUR任务创建成功\r\n");
     line_walking_Handle = xTimerCreate((const char *)"line_walking",
-                                       (TickType_t)30,                         /* 定时器周期 1000(tick) */
+                                       (TickType_t)20,                         /* 定时器周期 1000(tick) */
                                        (UBaseType_t)pdTRUE,                    /* 周期模式 */
                                        (void *)1,                              /* 为每个计时器分配一个索引的唯一ID */
                                        (TimerCallbackFunction_t)line_walking); //! 回调函数名
@@ -458,8 +458,8 @@ static void Car_Running(void)
     CCR_wheel[3] = Local_Y_Speed;
 
     CCR_wheel[0] += Local_X_Speed;
-    CCR_wheel[1] -= Local_X_Speed;
-    CCR_wheel[2] += Local_X_Speed;
+    CCR_wheel[1] += Local_X_Speed;
+    CCR_wheel[2] -= Local_X_Speed;
     CCR_wheel[3] -= Local_X_Speed;
 
     CCR_wheel[0] -= Local_angle_speed;
@@ -496,10 +496,22 @@ static void Car_Running(void)
 */
 static void Turn_Angle(void)
 {
+    static u8 i = 0;
     float Angle, PIDOUT;
     Angle = (float)stcAngle.Angle[2] / 32768 * 180;
     PIDOUT = PID_Realize(&Turn_Angle_PID, Angle);
-    Allocation_PID((int)PIDOUT);
+    angle_speed = (int32_t)PIDOUT;
+    if (fabs(Angle - Turn_Angle_PID.Target) < 1)
+    {
+        i++;
+        if(i > 4)
+        {
+            i = 0;
+            xTimerStop(Turn_Angle_Handle, 0);
+            already_turned = 1;
+        }
+    }
+    // Allocation_PID((int)PIDOUT);
 }
 
 /**
@@ -670,6 +682,7 @@ void start_trun(int i)
 		Turn_Angle_PID.Target = Angle + 90;
 	already_turned = 0;
 	xTimerStart(Turn_Angle_Handle, 0);
+    xTimerStart(Car_Running_Handle,0);
 }
 
 /**
@@ -758,7 +771,6 @@ static void Task__ONE(void *parameter)
     // char qrcode=0x07;
     while (1)
     {
-        
         //xEventGroupWaitBits(Group_One_Handle, 0x01, pdTRUE, pdTRUE, portMAX_DELAY); //! 开始比赛
         //-开箱 狗叫
         // float Angle;
@@ -786,7 +798,7 @@ static void Task__ONE(void *parameter)
         // here we need to switch the task that first go to the red area in the right hand side or in the left hand side
 
         
-        if(1)        //!the code in here is unfinished,we need to judge the value of the dataFromLinux[0] to decide which task we should switch to
+        if(0)        //!the code in here is unfinished,we need to judge the value of the dataFromLinux[0] to decide which task we should switch to
             vTaskResume(Task__TWO_Handle);
         else
             vTaskResume(Task__FOUR_Handle);
@@ -929,7 +941,7 @@ static void Task__FOUR(void)
         //!打开仓库，取出物品，这是后面需要加的代码
 
 
-        startStraight_Line_Base_On_Encoder(5500, forward);    //!向前走到十字t字路口 code is unfinished,the first param need to be changed
+        startStraight_Line_Base_On_Encoder(6100, forward);    //!向前走到十字t字路口 code is unfinished,the first param need to be changed
         startgostraight(-90);               //保证走直线
         while(!Y_have_achieved)             //检测到达位置
             vTaskDelay(20);
@@ -994,7 +1006,7 @@ static void BSP_Init(void)
 
     //pid初始化
     PID_Initialize(&Coord, 30, 0, 0, 0, 100, -100);         //微调巡线的pid初始化
-    PID_Initialize(&Turn_Angle_PID, 17.5, 0, 0, 0, 25, -25);  //转弯的pid初始化
+    PID_Initialize(&Turn_Angle_PID, 30, 0, 10, 0, 25, -25);  //转弯的pid初始化
     PID_Initialize(&X_Speed_PID, 3.5, 0, .5, 0, 100, -100); //x方向的远距离基于编码器的pid
     PID_Initialize(&Y_Speed_PID, 3.5, 0, .5, 0, 100, -100);   //y方向的远距离基于编码器的pid
     PID_Initialize(&X_Base_On_Laser_PID, 3.5, 0, 1., 0, 150, -150);
@@ -1012,107 +1024,4 @@ static void BSP_Init(void)
 }
 
 
-void Allocation_PID(int PIDOUT)
-{
-    if (Turn_Angle_PID.Target > 0)
-    {
-        if (PIDOUT > 0)
-        {
-            Turn_Right_Founction();
-            if (PIDOUT >= 1500)
-            {
-                /* code */
-                PIDOUT = 1500;
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 2);
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 3);
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 1);
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 4);
-            }
-            else
-            {
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 2);
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 3);
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 1);
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 4);
-            }
-        }
-        if (PIDOUT < 0)
-        {
-            Turn_Left_Founction();
-            if (PIDOUT < -1500)
-            {
-                /* code */
-                PIDOUT = -1500;
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 2);
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 3);
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 1);
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 4);
-            }
-            else
-            {
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 2);
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 3);
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 1);
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 4);
-            }
-        }
-    }
-    if (Turn_Angle_PID.Target < 0)
-    {
-        if (PIDOUT > 0)
-        {
-            Turn_Right_Founction();
-            if (PIDOUT >= 1500)
-            {
-                /* code */
-                PIDOUT = 1500;
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 2);
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 3);
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 1);
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 4);
-            }
-            else
-            {
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 2);
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 3);
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 1);
-                SetCompare1(TIM1, Turn_Speed + PIDOUT, 4);
-            }
-        }
-        if (PIDOUT < 0)
-        {
-            Turn_Left_Founction();
-            if (PIDOUT < -1500)
-            {
-                /* code */
-                PIDOUT = -1500;
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 2);
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 3);
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 1);
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 4);
-            }
-            else
-            {
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 2);
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 3);
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 1);
-                SetCompare1(TIM1, Turn_Speed - PIDOUT, 4);
-            }
-        }
-    }
-	static int i;
-    if (PIDOUT<35 & PIDOUT> -35)
-    {
-		i++;
-		if( i > 3 )
-		{
-			PULL_High();
-			xTimerStop(Turn_Angle_Handle, 0);
-			already_turned = 1;
-			i=0;
-		}
-        
-
-    }
-}
 /********************************END OF FILE****************************/

@@ -38,7 +38,7 @@ void OLED_SHOW_TASK()
     OLED_ShowString(3, 1, buff);
     sprintf(buff, "FD:%.1f", VOFA_Data[3]);
     OLED_ShowString(3, 9, buff);
-    sprintf(buff, "%d", check_rgb(1));
+    sprintf(buff, "%.2f", Turn_Angle_PID.Target);
     OLED_ShowString(4,1,buff);
 }
 void Read_RGB()

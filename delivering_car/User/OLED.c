@@ -1,5 +1,4 @@
 #include "stm32f10x.h"
-#include "OLED.h"
 #include "OLED_Font.h"
 
 /*引脚配置*/
@@ -95,6 +94,24 @@ void OLED_WriteData(uint8_t Data)
 }
 
 /**
+  * @brief  OLED写多个数据
+  * @param  dat 要写入的数据数组
+  * @param  len 要写入的数据长度
+  * @retval 无
+  */
+void OLED_WriteMultiData(u8 *dat, u8 len)
+{
+	u8 i;
+	OLED_I2C_Start();		// 通信开始
+	OLED_I2C_SendByte(0X78);	// 写从机地址'0111 100' 读写符号'0'
+	OLED_I2C_SendByte(0X40);		// 根据参数选择写命令还是数据
+	for(i=0; i<len; i++)
+		OLED_I2C_SendByte(dat[i]);
+	//通信结束
+	OLED_I2C_Stop();
+}
+
+/**
   * @brief  OLED设置光标位置
   * @param  Y 以左上角为原点，向下方向的坐标，范围：0~7
   * @param  X 以左上角为原点，向右方向的坐标，范围：0~127
@@ -113,15 +130,13 @@ void OLED_SetCursor(uint8_t Y, uint8_t X)
   * @retval 无
   */
 void OLED_Clear(void)
-{  
-	uint8_t i, j;
+{
+	u8 space[128]={0};
+	uint8_t j;
 	for (j = 0; j < 8; j++)
 	{
 		OLED_SetCursor(j, 0);
-		for(i = 0; i < 128; i++)
-		{
-			OLED_WriteData(0x00);
-		}
+		OLED_WriteMultiData(space,128);
 	}
 }
 
@@ -133,18 +148,15 @@ void OLED_Clear(void)
   * @retval 无
   */
 void OLED_ShowChar(uint8_t Line, uint8_t Column, char Char)
-{      	
-	uint8_t i;
+{
+	
 	OLED_SetCursor((Line - 1) * 2, (Column - 1) * 8);		//设置光标位置在上半部分
-	for (i = 0; i < 8; i++)
-	{
-		OLED_WriteData(OLED_F8x16[Char - ' '][i]);			//显示上半部分内容
-	}
+
+	OLED_WriteMultiData((u8*)(OLED_F8x16[Char - ' ']),8);
+	
 	OLED_SetCursor((Line - 1) * 2 + 1, (Column - 1) * 8);	//设置光标位置在下半部分
-	for (i = 0; i < 8; i++)
-	{
-		OLED_WriteData(OLED_F8x16[Char - ' '][i + 8]);		//显示下半部分内容
-	}
+
+	OLED_WriteMultiData((u8*)(OLED_F8x16[Char - ' '])+8,8);
 }
 
 /**
