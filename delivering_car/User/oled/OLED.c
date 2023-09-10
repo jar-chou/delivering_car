@@ -125,22 +125,6 @@ static inline void OLED_SetCursor(uint8_t Y, uint8_t X)
 }
 
 /**
-  * @brief  OLED清屏
-  * @param  无
-  * @retval 无
-  */
-void OLED_Clear(void)
-{
-	u8 space[128]={0};
-	uint8_t j;
-	for (j = 0; j < 8; j++)
-	{
-		OLED_SetCursor(j, 0);
-		OLED_WriteMultiData(space,128);
-	}
-}
-
-/**
   * @brief  OLED显示一个字符
   * @param  Line 行位置，范围：1~4
   * @param  Column 列位置，范围：1~16
@@ -273,6 +257,22 @@ void OLED_ShowBinNum(uint8_t Line, uint8_t Column, uint32_t Number, uint8_t Leng
 	for (i = 0; i < Length; i++)							
 	{
 		OLED_ShowChar(Line, Column + i, Number / OLED_Pow(2, Length - i - 1) % 2 + '0');
+	}
+}
+
+/**
+  * @brief  OLED清屏
+  * @param  无
+  * @retval 无
+  */
+void OLED_Clear(void)
+{
+	u8 space[128]={0};
+	uint8_t j;
+	for (j = 0; j < 8; j++)
+	{
+		OLED_SetCursor(j, 0);
+		OLED_WriteMultiData(space,128);
 	}
 }
 

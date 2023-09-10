@@ -1,23 +1,22 @@
 #include "buffer.h"
 #include "string.h"
 #include "stdio.h"
-struct Buff U3_buffer, U2_buffer, Soft_Usart, U1_buffer, U4_buffer, U5_buffer, IIC_buff;
+volatile struct Buff U3_buffer, U2_buffer, Soft_Usart, U1_buffer, U4_buffer, U5_buffer, IIC_buff;
 /**
  * @description: 初始化环形缓冲区
  * @param {Buff} *BUFF
  * @return {*}
  */
-void Iinitial_BUFF(struct Buff *BUFF)
+void Iinitial_BUFF(volatile struct Buff *BUFF)
 {
-    BUFF->head_p = BUFF->Data;
-    BUFF->end_p = &BUFF->Data[BUFFER_SIZE - 1];
-    BUFF->write_p = BUFF->Data;
-    BUFF->read_p = BUFF->Data;
-    BUFF->max = 0;
-    printf("%x\n", BUFF->head_p);
-    printf("%x\n", BUFF->end_p);
-    printf("%x\n", BUFF->write_p);
-    printf("%x\n", BUFF->read_p);
+    BUFF->head_p = (volatile u8*)BUFF->Data;
+    BUFF->end_p = (volatile u8*)&BUFF->Data[BUFFER_SIZE - 1];
+    BUFF->write_p = (volatile u8*)BUFF->Data;
+    BUFF->read_p = (volatile u8*)BUFF->Data;
+    printf("head_p:%x\n\r", BUFF->head_p);
+    printf("end_p:%x\n\r", BUFF->end_p);
+    printf("write_p:%x\n\r", BUFF->write_p);
+    printf("read_p:%x\n\r", BUFF->read_p);
 }
 /**
  * @description: 把数据写入缓冲区
@@ -25,32 +24,38 @@ void Iinitial_BUFF(struct Buff *BUFF)
  * @param {Buff} *BUFF
  * @return {*}
  */
-void Write_BUFF(u8 *P, struct Buff *BUFF)
+void Write_BUFF(u8 *P, volatile struct Buff *BUFF)
 {
+	
     if (BUFF->write_p == BUFF->end_p)
     {
-        BUFF->max = 1;
+		
         *BUFF->write_p = *P;
         BUFF->write_p = BUFF->head_p;
+		//printf("get data");
     }
     else
     {
         *BUFF->write_p = *P;
         BUFF->write_p++;
-        if (BUFF->max == 1)
-        {
-            BUFF->read_p = BUFF->write_p;
-        }
+		
     }
+	if((BUFF->read_p == BUFF->write_p))
+	{
+		BUFF->read_p++;
+		if(BUFF->read_p > BUFF->end_p)
+			BUFF->read_p = BUFF->head_p;
+		//printf("buff full %x %x\r\n", BUFF->write_p, BUFF->read_p);
+	}
 }
 /**
  * @description: 检查缓冲区是否有数据读
  * @param {Buff} *BUFF 传入需要检测的缓冲区
  * @return {*}
  */
-u8 Check_Buffer(struct Buff *BUFF)
+u8 Check_Buffer(volatile struct Buff *BUFF)
 {
-    if ((BUFF->read_p == BUFF->write_p) && BUFF->max == 0)
+    if ((BUFF->read_p == BUFF->write_p))
     {
         return 0;
     }
@@ -62,10 +67,10 @@ u8 Check_Buffer(struct Buff *BUFF)
  * @param {Buff} *BUFF
  * @return {*}
  */
-u8 Read_BUFF(struct Buff *BUFF)
+u8 Read_BUFF(volatile struct Buff *BUFF)
 {
-    u8 *p;
-    if (BUFF->read_p == BUFF->write_p && BUFF->max == 0)
+    volatile u8 *p;
+    if (BUFF->read_p == BUFF->write_p)
     {
         // printf("%u", *BUFF->read_p);
         // printf("\n数据为空\n");
@@ -77,7 +82,6 @@ u8 Read_BUFF(struct Buff *BUFF)
         {
 
             p = BUFF->read_p;
-            BUFF->max = 0;
             // printf("\n读到的数据为:%c\n", *p);
             BUFF->read_p = BUFF->head_p;
             return *p;
@@ -97,7 +101,7 @@ u8 Read_BUFF(struct Buff *BUFF)
  * @param {char} *p
  * @return {*}
  */
-u8 Find_Char(struct Buff *BUFF, char *p)
+u8 Find_Char(volatile struct Buff *BUFF, char *p)
 {
     u8 i, n, count = 0;
     n = BUFFER_SIZE;
@@ -151,7 +155,7 @@ u8 Find_Char(struct Buff *BUFF, char *p)
 //}
 
 // OPENMV 0xFF
-void Read_Data(struct Buff *BUFF, u8 head1, u8 head2, u8 head3, u8 count, u8 *p)
+void Read_Data(volatile struct Buff *BUFF, u8 head1, u8 head2, u8 head3, u8 count, u8 *p)
 {
     u8 i, A;
     A = 128;
@@ -174,7 +178,7 @@ void Read_Data(struct Buff *BUFF, u8 head1, u8 head2, u8 head3, u8 count, u8 *p)
         }
     }
 }
-u8 Read_buff(struct Buff *BUFF, const u8 *head, u8 head_number, u8 *data, u8 data_number)
+u8 Read_buff(volatile struct Buff *BUFF, const u8 *head, u8 head_number, u8 *data, u8 data_number)
 {
     u8 i, n, count = 0;
     n = BUFFER_SIZE;
@@ -217,7 +221,7 @@ u8 Read_buff(struct Buff *BUFF, const u8 *head, u8 head_number, u8 *data, u8 dat
  * @param {u8} bigfron 高位在前则1，低位在前则0
  * @return {*} 返回0读取失败，1成功
  */
-u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data, u8 data_number, u8 size, u8 bigfron)
+u8 Read_buff_Void(volatile struct Buff *BUFF, const u8 *head, u8 head_number, void *data, u8 data_number, u8 size, u8 bigfron)
 {
     u8 i, n, count = 0;
     n = BUFFER_SIZE;
@@ -362,3 +366,37 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
         return 0;
 }
 
+/**
+ * @description: 判断环形缓冲区是否有足够数据
+ * @param {Buff} *BUFF
+ * @param {u8} head_number 协议头个数
+ * @param {u8} data_number 数据个数
+ * @param {u8} size 数据类型
+ * @return {*}
+ */
+u8 have_enough_data(volatile struct Buff *BUFF, u8 head_number, u8 data_number, u8 size)
+{
+	int need_len = (head_number + data_number * size / 8);
+    if (BUFF->write_p >= BUFF->read_p)
+    {
+        if ((BUFF->write_p - BUFF->read_p) >= need_len)
+		{
+			
+			//printf("aa");
+			return 1;
+		}
+    }
+    else
+    {
+        if ((BUFF->end_p - BUFF->read_p + 1 + BUFF->write_p - BUFF->head_p) >= need_len)
+		{
+			//printf("!!\r\n");
+			return 1;
+			
+		}
+		else
+			printf("%x \r\n%x \r\n%d \r\n", (BUFF->write_p), (BUFF->read_p), need_len);
+    }
+	
+    return 0;
+}

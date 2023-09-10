@@ -14,23 +14,24 @@
 #define BUFFER_SIZE 128
 struct Buff
 {
-    u8 Data[BUFFER_SIZE];
-    u8 *head_p;
-    u8 *end_p;
-    u8 *write_p;
-    u8 *read_p;
-	  u8 max;
+    volatile u8 Data[BUFFER_SIZE];
+    volatile u8 *head_p;
+    volatile u8 *end_p;
+    volatile u8 *write_p;
+    volatile u8 *read_p;
 };
 
 // extern struct Buff BUFF;
 
-extern struct Buff U5_buffer, U3_buffer, U2_buffer, IIC_buff;
-void Iinitial_BUFF(struct Buff *BUFF);
-void Write_BUFF(u8 *P, struct Buff *BUFF);
-u8 Read_BUFF(struct Buff *BUFF);
-void Read_Data(struct Buff *BUFF, u8 head1, u8 head2, u8 head3,u8 count ,u8 *p);
-u8 Find_Char(struct Buff *BUFF, char *p);
-void Analysis_Contract(struct Buff *BUFF,char *Contract,u8 *data);
-u8 Read_buff(struct Buff *BUFF,const u8 *head, u8 head_number, u8 *data, u8 data_number);
-u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data, u8 data_number, u8 size, u8 bigfron);
+volatile extern struct Buff U5_buffer, U3_buffer, U2_buffer, IIC_buff, U1_buffer;
+void Iinitial_BUFF(volatile struct Buff *BUFF);
+void Write_BUFF(u8 *P, volatile struct Buff *BUFF);
+u8 Read_BUFF(volatile struct Buff *BUFF);
+void Read_Data(volatile struct Buff *BUFF, u8 head1, u8 head2, u8 head3,u8 count ,u8 *p);
+u8 Find_Char(volatile struct Buff *BUFF, char *p);
+void Analysis_Contract(volatile struct Buff *BUFF,char *Contract,u8 *data);
+u8 Read_buff(volatile struct Buff *BUFF,const u8 *head, u8 head_number, u8 *data, u8 data_number);
+u8 Read_buff_Void(volatile struct Buff *BUFF, const u8 *head, u8 head_number, void *data, u8 data_number, u8 size, u8 bigfron);
+u8 have_enough_data(volatile struct Buff *BUFF, u8 head_number, u8 data_number, u8 size);
+
 #endif

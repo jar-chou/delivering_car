@@ -2,7 +2,7 @@
  * @Author: jar-chou 2722642511@qq.com
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-09 19:12:22
+ * @LastEditTime: 2023-09-10 21:21:49
  * @FilePath: \delivering_car\User\sys.c
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -32,8 +32,7 @@ extern int32_t position_of_car[3];
 extern int32_t CCR_wheel[4];
 
 extern bool check_rgb(int color);
-
-int i = 0;
+extern u8 dataFromLinux[4];       //the data get from linux
 
 void OLED_SHOW_TASK()
 {
@@ -48,7 +47,8 @@ void OLED_SHOW_TASK()
     DrawString(2, 0, buff);
     sprintf(buff, "FD:%.1f", VOFA_Data[3]);
     DrawString(2, 8, buff);
-    sprintf(buff, "%.2f  %d", Turn_Angle_PID.Target, i++);
+    sprintf(buff, "%.2f  %d", Turn_Angle_PID.Target, dataFromLinux[0]);
+    printf("dataFromLinux[0]:%c\n\r", dataFromLinux[0]);
     DrawString(3, 0, buff);
     UpdateScreenDisplay();
 }

@@ -69,7 +69,7 @@ void USARTX_VL53_Config(void)
     USART_Cmd(VL53_USARTX, ENABLE);
 }
 
-struct Buff VL53_USARTX_Buff;
+volatile struct Buff VL53_USARTX_Buff;
 
 void VL53_USARTX_IRQHandler()
 {
@@ -79,7 +79,6 @@ void VL53_USARTX_IRQHandler()
         Data = VL53_USARTX->DR;
         Write_BUFF(&Data, &VL53_USARTX_Buff); // 把串口接收到的数据并存进环形缓冲区
     }
-    USART_ClearFlag(VL53_USARTX, USART_FLAG_RXNE);
 }
 /**
  * @description: 初始化激光测距（总函数）

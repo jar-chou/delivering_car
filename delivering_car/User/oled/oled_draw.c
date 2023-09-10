@@ -2,9 +2,10 @@
  * @Author: jar-chou 2722642511@qq.com
  * @Date: 2023-09-09 17:15:48
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-09 18:09:55
+ * @LastEditTime: 2023-09-09 22:53:57
  * @FilePath: \delivering_car\User\oled\oled_draw.c
- * @Description: 
+ * @Description: cn:这个文件用于在屏幕上画文字或图形
+ * 			 en:The file is used to draw text or graphics on the screen
  */
 
 #include "oled_draw.h"
@@ -12,13 +13,18 @@
 #include "OLED_Font.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-//显示一个字符
-//关于字体尺寸及使用请看SetFontSize()的注释
-//当size=0时 x为第几行 y为第几列
+/**
+ * @description: cn:画一个字符在指定位置
+ * 				 en:Draw a character at the specified location
+ * @param {int} x ：range 0-4 it is the row num
+ * @param {int} y ：range 0-16 it is the column num
+ * @param {unsigned char} c : which char you want to draw
+ * @return {*}
+ */
 void DrawChar(int x, int y, unsigned char c)
 {
 	int i;
-	if((x>4) || (y > 16))
+	if((x>3) || (y > 16))
 		return;
 	c = c - ' ';			//得到偏移后的位置
 	y = 8 * y;
@@ -27,7 +33,15 @@ void DrawChar(int x, int y, unsigned char c)
 	for(i=0;i<8;i++)
 		WriteByteBuffer(x*2+1, y+i, *(OLED_F8x16[c]+i+8));
 }
-//显示字符串 就是显示多次显示字符
+
+/**
+ * @description: cn:画一个字符串
+ * 				 en:Draw a string
+ * @param {int} x	从第几行开始画字符串
+ * @param {int} y	从第几列开始画字符串
+ * @param {char} *str	要显示的字符串
+ * @return {*}
+ */
 void DrawString(int x, int y,char *str)
 {
 	unsigned char j=0;
@@ -36,11 +50,11 @@ void DrawString(int x, int y,char *str)
 	{
 		DrawChar(x, y, str[j]);
 		y++;
-		if(y>15)
+		if(y>15)	//换行
 		{
 			y=0;
 			x++;
-		}		//换行
+		}
 		j++;
 	}
 }

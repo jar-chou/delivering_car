@@ -1,3 +1,12 @@
+/*
+ * @Author: jar-chou 2722642511@qq.com
+ * @Date: 2023-09-09 17:15:34
+ * @LastEditors: jar-chou 2722642511@qq.com
+ * @LastEditTime: 2023-09-09 22:36:49
+ * @FilePath: \delivering_car\User\oled\oled_buffer.c
+ * @Description: cn:这个文件用于操作屏幕缓冲区
+ * 			 en:This file is used to operate the screen buffer
+ */
 
 #include "oled_buffer.h"
 #include "string.h"

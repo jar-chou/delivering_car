@@ -50,7 +50,7 @@
  * @Author: zhaojianchao and jar-chou 2722642511@qq.com 
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-09 19:18:22
+ * @LastEditTime: 2023-09-10 21:19:54
  * @FilePath: \delivering_car\User\main.c
  * @Description: 龙王保佑此文件无bug！！！
  */
@@ -132,7 +132,7 @@ int32_t Y_Speed = Initial_Speed;
 int32_t X_Speed = 0;
 int32_t angle_speed = 0;
 float VOFA_Data[4];
-extern struct Buff VL53_USARTX_Buff;
+volatile extern struct Buff VL53_USARTX_Buff;
 struct PID Coord, Turn_Angle_PID, X_Speed_PID, Y_Speed_PID, X_Base_On_Laser_PID, Y_Base_On_Laser_PID;
 u8 already_turned = 0, Y_have_achieved = 0, X_have_achieved = 0;   //是否达到定时器目的的信号量
 int32_t CCR_wheel[4]={0,0,0,0};
@@ -545,10 +545,12 @@ static void line_walking(void)
 static void analyse_data(void)
 {
     u8 i = 0;
-    const u8 VL53_Agreement_RX[] = {0x50, 0x03, 0x02};
+    const static u8 VL53_Agreement_RX[] = {0x50, 0x03, 0x02};
     for (i = 0; i < 5; i++)
     {
         VL53_Send_Agrement();
+        // while(!have_enough_data(&U3_buffer, 3, 1, 16))
+		// 	vTaskDelay(1);
         Read_buff_Void(&VL53_USARTX_Buff, VL53_Agreement_RX, 3, &Distance.R[i], 1, 16, 1);
         Read_buff_Void(&U3_buffer, VL53_Agreement_RX, 3, &Distance.F[i], 1, 16, 1);
     }
@@ -574,18 +576,39 @@ static void analyse_data(void)
                             +How_many_revolutions_of_the_motor[1]
                             +How_many_revolutions_of_the_motor[2]
                             -How_many_revolutions_of_the_motor[3])/4;
-    #if 0
+    
     //get data from upper computer
-    const u8 upper_head[] = {0x1C, 0x2C, 0x3C};
-    u8 local_dataFromLinux[4] = {0, 0};
-    Read_buff_Void(&U5_buffer, (u8 *)upper_head, 3, local_dataFromLinux, 4, 8, 1);
-    #endif
+    const static u8 upper_head[] = {0x1C, 0x2C, 0x3C};
+    u8 local_dataFromLinux_buff[4] = {0, 0};
+    static u8 index = 0;
+    static u8 local_dataFromLinux[4] = {0, 0};
+    while(have_enough_data(&U5_buffer, 3, 4, 8))    //judge whether the data is enough
+    {
+        Read_buff_Void(&U5_buffer, (u8 *)upper_head, 3, local_dataFromLinux_buff, 4, 8, 1); //read the data from buffer
+        
+        if(!memcmp(local_dataFromLinux_buff, local_dataFromLinux, 4))   //judge whether the data is same as the last data
+        {
+            index++;
+            if(index >= 4)   //if the data is same as the last data, then judge whether the data is same as the last data for 4 times
+            {
+                index = 0;
+                //
+                memcpy(dataFromLinux, local_dataFromLinux, 4);   //copy the data from local variable to global variable
+            }
+        }
+        else
+        {
+            index = 0;
+            memcpy(local_dataFromLinux, local_dataFromLinux_buff, 4);   //copy the data from local variable to global variable
+        }
+    
+    }
+    
+    
 
     taskENTER_CRITICAL();           //进入基本临界区
 
-    #if 0
-    memcpy(dataFromLinux, local_dataFromLinux, 4);   //copy the data from local variable to global variable
-    #endif
+    
     VOFA_Data[2] = (float)Distance.R_OUT;           //右边激光测距得到的距离
     VOFA_Data[3] = (float)Distance.F_OUT;           //前面激光测距得到的距离
     position_of_car[0] += The_distance_that_has_gone_forward;            //the distance that car have gone forward
@@ -782,6 +805,10 @@ static void Task__ONE(void *parameter)
     // char qrcode=0x07;
     while (1)
     {
+        while(1)
+        {
+            vTaskDelay(1000);
+        }
         //xEventGroupWaitBits(Group_One_Handle, 0x01, pdTRUE, pdTRUE, portMAX_DELAY); //! 开始比赛
         //-开箱 狗叫
         // float Angle;
@@ -1010,9 +1037,12 @@ static void BSP_Init(void)
     Encoder_Init();
     USART3_Config();      //*USART3前激光测距
     USART5_Config();      //*USART5 responsible for the communication between the car and the upper computer Raspberry PI   负责和上位机树莓派通信
+	
     USART4_Config_JY62(); //*UART4陀螺仪
     USART1_Config();      //*调试信息输出
     Iinitial_BUFF(&U3_buffer);
+	Iinitial_BUFF(&U1_buffer);
+	Iinitial_BUFF(&U5_buffer);
     VL53_Initial(); //*USART2右激光测距
     Initial_Control_PIN();
     PULL_High();
@@ -1034,6 +1064,8 @@ static void BSP_Init(void)
     sendcmd(YAWCMD);
     Delayms(2000);
     GPIO_SetBits(GPIOE, GPIO_Pin_1);
+	
+	
 }
 
 

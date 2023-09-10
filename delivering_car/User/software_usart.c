@@ -6,7 +6,7 @@
     Software_USART_IOConfig();
 */
 u8 len = 0; // 接收计数
-extern struct Buff USART1_buffer, U3_buffer, Soft_Usart;
+volatile extern struct Buff USART1_buffer, U3_buffer, Soft_Usart;
 enum stat
 {
     COM_START_BIT,

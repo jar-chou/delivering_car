@@ -1,6 +1,6 @@
 #include "usart.h"
 #include "buffer.h"
- extern struct Buff U3_buffer, U2_buffer, Soft_Usart, U1_buffer, U4_buffer, U5_buffer;
+volatile extern struct Buff U3_buffer, U2_buffer, Soft_Usart, U1_buffer, U4_buffer, U5_buffer;
 /*
 way：1.调用USARTX_Config()函数初始化即可
 */
@@ -78,13 +78,14 @@ void USART1_Config(void)
 
 void USART1_IRQHandler()
 {
-//	u8 dr;
-    if (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == 1)
+	u8 res = 0;
+    if (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) != RESET)
     {
-//        dr = USART_ReceiveData(USART1);
-      
+		//		USART_ClearFlag(USART1, USART_FLAG_RXNE);	//不推荐清除标志位
+		res = USART_ReceiveData(USART1);
+        Write_BUFF(&res, &U1_buffer);
     }
-    USART_ClearFlag(USART1, USART_FLAG_RXNE);
+    
 }
 
 #endif
@@ -232,13 +233,12 @@ void USART3_Config(void)
 
 void USART3_IRQHandler()
 {
-	u8 abn = 0;
+	u8 res = 0;
     if (USART_GetFlagStatus(USART3, USART_FLAG_RXNE) == 1)
     {
-        abn = USART_ReceiveData(USART3);
+        res = USART_ReceiveData(USART3);
         Write_BUFF(&abn, &U3_buffer);
     }
-    USART_ClearFlag(USART3, USART_FLAG_RXNE);
 }
 #endif
 #if 0
@@ -391,7 +391,6 @@ void DEBUG_UART5_IRQHandler()
         res = USART_ReceiveData(UART5);
         Write_BUFF(&res, &U5_buffer);
     }
-    USART_ClearFlag(UART5, USART_FLAG_RXNE);
 }
 
 #endif
