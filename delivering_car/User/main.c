@@ -50,7 +50,7 @@
  * @Author: zhaojianchao and jar-chou 2722642511@qq.com 
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-10 21:19:54
+ * @LastEditTime: 2023-09-11 00:01:15
  * @FilePath: \delivering_car\User\main.c
  * @Description: 龙王保佑此文件无bug！！！
  */
@@ -1035,14 +1035,15 @@ static void BSP_Init(void)
     PWM_TIM1_config(2000, 3, Initial_Speed, Initial_Speed, Initial_Speed, Initial_Speed);
     TIMX_Delay_Init(RCC_APB1Periph_TIM6, 65530, 72, TIM6);
     Encoder_Init();
-    USART3_Config();      //*USART3前激光测距
-    USART5_Config();      //*USART5 responsible for the communication between the car and the upper computer Raspberry PI   负责和上位机树莓派通信
-	
-    USART4_Config_JY62(); //*UART4陀螺仪
     USART1_Config();      //*调试信息输出
     Iinitial_BUFF(&U3_buffer);
 	Iinitial_BUFF(&U1_buffer);
 	Iinitial_BUFF(&U5_buffer);
+    USART3_Config();      //*USART3前激光测距
+    USART5_Config();      //*USART5 responsible for the communication between the car and the upper computer Raspberry PI   负责和上位机树莓派通信
+	
+    USART4_Config_JY62(); //*UART4陀螺仪
+    
     VL53_Initial(); //*USART2右激光测距
     Initial_Control_PIN();
     PULL_High();

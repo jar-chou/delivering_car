@@ -337,7 +337,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>--no-multibyte-chars</MiscControls>
+              <MiscControls>--locale=english</MiscControls>
               <Define>STM32F40X_HD, USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
               <IncludePath>.\User;.\User\exti;.\User\key;.\User\led;.\User\uart;.\Libraries\FWlib\inc;.\FreeRTOS\include;.\Libraries\CMSIS;.\FreeRTOS\port\RVDS\ARM_CM3;..\9.5 22h;.\User\oled</IncludePath>

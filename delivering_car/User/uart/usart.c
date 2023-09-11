@@ -237,7 +237,7 @@ void USART3_IRQHandler()
     if (USART_GetFlagStatus(USART3, USART_FLAG_RXNE) == 1)
     {
         res = USART_ReceiveData(USART3);
-        Write_BUFF(&abn, &U3_buffer);
+        Write_BUFF(&res, &U3_buffer);
     }
 }
 #endif
