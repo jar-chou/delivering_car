@@ -123,7 +123,7 @@
                 "c:\\Users\\27226\\Desktop\\vscode git repository\\delivering_car\\delivering_car\\Doc"
             ],
             "defines": [
-                "STM32F40X_HD",
+                "STM32F10X_HD",
                 "USE_STDPERIPH_DRIVER",
                 "__CC_ARM",
                 "__arm__",

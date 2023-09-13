@@ -1,59 +1,36 @@
 /*
- * ......................................&&.........................
- * ....................................&&&..........................
- * .................................&&&&............................
- * ...............................&&&&..............................
- * .............................&&&&&&..............................
- * ...........................&&&&&&....&&&..&&&&&&&&&&&&&&&........
- * ..................&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&..............
- * ................&...&&&&&&&&&&&&&&&&&&&&&&&&&&&&.................
- * .......................&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&.........
- * ...................&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&...............
- * ..................&&&   &&&&&&&&&&&&&&&&&&&&&&&&&&&&&............
- * ...............&&&&&@  &&&&&&&&&&..&&&&&&&&&&&&&&&&&&&...........
- * ..............&&&&&&&&&&&&&&&.&&....&&&&&&&&&&&&&..&&&&&.........
- * ..........&&&&&&&&&&&&&&&&&&...&.....&&&&&&&&&&&&&...&&&&........
- * ........&&&&&&&&&&&&&&&&&&&.........&&&&&&&&&&&&&&&....&&&.......
- * .......&&&&&&&&.....................&&&&&&&&&&&&&&&&.....&&......
- * ........&&&&&.....................&&&&&&&&&&&&&&&&&&.............
- * ..........&...................&&&&&&&&&&&&&&&&&&&&&&&............
- * ................&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&............
- * ..................&&&&&&&&&&&&&&&&&&&&&&&&&&&&..&&&&&............
- * ..............&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&....&&&&&............
- * ...........&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&......&&&&............
- * .........&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&.........&&&&............
- * .......&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&...........&&&&............
- * ......&&&&&&&&&&&&&&&&&&&...&&&&&&...............&&&.............
- * .....&&&&&&&&&&&&&&&&............................&&..............
- * ....&&&&&&&&&&&&&&&.................&&...........................
- * ...&&&&&&&&&&&&&&&.....................&&&&......................
- * ...&&&&&&&&&&.&&&........................&&&&&...................
- * ..&&&&&&&&&&&..&&..........................&&&&&&&...............
- * ..&&&&&&&&&&&&...&............&&&.....&&&&...&&&&&&&.............
- * ..&&&&&&&&&&&&&.................&&&.....&&&&&&&&&&&&&&...........
- * ..&&&&&&&&&&&&&&&&..............&&&&&&&&&&&&&&&&&&&&&&&&.........
- * ..&&.&&&&&&&&&&&&&&&&&.........&&&&&&&&&&&&&&&&&&&&&&&&&&&.......
- * ...&&..&&&&&&&&&&&&.........&&&&&&&&&&&&&&&&...&&&&&&&&&&&&......
- * ....&..&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&...........&&&&&&&&.....
- * .......&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&..............&&&&&&&....
- * .......&&&&&.&&&&&&&&&&&&&&&&&&..&&&&&&&&...&..........&&&&&&....
- * ........&&&.....&&&&&&&&&&&&&.....&&&&&&&&&&...........&..&&&&...
- * .......&&&........&&&.&&&&&&&&&.....&&&&&.................&&&&...
- * .......&&&...............&&&&&&&.......&&&&&&&&............&&&...
- * ........&&...................&&&&&&.........................&&&..
- * .........&.....................&&&&........................&&....
- * ...............................&&&.......................&&......
- * ................................&&......................&&.......
- * .................................&&..............................
- * ..................................&..............................
+ *                        _oo0oo_
+ *                       o8888888o
+ *                       88" . "88
+ *                       (| -_- |)
+ *                       0\  =  /0
+ *                     ___/`---'\___
+ *                   .' \\|     |// '.
+ *                  / \\|||  :  |||// \
+ *                 / _||||| -:- |||||- \
+ *                |   | \\\  - /// |   |
+ *                | \_|  ''\---/''  |_/ |
+ *                \  .-\__  '-'  ___/-. /
+ *              ___'. .'  /--.--\  `. .'___
+ *           ."" '<  `.___\_<|>_/___.' >' "".
+ *          | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+ *          \  \ `_.   \_ __\ /__ _/   .-` /  /
+ *      =====`-.____`.___ \_____/___.-`___.-'=====
+ *                        `=---='
  * 
- * @Author: zhaojianchao and jar-chou 2722642511@qq.com 
+ * 
+ *      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * 
+ *            佛祖保佑     永不宕机     永无BUG
+ * 
+ * @Author: zhaojianchao and jar-chou 2722642511@qq.com
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-11 00:01:15
+ * @LastEditTime: 2023-09-13 17:56:28
  * @FilePath: \delivering_car\User\main.c
- * @Description: 龙王保佑此文件无bug！！！
+ * @Description: 
  */
+
 
 
 
@@ -233,7 +210,7 @@ static void AppTaskCreate(void)
         printf("Task__ONE任务创建成功\r\n");
     xReturn = xTaskCreate((TaskFunction_t)OLED_SHOW,          /* 任务入口函数 */
                           (const char *)"OLED_SHOW",          /* 任务名字 */
-                          (uint16_t)256,                      /* 任务栈大小 */
+                          (uint16_t)512,                      /* 任务栈大小 */
                           (void *)NULL,                       /* 任务入口函数参数 */
                           (UBaseType_t)2,                     /* 任务的优先级 */
                           (TaskHandle_t *)&OLED_SHOW_Handle); /* 任务控制块指针 */
@@ -346,14 +323,16 @@ static void Pan_Left_Base_On_Encoder(void)
     int32_t speed = -(int32_t)PID_Realize(&X_Speed_PID, distance);
 	speed = speed > 400 ? 400 : speed;
 	speed = speed < -400 ? -400 : speed;
+    taskENTER_CRITICAL();
     X_Speed = speed;
-    if (fabs(distance - X_Speed_PID.Target)<7)
+    taskEXIT_CRITICAL();
+    if (fabs(distance - X_Speed_PID.Target)<15)
     {
         i++;
         if(i > 4)
         {
             i = 0;
-            xTimerStop(Achieve_Distance_For_Right_Laser_Handle, 0);
+            xTimerStop(Pan_Left_Base_On_Encoder_Handle, 0);
             X_have_achieved = 1;
         }
     }
@@ -370,14 +349,16 @@ static void Go_Forward_Base_On_Encoder(void)
     int32_t speed = (int32_t)PID_Realize(&Y_Speed_PID, distance);
 	speed = speed > 1000 ? 1000 : speed;
 	speed = speed < -1000 ? -1000 : speed;
+    taskENTER_CRITICAL();
     Y_Speed = speed;
-    if (fabs(distance - Y_Speed_PID.Target)<10)
+    taskEXIT_CRITICAL();
+    if (fabs(distance - Y_Speed_PID.Target)<20)
     {
         i++;
         if(i > 4)
         {
             i = 0;
-            xTimerStop(Achieve_Distance_For_Front_Laser_Handle, 0);
+            xTimerStop(Go_Forward_Base_On_Encoder_Handle, 0);
             Y_have_achieved = 1;
         }
     }
@@ -394,8 +375,12 @@ static void Achieve_Distance_For_Right_Laser(void)
     int32_t speed = -(int32_t)PID_Realize(&X_Base_On_Laser_PID, distance);
     speed = speed > 300 ? 300 : speed;
 	speed = speed < -300 ? -300 : speed;
+
+    taskENTER_CRITICAL();
     X_Speed = speed;
-    if (fabs(distance - X_Base_On_Laser_PID.Target)<5)
+    taskEXIT_CRITICAL();
+
+    if (fabs(distance - X_Base_On_Laser_PID.Target)<10)
     {
         i++;
         if(i > 4)
@@ -418,8 +403,12 @@ static void Achieve_Distance_Front_Head_Laser(void)
     int32_t speed = -(int32_t)PID_Realize(&Y_Base_On_Laser_PID, distance);
 	speed = speed > 300 ? 300 : speed;
 	speed = speed < -300 ? -300 : speed;
+
+    taskENTER_CRITICAL();
     Y_Speed = speed;
-    if (fabs(distance - Y_Base_On_Laser_PID.Target)<20)
+    taskEXIT_CRITICAL();
+
+    if (fabs(distance - Y_Base_On_Laser_PID.Target)<10)
     {
         i++;
         if(i > 4)
@@ -546,21 +535,40 @@ static void analyse_data(void)
 {
     u8 i = 0;
     const static u8 VL53_Agreement_RX[] = {0x50, 0x03, 0x02};
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < 2; i++)
     {
         VL53_Send_Agrement();
-        // while(!have_enough_data(&U3_buffer, 3, 1, 16))
-		// 	vTaskDelay(1);
-        Read_buff_Void(&VL53_USARTX_Buff, VL53_Agreement_RX, 3, &Distance.R[i], 1, 16, 1);
-        Read_buff_Void(&U3_buffer, VL53_Agreement_RX, 3, &Distance.F[i], 1, 16, 1);
-    }
-    for (i = 0; i < 5; i++)
+        uint8_t t = 0;
+        while(!have_enough_data(&U3_buffer, 3, 1, 16))
+        {
+            if(t == 4)
+            {
+                VL53_Send_Agrement();
+            }
+            vTaskDelay(1);
+            t++;
+        }
+        while(have_enough_data(&VL53_USARTX_Buff, 3, 1, 16))    //judge whether the data is enough
+        {
+            Read_buff_Void(&VL53_USARTX_Buff, VL53_Agreement_RX, 3, &Distance.R[i], 1, 16, 1);//read the data from buffer
+        }
+        
+        while(have_enough_data(&U3_buffer, 3, 1, 16))    //judge whether the data is enough
+        {
+            Read_buff_Void(&U3_buffer, VL53_Agreement_RX, 3, &Distance.F[i], 1, 16, 1); //read the data from buffer
+        }
+
+
+        // Read_buff_Void(&VL53_USARTX_Buff, VL53_Agreement_RX, 3, &Distance.R[i], 1, 16, 1);
+        // Read_buff_Void(&U3_buffer, VL53_Agreement_RX, 3, &Distance.F[i], 1, 16, 1);
+}
+    for (i = 0; i < 2; i++)
     {
         Distance.R_OUT += Distance.R[i];
         Distance.F_OUT += Distance.F[i];
     }
-    Distance.R_OUT /= 5;
-    Distance.F_OUT /= 5;
+    Distance.R_OUT /= 2;
+    Distance.F_OUT /= 2;
 
     static int32_t How_many_revolutions_of_the_motor[4] = {0,0,0,0};
     How_many_revolutions_of_the_motor[0] = Read_Encoder(2);
@@ -609,8 +617,10 @@ static void analyse_data(void)
     taskENTER_CRITICAL();           //进入基本临界区
 
     
-    VOFA_Data[2] = (float)Distance.R_OUT;           //右边激光测距得到的距离
-    VOFA_Data[3] = (float)Distance.F_OUT;           //前面激光测距得到的距离
+    VOFA_Data[2] = Distance.R_OUT;           //右边激光测距得到的距离
+    VOFA_Data[3] = Distance.F_OUT;           //前面激光测距得到的距离
+    Distance.F_OUT = 0;
+    Distance.R_OUT = 0;
     position_of_car[0] += The_distance_that_has_gone_forward;            //the distance that car have gone forward
     position_of_car[1] += The_distance_that_has_gone_right_head_side;    //the distance that car have gone right hand side
     Read_RGB();
@@ -799,16 +809,13 @@ static void OLED_SHOW(void *pvParameters)
  */
 static void Task__ONE(void *parameter)
 {
-
+    // while(1)
+    //     vTaskDelay(1000);
 
 
     // char qrcode=0x07;
     while (1)
     {
-        while(1)
-        {
-            vTaskDelay(1000);
-        }
         //xEventGroupWaitBits(Group_One_Handle, 0x01, pdTRUE, pdTRUE, portMAX_DELAY); //! 开始比赛
         //-开箱 狗叫
         // float Angle;
@@ -826,7 +833,7 @@ static void Task__ONE(void *parameter)
 		while(!already_turned)                          //等待转弯完成
             vTaskDelay(20);
         
-        startStraight_Line_For_Laser(240,pan);      //!the distance need to be changed,it is because only the center of road do not have barrier
+        startStraight_Line_For_Laser(210,pan);      //!the distance need to be changed,it is because only the center of road do not have barrier
         startgostraight(-90);       //保证车的方向不变
         while (!X_have_achieved)
         {
@@ -836,7 +843,7 @@ static void Task__ONE(void *parameter)
         // here we need to switch the task that first go to the red area in the right hand side or in the left hand side
 
         
-        if(0)        //!the code in here is unfinished,we need to judge the value of the dataFromLinux[0] to decide which task we should switch to
+        if(1)        //!the code in here is unfinished,we need to judge the value of the dataFromLinux[0] to decide which task we should switch to
             vTaskResume(Task__TWO_Handle);
         else
             vTaskResume(Task__FOUR_Handle);
@@ -873,13 +880,13 @@ static void Task__TWO(void *parameter)
         //播报到达二号仓库
         USART_Send(voice[2],6);
         //向前走到左边红色区域
-        startStraight_Line_Base_On_Encoder(11000, forward);     //!code is unfinished,the first param need to be changed
+        startStraight_Line_Base_On_Encoder(12000, forward);     //!code is unfinished,the first param need to be changed
 
         startgostraight(-90);                           //保证走直线
         while(!Y_have_achieved)                         //检测到达位置
             vTaskDelay(20);
-        startStraight_Line_For_Laser(240, pan);       //根据右边激光测距调整距离
-        startStraight_Line_For_Laser(190, forward);     //根据前面激光测距调整距离
+        startStraight_Line_For_Laser(210, pan);       //根据右边激光测距调整距离
+        startStraight_Line_For_Laser(150, forward);     //根据前面激光测距调整距离
         while((!X_have_achieved)||(!Y_have_achieved))    //检测到达位置
             vTaskDelay(20);
         
@@ -955,8 +962,8 @@ static void Task__FOUR(void *parameter)
 		while(!Y_have_achieved)         //检测到达左边红色区域
             vTaskDelay(10);
 		
-        startStraight_Line_For_Laser(240, pan);       //根据右边激光测距调整距离
-        startStraight_Line_For_Laser(190, forward);     //根据前面激光测距调整距离
+        startStraight_Line_For_Laser(210, pan);       //根据右边激光测距调整距离
+        startStraight_Line_For_Laser(150, forward);     //根据前面激光测距调整距离
         while((!X_have_achieved)||(!Y_have_achieved))    //检测到达位置
             vTaskDelay(10);
 		xTimerStop(Car_Running_Handle, 1);      //小车停止移动
@@ -969,7 +976,6 @@ static void Task__FOUR(void *parameter)
         while(!check_rgb(1))            //用rgb颜色识别检测到达右边红色区域
         vTaskDelay(20);                 //延时20ms
 
-		xTimerStop(line_walking_Handle, 1);     //停止走直线
         xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);   //停止前后走
         PULL_High();
 
@@ -1051,10 +1057,10 @@ static void BSP_Init(void)
     //pid初始化
     PID_Initialize(&Coord, 45, 0, 0, 0, 25, -25);                   //微调巡线的pid初始化
     PID_Initialize(&Turn_Angle_PID, 30, 0, 10, 0, 25, -25);         //转弯的pid初始化
-    PID_Initialize(&X_Speed_PID, 3.5, 0, .5, 0, 100, -100);         //x方向的远距离基于编码器的pid
-    PID_Initialize(&Y_Speed_PID, 3.5, 0, .5, 0, 100, -100);         //y方向的远距离基于编码器的pid
-    PID_Initialize(&X_Base_On_Laser_PID, 3.5, 0, 1., 0, 150, -150);
-    PID_Initialize(&Y_Base_On_Laser_PID, 3.5, 0, 1., 0, 150, -150);
+    PID_Initialize(&X_Speed_PID, 3.75, 0, .5, 0, 100, -100);         //x方向的远距离基于编码器的pid
+    PID_Initialize(&Y_Speed_PID, 3.75, 0, .5, 0, 100, -100);         //y方向的远距离基于编码器的pid
+    PID_Initialize(&X_Base_On_Laser_PID, 20, 0, 1., 0, 150, -150);
+    PID_Initialize(&Y_Base_On_Laser_PID, 20, 0, 1., 0, 150, -150);
 	Software_USART_IOConfig();
     LED_GPIO_Config();
     KEY_ONE();

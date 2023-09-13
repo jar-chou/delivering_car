@@ -16,8 +16,8 @@
 /**
  * @description: cn:画一个字符在指定位置
  * 				 en:Draw a character at the specified location
- * @param {int} x ：range 0-4 it is the row num
- * @param {int} y ：range 0-16 it is the column num
+ * @param {int} x ：range 0-3 it is the row num
+ * @param {int} y ：range 0-15 it is the column num
  * @param {unsigned char} c : which char you want to draw
  * @return {*}
  */

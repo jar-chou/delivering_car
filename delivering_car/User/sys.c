@@ -2,7 +2,7 @@
  * @Author: jar-chou 2722642511@qq.com
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-10 21:21:49
+ * @LastEditTime: 2023-09-13 17:56:56
  * @FilePath: \delivering_car\User\sys.c
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -22,7 +22,7 @@
 struct COLOR RGB;
 int count = 0;
 extern float VOFA_Data[4];
-extern u8 already_turned, Y_have_achieved, X_have_achieved;
+extern volatile u8 already_turned, Y_have_achieved, X_have_achieved, Y_Laser_have_achieved, X_Laser_have_achieved;
 extern int32_t Y_Speed;
 extern int32_t X_Speed;
 extern int32_t angle_speed;
@@ -47,7 +47,7 @@ void OLED_SHOW_TASK()
     DrawString(2, 0, buff);
     sprintf(buff, "FD:%.1f", VOFA_Data[3]);
     DrawString(2, 8, buff);
-    sprintf(buff, "%.2f  %d", Turn_Angle_PID.Target, dataFromLinux[0]);
+    sprintf(buff, "%.2f %d %d %d", Turn_Angle_PID.Target, Y_have_achieved, X_have_achieved, !((Y_have_achieved)&&(X_have_achieved)));
     printf("dataFromLinux[0]:%c\n\r", dataFromLinux[0]);
     DrawString(3, 0, buff);
     UpdateScreenDisplay();

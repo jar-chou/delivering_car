@@ -14,11 +14,11 @@
 #define BUFFER_SIZE 128
 struct Buff
 {
-    volatile u8 Data[BUFFER_SIZE] = {0};
-    volatile u8 *head_p = Data;
-    volatile u8 *end_p = Data + BUFFER_SIZE -1;
-    volatile u8 *write_p = Data;
-    volatile u8 *read_p = Data;
+    volatile u8 Data[BUFFER_SIZE];
+    volatile u8 *head_p;
+    volatile u8 *end_p;
+    volatile u8 *write_p;
+    volatile u8 *read_p;
 };
 
 // extern struct Buff BUFF;

@@ -79,6 +79,7 @@ void VL53_USARTX_IRQHandler()
         Data = VL53_USARTX->DR;
         Write_BUFF(&Data, &VL53_USARTX_Buff); // 把串口接收到的数据并存进环形缓冲区
     }
+    //USART_ClearFlag(VL53_USARTX, USART_FLAG_RXNE);
 }
 /**
  * @description: 初始化激光测距（总函数）
@@ -134,6 +135,30 @@ void VL53_Send_Agrement()
         USART_SendData(USART3, Agreement[i]);
         while (USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
     }
+}
+
+void VL53_Send_Agrement_R()
+{
+    u8 i;
+    const u8 Agreement[] = {0x50, 0x03, 0x00, 0x34, 0x00, 0X01, 0XC8, 0X45};
+    for (i = 0; i < 8; i++)
+    {
+        USART_SendData(VL53_USARTX, Agreement[i]);
+        while (USART_GetFlagStatus(VL53_USARTX, USART_FLAG_TXE) == RESET)
+            ;
+    }
+}
+
+void VL53_Send_Agrement_F()
+{
+    u8 i;
+    const u8 Agreement[] = {0x50, 0x03, 0x00, 0x34, 0x00, 0X01, 0XC8, 0X45};
+    for (i = 0; i < 8; i++)
+    {
+        USART_SendData(USART3, Agreement[i]);
+        while (USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+    }
+
 }
 
 #endif

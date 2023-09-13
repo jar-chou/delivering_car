@@ -329,16 +329,16 @@
             <uC99>1</uC99>
             <uGnu>0</uGnu>
             <useXO>0</useXO>
-            <v6Lang>3</v6Lang>
-            <v6LangP>3</v6LangP>
-            <vShortEn>0</vShortEn>
-            <vShortWch>0</vShortWch>
+            <v6Lang>5</v6Lang>
+            <v6LangP>5</v6LangP>
+            <vShortEn>1</vShortEn>
+            <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>--locale=english</MiscControls>
-              <Define>STM32F40X_HD, USE_STDPERIPH_DRIVER</Define>
+              <MiscControls>--no-multibyte-chars</MiscControls>
+              <Define>STM32F10X_HD, USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
               <IncludePath>.\User;.\User\exti;.\User\key;.\User\led;.\User\uart;.\Libraries\FWlib\inc;.\FreeRTOS\include;.\Libraries\CMSIS;.\FreeRTOS\port\RVDS\ARM_CM3;..\9.5 22h;.\User\oled</IncludePath>
             </VariousControls>
