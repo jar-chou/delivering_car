@@ -17,4 +17,7 @@
 void VL53_Initial(void);
 void VL53_Read_Data(u16 *distance);
 void VL53_Send_Agrement(void);
+void VL53_Send_Agrement_F(void);
+void VL53_Send_Agrement_R(void);
+
 #endif

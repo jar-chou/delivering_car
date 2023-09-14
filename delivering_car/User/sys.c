@@ -43,11 +43,11 @@ void OLED_SHOW_TASK()
     DrawString(0, 0, buff);
 	sprintf(buff, "R:%d G:%d B:%d", RGB.R,RGB.G,RGB.B);
     DrawString(1, 0, buff);
-    sprintf(buff, "RD:%.1f", VOFA_Data[2]);
+    sprintf(buff, "RD:%d", (int)VOFA_Data[2]);
     DrawString(2, 0, buff);
-    sprintf(buff, "FD:%.1f", VOFA_Data[3]);
+    sprintf(buff, "FD:%d", (int)VOFA_Data[3]);
     DrawString(2, 8, buff);
-    sprintf(buff, "%.2f %d %d %d", Turn_Angle_PID.Target, Y_have_achieved, X_have_achieved, !((Y_have_achieved)&&(X_have_achieved)));
+    sprintf(buff, "%.2f %d %d %d", Turn_Angle_PID.Target, position_of_car[0], X_have_achieved, dataFromLinux[0]);
     printf("dataFromLinux[0]:%c\n\r", dataFromLinux[0]);
     DrawString(3, 0, buff);
     UpdateScreenDisplay();

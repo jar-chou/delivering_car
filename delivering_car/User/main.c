@@ -319,7 +319,7 @@ static void AppTaskCreate(void)
 static void Pan_Left_Base_On_Encoder(void)
 {
     static int i = 0;
-    int32_t distance = position_of_car[0];
+    int32_t distance = position_of_car[1];
     int32_t speed = -(int32_t)PID_Realize(&X_Speed_PID, distance);
 	speed = speed > 400 ? 400 : speed;
 	speed = speed < -400 ? -400 : speed;
@@ -345,7 +345,7 @@ static void Pan_Left_Base_On_Encoder(void)
 static void Go_Forward_Base_On_Encoder(void)
 {
     static int i = 0;
-    int32_t distance = position_of_car[1];
+    int32_t distance = position_of_car[0];
     int32_t speed = (int32_t)PID_Realize(&Y_Speed_PID, distance);
 	speed = speed > 1000 ? 1000 : speed;
 	speed = speed < -1000 ? -1000 : speed;
@@ -533,42 +533,41 @@ static void line_walking(void)
 */
 static void analyse_data(void)
 {
-    u8 i = 0;
+    u8 i = 0, num_f = 0, num_r = 0;
     const static u8 VL53_Agreement_RX[] = {0x50, 0x03, 0x02};
-    for (i = 0; i < 2; i++)
+    for (i = 0; i < 3; i++)
     {
         VL53_Send_Agrement();
-        uint8_t t = 0;
-        while(!have_enough_data(&U3_buffer, 3, 1, 16))
-        {
-            if(t == 4)
-            {
-                VL53_Send_Agrement();
-            }
-            vTaskDelay(1);
-            t++;
-        }
-        while(have_enough_data(&VL53_USARTX_Buff, 3, 1, 16))    //judge whether the data is enough
-        {
-            Read_buff_Void(&VL53_USARTX_Buff, VL53_Agreement_RX, 3, &Distance.R[i], 1, 16, 1);//read the data from buffer
-        }
+		vTaskDelay(1);
+		if(have_enough_data(&VL53_USARTX_Buff,3,1,16))
+		{
+			Read_buff_Void(&VL53_USARTX_Buff, VL53_Agreement_RX, 3, &Distance.R[i], 1, 16, 1);
+			num_r++;
+		}
+		else
+			Distance.R[i] = 0;
+		if(have_enough_data(&U3_buffer,3,1,16))
+		{
+			Read_buff_Void(&U3_buffer, VL53_Agreement_RX, 3, &Distance.F[i], 1, 16, 1);
+			num_f++;
+		}
+		else
+			Distance.F[i] = 0;
         
-        while(have_enough_data(&U3_buffer, 3, 1, 16))    //judge whether the data is enough
-        {
-            Read_buff_Void(&U3_buffer, VL53_Agreement_RX, 3, &Distance.F[i], 1, 16, 1); //read the data from buffer
-        }
-
-
-        // Read_buff_Void(&VL53_USARTX_Buff, VL53_Agreement_RX, 3, &Distance.R[i], 1, 16, 1);
-        // Read_buff_Void(&U3_buffer, VL53_Agreement_RX, 3, &Distance.F[i], 1, 16, 1);
-}
-    for (i = 0; i < 2; i++)
+    }
+    for (i = 0; i < 3; i++)
     {
         Distance.R_OUT += Distance.R[i];
         Distance.F_OUT += Distance.F[i];
     }
-    Distance.R_OUT /= 2;
-    Distance.F_OUT /= 2;
+	if(num_r)
+		Distance.R_OUT /= num_r;
+	else
+		Distance.R_OUT = 0;
+	if(num_f)
+		Distance.F_OUT /= num_f;
+	else
+		Distance.F_OUT = 0;
 
     static int32_t How_many_revolutions_of_the_motor[4] = {0,0,0,0};
     How_many_revolutions_of_the_motor[0] = Read_Encoder(2);
@@ -797,7 +796,7 @@ static void OLED_SHOW(void *pvParameters)
 {
     while (1)
     {
-
+		vTaskDelay(50);
         OLED_SHOW_TASK();
     }
 }
@@ -809,13 +808,14 @@ static void OLED_SHOW(void *pvParameters)
  */
 static void Task__ONE(void *parameter)
 {
-    // while(1)
-    //     vTaskDelay(1000);
+    
 
 
     // char qrcode=0x07;
     while (1)
     {
+		while(1)
+			vTaskDelay(1000);
         //xEventGroupWaitBits(Group_One_Handle, 0x01, pdTRUE, pdTRUE, portMAX_DELAY); //! 开始比赛
         //-开箱 狗叫
         // float Angle;
@@ -1067,9 +1067,9 @@ static void BSP_Init(void)
     OLED_Init();
     IIC_Init();
     sendcmd(ACCCMD);
-    Delayms(500);
+    Delayms(200);
     sendcmd(YAWCMD);
-    Delayms(2000);
+    Delayms(200);
     GPIO_SetBits(GPIOE, GPIO_Pin_1);
 	
 	
