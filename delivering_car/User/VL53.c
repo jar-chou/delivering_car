@@ -12,7 +12,7 @@ static void NVIC_USARTX_VL53_Configuration(void)
     /* 配置USART为中断源 */
     NVIC_InitStructure.NVIC_IRQChannel = VL53_USARTX_IRQn;
     /* 抢断优先级*/
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 6;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
     /* 子优先级 */
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     /* 使能中断 */
@@ -124,9 +124,10 @@ void VL53_Send_Agrement()
 {
     u8 i;
     const u8 Agreement[] = {0x50, 0x03, 0x00, 0x34, 0x00, 0X01, 0XC8, 0X45};
+    const u8 Agreement1[8] = {0x57, 0x10, 0xff, 0xff, 0x01, 0xff, 0xff, 0x64};
     for (i = 0; i < 8; i++)
     {
-        USART_SendData(VL53_USARTX, Agreement[i]);
+        USART_SendData(VL53_USARTX, Agreement1[i]);
         while (USART_GetFlagStatus(VL53_USARTX, USART_FLAG_TXE) == RESET)
             ;
     }

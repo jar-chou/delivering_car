@@ -26,7 +26,7 @@
  * @Author: zhaojianchao and jar-chou 2722642511@qq.com
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-13 18:01:53
+ * @LastEditTime: 2023-09-15 22:16:26
  * @FilePath: \delivering_car\User\main.c
  * @Description: 
  */
@@ -101,7 +101,7 @@ static EventGroupHandle_t Group_One_Handle = NULL; 			//+事件组句柄
 /*
  * 当我们在写应用程序的时候，可能需要用到一些全局变量。
  */
-#define Initial_Speed 600
+#define Initial_Speed 0
 #define Turn_Speed 0
 extern const char ACCCMD[3];
 extern const char YAWCMD[3];
@@ -119,9 +119,9 @@ u8 voice[3][6] = {0xaa,0x07,0x02,0x00,0x01,0xb4,0xaa,0x07,0x02,0x00,0x02,0xb5,0x
 struct distance
 {
     u16 F[5];
-    u16 R[5];
+    int R[5];
     u16 F_OUT;
-    u16 R_OUT;
+    int R_OUT;
 } Distance;
 
 /*
@@ -196,7 +196,7 @@ static void AppTaskCreate(void)
                           (const char *)"Task__TWO",          /* 任务名字 */
                           (uint16_t)512,                      /* 任务栈大小 */
                           (void *)NULL,                       /* 任务入口函数参数 */
-                          (UBaseType_t)2,                    /* 任务的优先级 */
+                          (UBaseType_t)3,                    /* 任务的优先级 */
                           (TaskHandle_t *)&Task__TWO_Handle); /* 任务控制块指针 */
     if (xReturn == pdPASS)
         printf("Task__TWO任务创建成功\r\n");
@@ -204,7 +204,7 @@ static void AppTaskCreate(void)
                           (const char *)"Task__ONE",          /* 任务名字 */
                           (uint16_t)512,                      /* 任务栈大小 */
                           (void *)NULL,                       /* 任务入口函数参数 */
-                          (UBaseType_t)2,                     /* 任务的优先级 */
+                          (UBaseType_t)3,                     /* 任务的优先级 */
                           (TaskHandle_t *)&Task__ONE_Handle); /* 任务控制块指针 */
     if (xReturn == pdPASS)
         printf("Task__ONE任务创建成功\r\n");
@@ -220,7 +220,7 @@ static void AppTaskCreate(void)
                           (const char *)"Task__THREE",          /* 任务名字 */
                           (uint16_t)256,                        /* 任务栈大小 */
                           (void *)NULL,                         /* 任务入口函数参数 */
-                          (UBaseType_t)2,                       /* 任务的优先级 */
+                          (UBaseType_t)3,                       /* 任务的优先级 */
                           (TaskHandle_t *)&Task__THREE_Handle); /* 任务控制块指针 */
     if (xReturn == pdPASS)
         printf("Task__THREE任务创建成功\r\n");
@@ -228,7 +228,7 @@ static void AppTaskCreate(void)
                           (const char *)"Task__FOUR",          /* 任务名字 */
                           (uint16_t)256,                       /* 任务栈大小 */
                           (void *)NULL,                        /* 任务入口函数参数 */
-                          (UBaseType_t)2,                      /* 任务的优先级 */
+                          (UBaseType_t)3,                      /* 任务的优先级 */
                           (TaskHandle_t *)&Task__FOUR_Handle); /* 任务控制块指针 */
     if (xReturn == pdPASS)
         printf("Task__FOUR任务创建成功\r\n");
@@ -352,7 +352,7 @@ static void Go_Forward_Base_On_Encoder(void)
     taskENTER_CRITICAL();
     Y_Speed = speed;
     taskEXIT_CRITICAL();
-    if (fabs(distance - Y_Speed_PID.Target)<20)
+    if (fabs(distance - Y_Speed_PID.Target)<100)
     {
         i++;
         if(i > 4)
@@ -373,8 +373,8 @@ static void Achieve_Distance_For_Right_Laser(void)
     static int i = 0;
     float distance = VOFA_Data[2];
     int32_t speed = -(int32_t)PID_Realize(&X_Base_On_Laser_PID, distance);
-    speed = speed > 300 ? 300 : speed;
-	speed = speed < -300 ? -300 : speed;
+    speed = speed > 400 ? 400 : speed;
+	speed = speed < -400 ? -400 : speed;
 
     taskENTER_CRITICAL();
     X_Speed = speed;
@@ -533,29 +533,35 @@ static void line_walking(void)
 */
 static void analyse_data(void)
 {
-    u8 i = 0, num_f = 0, num_r = 0;
+    u8 i = 0, num_f = 0, num_r = 0, TOF_Data[7];
     const static u8 VL53_Agreement_RX[] = {0x50, 0x03, 0x02};
-    for (i = 0; i < 3; i++)
+    const u8 TOFSENSE[] = {0x57,0x00,0xFF,0x01};
+    for (i = 0; i < 5; i++)
     {
         VL53_Send_Agrement();
 		vTaskDelay(1);
-		if(have_enough_data(&VL53_USARTX_Buff,3,1,16))
-		{
-			Read_buff_Void(&VL53_USARTX_Buff, VL53_Agreement_RX, 3, &Distance.R[i], 1, 16, 1);
-			num_r++;
-		}
-		else
-			Distance.R[i] = 0;
 		if(have_enough_data(&U3_buffer,3,1,16))
 		{
-			Read_buff_Void(&U3_buffer, VL53_Agreement_RX, 3, &Distance.F[i], 1, 16, 1);
+			while(have_enough_data(&U3_buffer, 3,1,16))
+				Read_buff_Void(&U3_buffer, VL53_Agreement_RX, 3, &Distance.F[i], 1, 16, 1);
 			num_f++;
 		}
 		else
 			Distance.F[i] = 0;
+		if(have_enough_data(&VL53_USARTX_Buff,20,0,8))
+		{
+			while(have_enough_data(&VL53_USARTX_Buff, 3, 4, 8))
+            {
+				Read_buff_Void(&VL53_USARTX_Buff,TOFSENSE,4,TOF_Data,7,8,1);
+                Distance.R[i] = (int32_t)(TOF_Data[4] << 8 | TOF_Data[5] << 16 | TOF_Data[6] << 24) / 256;
+            }
+			num_r++;
+		}
+		else
+			Distance.R[i] = 0;
         
     }
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 5; i++)
     {
         Distance.R_OUT += Distance.R[i];
         Distance.F_OUT += Distance.F[i];
@@ -569,16 +575,28 @@ static void analyse_data(void)
 	else
 		Distance.F_OUT = 0;
 
-    static int32_t How_many_revolutions_of_the_motor[4] = {0,0,0,0};
+    int32_t How_many_revolutions_of_the_motor[4] = {0,0,0,0};
+
     How_many_revolutions_of_the_motor[0] = Read_Encoder(2);
     How_many_revolutions_of_the_motor[1] = Read_Encoder(3);
     How_many_revolutions_of_the_motor[2] = Read_Encoder(4);
     How_many_revolutions_of_the_motor[3] = Read_Encoder(5);
+	
+	u8 get_howmanyencoder = 0;
+	for(u8 n=0;n<4;n++)
+	{
+		if(fabs(How_many_revolutions_of_the_motor[n]) > 5)
+			get_howmanyencoder++;
+	}
 
-    int32_t The_distance_that_has_gone_forward = (How_many_revolutions_of_the_motor[0]
+	int32_t The_distance_that_has_gone_forward = 0;
+    if(get_howmanyencoder != 0)
+        The_distance_that_has_gone_forward = (How_many_revolutions_of_the_motor[0]
                             +How_many_revolutions_of_the_motor[1]
                             +How_many_revolutions_of_the_motor[2]
-                            +How_many_revolutions_of_the_motor[3])/4;
+                            +How_many_revolutions_of_the_motor[3])/get_howmanyencoder;
+    
+
     int32_t The_distance_that_has_gone_right_head_side = (-How_many_revolutions_of_the_motor[0]
                             +How_many_revolutions_of_the_motor[1]
                             +How_many_revolutions_of_the_motor[2]
@@ -683,7 +701,7 @@ void startStraight_Line_Base_On_Encoder(float target, int forwardOrPan)
         X_Speed_PID.Target = target;
         X_Speed_PID.Cumulation_Error = 0;
         X_have_achieved = 0;
-        position_of_car[0] = 0;
+        position_of_car[1] = 0;
         xTimerStart(Pan_Left_Base_On_Encoder_Handle, 1);
         xTimerStart(Car_Running_Handle, 0);
     }
@@ -692,7 +710,7 @@ void startStraight_Line_Base_On_Encoder(float target, int forwardOrPan)
         Y_Speed_PID.Target = target;
         Y_Speed_PID.Cumulation_Error = 0;
         Y_have_achieved = 0;
-        position_of_car[1] = 0;
+        position_of_car[0] = 0;
         xTimerStart(Go_Forward_Base_On_Encoder_Handle, 1);
         xTimerStart(Car_Running_Handle, 0);
     }
@@ -796,7 +814,7 @@ static void OLED_SHOW(void *pvParameters)
 {
     while (1)
     {
-		vTaskDelay(50);
+		vTaskDelay(1);
         OLED_SHOW_TASK();
     }
 }
@@ -814,8 +832,23 @@ static void Task__ONE(void *parameter)
     // char qrcode=0x07;
     while (1)
     {
-		while(1)
-			vTaskDelay(1000);
+        // while(1)
+        // {
+        //     if(check_keystart == RESET)
+        //     {
+        //         vTaskDelay(50);
+        //         if(check_keystart == RESET)
+        //         {
+        //             break;
+        //         }
+        //     }
+        // }
+//        while(1)
+//		{
+//			vTaskDelay(1000);
+//			printf("1:%4d 2:%4d 3:%4d 4:%4d\r\n",Read_Encoder(2), Read_Encoder(3),Read_Encoder(4), Read_Encoder(5));
+//		}
+        
         //xEventGroupWaitBits(Group_One_Handle, 0x01, pdTRUE, pdTRUE, portMAX_DELAY); //! 开始比赛
         //-开箱 狗叫
         // float Angle;
@@ -827,23 +860,26 @@ static void Task__ONE(void *parameter)
         startgostraight(0);								//保证走直线
         while(!Y_have_achieved)							//检测到达位置
             vTaskDelay(20);
+        
+        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);				//小车停止移动
         xTimerStop(Car_Running_Handle, 1);				//小车停止移动
         xTimerStop(line_walking_Handle, 1);				//停止走直线
 		start_trun(1);                                  //左转
 		while(!already_turned)                          //等待转弯完成
             vTaskDelay(20);
         
-        startStraight_Line_For_Laser(210,pan);      //!the distance need to be changed,it is because only the center of road do not have barrier
+        startStraight_Line_For_Laser(175,pan);      //!the distance need to be changed,it is because only the center of road do not have barrier
         startgostraight(-90);       //保证车的方向不变
         while (!X_have_achieved)
         {
             vTaskDelay(20);
         }
         xTimerStop(line_walking_Handle, 1);				//停止走直线
+        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);				//小车停止移动
         // here we need to switch the task that first go to the red area in the right hand side or in the left hand side
 
         
-        if(1)        //!the code in here is unfinished,we need to judge the value of the dataFromLinux[0] to decide which task we should switch to
+        if(0)        //!the code in here is unfinished,we need to judge the value of the dataFromLinux[0] to decide which task we should switch to
             vTaskResume(Task__TWO_Handle);
         else
             vTaskResume(Task__FOUR_Handle);
@@ -885,7 +921,7 @@ static void Task__TWO(void *parameter)
         startgostraight(-90);                           //保证走直线
         while(!Y_have_achieved)                         //检测到达位置
             vTaskDelay(20);
-        startStraight_Line_For_Laser(210, pan);       //根据右边激光测距调整距离
+        startStraight_Line_For_Laser(175, pan);       //根据右边激光测距调整距离
         startStraight_Line_For_Laser(150, forward);     //根据前面激光测距调整距离
         while((!X_have_achieved)||(!Y_have_achieved))    //检测到达位置
             vTaskDelay(20);
@@ -962,7 +998,7 @@ static void Task__FOUR(void *parameter)
 		while(!Y_have_achieved)         //检测到达左边红色区域
             vTaskDelay(10);
 		
-        startStraight_Line_For_Laser(210, pan);       //根据右边激光测距调整距离
+        startStraight_Line_For_Laser(175, pan);       //根据右边激光测距调整距离
         startStraight_Line_For_Laser(150, forward);     //根据前面激光测距调整距离
         while((!X_have_achieved)||(!Y_have_achieved))    //检测到达位置
             vTaskDelay(10);
@@ -979,7 +1015,7 @@ static void Task__FOUR(void *parameter)
         xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);   //停止前后走
         PULL_High();
 
-        startStraight_Line_For_Laser(240, pan);       //根据右边激光测距调整距离
+        startStraight_Line_For_Laser(175, pan);       //根据右边激光测距调整距离
         while(!X_have_achieved)         //检测到达位置
             vTaskDelay(20);
 
@@ -1052,24 +1088,25 @@ static void BSP_Init(void)
     
     VL53_Initial(); //*USART2右激光测距
     Initial_Control_PIN();
-    PULL_High();
-
+	
     //pid初始化
     PID_Initialize(&Coord, 45, 0, 0, 0, 25, -25);                   //微调巡线的pid初始化
     PID_Initialize(&Turn_Angle_PID, 30, 0, 10, 0, 25, -25);         //转弯的pid初始化
     PID_Initialize(&X_Speed_PID, 3.75, 0, .5, 0, 100, -100);         //x方向的远距离基于编码器的pid
     PID_Initialize(&Y_Speed_PID, 3.75, 0, .5, 0, 100, -100);         //y方向的远距离基于编码器的pid
-    PID_Initialize(&X_Base_On_Laser_PID, 20, 0, 1., 0, 150, -150);
-    PID_Initialize(&Y_Base_On_Laser_PID, 20, 0, 1., 0, 150, -150);
+    PID_Initialize(&X_Base_On_Laser_PID, 50, 0, 1., 0, 100, -100);
+    PID_Initialize(&Y_Base_On_Laser_PID, 50, 0, 1., 0, 100, -100);
 	Software_USART_IOConfig();
     LED_GPIO_Config();
+
+    keystart();     //开始启动小车
     KEY_ONE();
     OLED_Init();
     IIC_Init();
     sendcmd(ACCCMD);
-    Delayms(200);
+    Delayms(500);
     sendcmd(YAWCMD);
-    Delayms(200);
+    Delayms(2000);
     GPIO_SetBits(GPIOE, GPIO_Pin_1);
 	
 	

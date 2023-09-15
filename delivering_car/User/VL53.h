@@ -10,7 +10,7 @@
 #define VL53_TX GPIO_Pin_2
 #define VL53_RX GPIO_Pin_3
 #define VL53_GPIOX GPIOA
-#define VL53_BAUDRATE 115200 // 波特率
+#define VL53_BAUDRATE 921600 // 波特率
 
 #define VL53_USARTX_IRQHandler USART2_IRQHandler // 中断服务函数
 
