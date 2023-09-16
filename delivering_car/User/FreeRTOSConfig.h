@@ -144,10 +144,10 @@
 #define configMAX_PRIORITIES					  (32)
 
 //空闲任务使用的堆栈大小
-#define configMINIMAL_STACK_SIZE				((unsigned short)128)
+#define configMINIMAL_STACK_SIZE				((unsigned short)256)
   
 //任务名字字符串长度
-#define configMAX_TASK_NAME_LEN					(16)
+#define configMAX_TASK_NAME_LEN					(32)
 
  //系统节拍计数器变量数据类型，1表示为16位无符号整形，0表示为32位无符号整形
 #define configUSE_16_BIT_TICKS					0                      

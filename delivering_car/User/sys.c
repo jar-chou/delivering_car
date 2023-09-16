@@ -2,7 +2,7 @@
  * @Author: jar-chou 2722642511@qq.com
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-13 17:56:56
+ * @LastEditTime: 2023-09-16 15:22:58
  * @FilePath: \delivering_car\User\sys.c
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -47,7 +47,7 @@ void OLED_SHOW_TASK()
     DrawString(2, 0, buff);
     sprintf(buff, "FD:%d", (int)VOFA_Data[3]);
     DrawString(2, 8, buff);
-    sprintf(buff, "%.2f %d %d %d", Coord.Target, position_of_car[0], X_have_achieved, dataFromLinux[0]);
+    sprintf(buff, "%.2f %d %d %d", Coord.Target, position_of_car[1], X_have_achieved, dataFromLinux[0]);
     DrawString(3, 0, buff);
     UpdateScreenDisplay();
 }

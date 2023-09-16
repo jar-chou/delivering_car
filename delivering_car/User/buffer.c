@@ -394,8 +394,8 @@ u8 have_enough_data(volatile struct Buff *BUFF, u8 head_number, u8 data_number, 
 			return 1;
 			
 		}
-		else
-			printf("%x \r\n%x \r\n%d \r\n", (BUFF->write_p), (BUFF->read_p), need_len);
+		
+			//printf("%x \r\n%x \r\n%d \r\n", (BUFF->write_p), (BUFF->read_p), need_len);
     }
 	
     return 0;
