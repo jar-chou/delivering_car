@@ -26,7 +26,7 @@
  * @Author: zhaojianchao and jar-chou 2722642511@qq.com
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-16 17:42:59
+ * @LastEditTime: 2023-09-16 22:37:46
  * @FilePath: \delivering_car\User\main.c
  * @Description:
  */
@@ -110,7 +110,7 @@ struct PID Coord, Turn_Angle_PID, X_Speed_PID, Y_Speed_PID, X_Base_On_Laser_PID,
 u8 already_turned = 0, Y_have_achieved = 0, X_have_achieved = 0; // 是否达到定时器目的的信号量
 int32_t CCR_wheel[4] = {0, 0, 0, 0};
 int32_t position_of_car[3] = {0, 0, 0};
-u8 dataFromLinux[4] = {'1', '1', '2', '2'}; // the data get from linux
+u8 dataFromLinux[4] = {0};//{'1', '1', '2', '2'}; // the data get from linux
 u8 voice[3][6] = {0xaa, 0x07, 0x02, 0x00, 0x01, 0xb4, 0xaa, 0x07, 0x02, 0x00, 0x02, 0xb5, 0xaa, 0x07, 0x02, 0x00, 0x03, 0xb6};
 struct distance
 {
@@ -351,8 +351,8 @@ static void Go_Forward_Base_On_Encoder(void)
     static int i = 0;
     int32_t distance = position_of_car[0];
     int32_t speed = (int32_t)PID_Realize(&Y_Speed_PID, distance);
-    speed = speed > 1000 ? 1000 : speed;
-    speed = speed < -1000 ? -1000 : speed;
+    speed = speed > 1100 ? 1100 : speed;
+    speed = speed < -1100 ? -1100 : speed;
     taskENTER_CRITICAL();
     Y_Speed = speed;
     taskEXIT_CRITICAL();
@@ -594,7 +594,7 @@ static void analyse_data(void)
         if (!memcmp(local_dataFromLinux_buff, local_dataFromLinux, 4)) // judge whether the data is same as the last data
         {
             index++;
-            if (index >= 4) // if the data is same as the last data, then judge whether the data is same as the last data for 4 times
+            if (index >= 2) // if the data is same as the last data, then judge whether the data is same as the last data for 4 times
             {
                 index = 0;
                 //
@@ -766,6 +766,14 @@ static inline bool check_rgb(int color)
     }
 }
 
+/**
+ * @description: this function is used to check whether all the elements in the array are in the range
+ * @param {u8} *charArray :the array that you want to check
+ * @param {int} length :the length of the array
+ * @param {int} min :the min value of the range
+ * @param {int} max :the max value of the range
+ * @return {bool} :if all the elements in the array are in the range,return true,else return false
+ */
 static inline bool check_whetherCharArrayInRange(u8 *charArray, int length, int min, int max)
 {
     for (size_t i = 0; i < length; i++)
@@ -945,9 +953,9 @@ static void Task__FIVE(void *parameter)
         
         // here we need to switch the task that first go to the red area in the right hand side or in the left hand side
 
-        if (dataFromLinux[1] == 2) //! the code in here is unfinished,we need to judge the value of the dataFromLinux[0] to decide which task we should switch to
+        if (dataFromLinux[1] == '2') //! the code in here is unfinished,we need to judge the value of the dataFromLinux[0] to decide which task we should switch to
             vTaskResume(Task__TWO_Handle);
-        else if(dataFromLinux[1] == 1)
+        else if(dataFromLinux[1] == '1')
             vTaskResume(Task__FOUR_Handle);
 
         vTaskDelete(Task__FIVE_Handle);
@@ -1124,14 +1132,13 @@ static void Task__FOUR(void *parameter)
         startStraight_Line_For_Laser(150, forward);      // 根据前面激光测距调整距离
         while ((!X_have_achieved) || (!Y_have_achieved)) // 检测到达位置
             vTaskDelay(10);
-        xTimerStop(Car_Running_Handle, 1); // 小车停止移动
 
         //! 打开仓库，取出物品，这是后面需要加的代码
-        if(dataFromLinux[2] == '1') //打开一号仓库
+        if(dataFromLinux[0] == '1') //打开一号仓库
         {
             SetCompare1(TIM8, 1820, 1);
         }
-        else if(dataFromLinux[2] == '2') //打开二号仓库
+        else if(dataFromLinux[0] == '2') //打开二号仓库
         {
             SetCompare1(TIM8, 500, 2);
         }
@@ -1160,11 +1167,11 @@ static void Task__FOUR(void *parameter)
             vTaskDelay(20);
 
         //! 打开仓库，取出物品，这是后面需要加的代码
-        if(dataFromLinux[0] == '1') //打开一号仓库
+        if(dataFromLinux[2] == '1') //打开一号仓库
         {
             SetCompare1(TIM8, 1820, 1);
         }
-        else if(dataFromLinux[0] == '2') //打开二号仓库
+        else if(dataFromLinux[2] == '2') //打开二号仓库
         {
             SetCompare1(TIM8, 500, 2);
         }
