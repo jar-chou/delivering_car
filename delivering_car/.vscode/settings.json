@@ -48,6 +48,7 @@
         "oled.h": "c",
         "oled_font.h": "c",
         "oled_buffer.h": "c",
-        "oled_draw.h": "c"
+        "oled_draw.h": "c",
+        "limits.h": "c"
     }
 }

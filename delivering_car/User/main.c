@@ -26,7 +26,7 @@
  * @Author: zhaojianchao and jar-chou 2722642511@qq.com
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-16 22:37:46
+ * @LastEditTime: 2023-09-18 21:37:27
  * @FilePath: \delivering_car\User\main.c
  * @Description:
  */
@@ -46,7 +46,6 @@
 #include "bsp_led.h"
 #include "usart.h"
 #include "bsp_key.h"
-#include "bsp_exti.h"
 #include "Delay.h"
 #include "Sysclk_output.h"
 #include "PWM.h"
@@ -83,12 +82,13 @@ static TimerHandle_t Achieve_Distance_For_Right_Laser_Handle = NULL;
 static TimerHandle_t Car_Running_Handle = NULL;
 static TimerHandle_t Go_Forward_Base_On_Encoder_Handle = NULL;
 static TimerHandle_t Pan_Left_Base_On_Encoder_Handle = NULL;
+static TimerHandle_t Keep_The_Car_Have_Special_Right_Distance_Handle = NULL;
 
 static TaskHandle_t OLED_SHOW_Handle = NULL;       //+OLDE显示句柄
 static TaskHandle_t AppTaskCreate_Handle = NULL;   //+创建任务句柄
 static TaskHandle_t Task__ONE_Handle = NULL;       //+任务1句柄
 static TaskHandle_t Task__TWO_Handle = NULL;       //+任务2句柄
-static TaskHandle_t Task__THREE_Handle = NULL;     //+任务3句柄
+static TaskHandle_t Get_Start_Handle = NULL;     //+任务3句柄
 static TaskHandle_t Task__FOUR_Handle = NULL;      //+任务4句柄
 static TaskHandle_t Task__FIVE_Handle = NULL;      //+任务4句柄
 static EventGroupHandle_t Group_One_Handle = NULL; //+事件组句柄
@@ -125,24 +125,25 @@ struct distance
 *                             函数声明
 *************************************************************************
 */
-static void analyse_data(void);
-static void line_walking(void);
 static void AppTaskCreate(void);             /* 用于创建任务 */
 static void Task__TWO(void *pvParameters);   /* Test_Task任务实现 */
 static void OLED_SHOW(void *pvParameters);   /* Test_Task任务实现 */
 static void Task__ONE(void *pvParameters);   /* Test_Task任务实现 */
 static void Task__FIVE(void *parameter);    /* Test_Task任务实现 */
 static void BSP_Init(void);                  /* 用于初始化板载相关资源 */
-static void sendto_Upper(void);              /* 用于初始化板载相关资源 */
-static void Task__THREE(void *pvParameters); //
+static void Get_Start(void *pvParameters); //
 static void Task__FOUR(void *pvParameters);  //
-static void Turn_Angle(void);                //
-static void Achieve_Distance_Front_Head_Laser(void);
-static void Achieve_Distance_For_Right_Laser(void);
-static void Car_Running(void);
-static void Go_Forward_Base_On_Encoder(void);
-static void Pan_Left_Base_On_Encoder(void);
-void Allocation_PID(int PIDOUT);
+
+static void analyse_data(TimerHandle_t xTimer);
+static void line_walking(TimerHandle_t xTimer);
+static void sendto_Upper(TimerHandle_t xTimer);              /* 用于初始化板载相关资源 */
+static void Turn_Angle(TimerHandle_t xTimer);                //
+static void Achieve_Distance_Front_Head_Laser(TimerHandle_t xTimer);
+static void Achieve_Distance_For_Right_Laser(TimerHandle_t xTimer);
+static void Car_Running(TimerHandle_t xTimer);
+static void Go_Forward_Base_On_Encoder(TimerHandle_t xTimer);
+static void Pan_Left_Base_On_Encoder(TimerHandle_t xTimer);
+static void Keep_The_Car_Have_Special_Right_Distance(TimerHandle_t xTimer);
 
 /*****************************************************************
   * @brief  主函数
@@ -212,12 +213,12 @@ static void AppTaskCreate(void)
                           (TaskHandle_t *)&OLED_SHOW_Handle); /* 任务控制块指针 */
     if (xReturn == pdPASS)
         printf("OLED_SHOW任务创建成功\r\n");
-    xReturn = xTaskCreate((TaskFunction_t)Task__THREE,          /* 任务入口函数 */
-                          (const char *)"Task__THREE",          /* 任务名字 */
+    xReturn = xTaskCreate((TaskFunction_t)Get_Start,          /* 任务入口函数 */
+                          (const char *)"Get_Start",          /* 任务名字 */
                           (uint16_t)512,                        /* 任务栈大小 */
                           (void *)NULL,                         /* 任务入口函数参数 */
                           (UBaseType_t)3,                       /* 任务的优先级 */
-                          (TaskHandle_t *)&Task__THREE_Handle); /* 任务控制块指针 */
+                          (TaskHandle_t *)&Get_Start_Handle); /* 任务控制块指针 */
     if (xReturn == pdPASS)
         printf("Task__THREE任务创建成功\r\n");
     xReturn = xTaskCreate((TaskFunction_t)Task__FOUR,          /* 任务入口函数 */
@@ -244,13 +245,13 @@ static void AppTaskCreate(void)
     analyse_data_Handle = xTimerCreate((const char *)"analyse_data",
                                        (TickType_t)20,                         /* 定时器周期 1000(tick) */
                                        (UBaseType_t)pdTRUE,                    /* 周期模式 */
-                                       (void *)4,                              /* 为每个计时器分配一个索引的唯一ID */
+                                       (void *)2,                              /* 为每个计时器分配一个索引的唯一ID */
                                        (TimerCallbackFunction_t)analyse_data); //! 回调函数名
 
     sendto_Upper_Handle = xTimerCreate((const char *)"sendto_Upper",
                                        (TickType_t)5,                          /* 定时器周期 1000(tick) */
                                        (UBaseType_t)pdTRUE,                    /* 周期模式 */
-                                       (void *)4,                              /* 为每个计时器分配一个索引的唯一ID */
+                                       (void *)3,                              /* 为每个计时器分配一个索引的唯一ID */
                                        (TimerCallbackFunction_t)sendto_Upper); //! 回调函数名
     Turn_Angle_Handle = xTimerCreate((const char *)"Turn_Angle",
                                      (TickType_t)40,                       /* 定时器周期 1000(tick) */
@@ -260,38 +261,45 @@ static void AppTaskCreate(void)
     Achieve_Distance_For_Front_Laser_Handle = xTimerCreate((const char *)"Achieve_Distance_Front_Head_Laser",
                                                            (TickType_t)20,                                              /* 定时器周期 1000(tick) */
                                                            (UBaseType_t)pdTRUE,                                         /* 周期模式 */
-                                                           (void *)4,                                                   /* 为每个计时器分配一个索引的唯一ID */
+                                                           (void *)5,                                                   /* 为每个计时器分配一个索引的唯一ID */
                                                            (TimerCallbackFunction_t)Achieve_Distance_Front_Head_Laser); //! 回调函数名
     Achieve_Distance_For_Right_Laser_Handle = xTimerCreate((const char *)"Achieve_Distance_For_Right_Laser",
                                                            (TickType_t)20,                                             /* 定时器周期 1000(tick) */
                                                            (UBaseType_t)pdTRUE,                                        /* 周期模式 */
-                                                           (void *)4,                                                  /* 为每个计时器分配一个索引的唯一ID */
+                                                           (void *)6,                                                  /* 为每个计时器分配一个索引的唯一ID */
                                                            (TimerCallbackFunction_t)Achieve_Distance_For_Right_Laser); //! 回调函数名
     Car_Running_Handle = xTimerCreate((const char *)"Car_Running",
                                       (TickType_t)20,                        /* 定时器周期 1000(tick) */
                                       (UBaseType_t)pdTRUE,                   /* 周期模式 */
-                                      (void *)4,                             /* 为每个计时器分配一个索引的唯一ID */
+                                      (void *)7,                             /* 为每个计时器分配一个索引的唯一ID */
                                       (TimerCallbackFunction_t)Car_Running); //! 回调函数名
     Go_Forward_Base_On_Encoder_Handle = xTimerCreate((const char *)"Go_Forward_Base_On_Encoder",
                                                      (TickType_t)20,                                       /* 定时器周期 1000(tick) */
                                                      (UBaseType_t)pdTRUE,                                  /* 周期模式 */
-                                                     (void *)4,                                            /* 为每个计时器分配一个索引的唯一ID */
+                                                     (void *)8,                                            /* 为每个计时器分配一个索引的唯一ID */
                                                      (TimerCallbackFunction_t)Go_Forward_Base_On_Encoder); //! 回调函数名
     Pan_Left_Base_On_Encoder_Handle = xTimerCreate((const char *)"Pan_Left_Base_On_Encoder",
                                                    (TickType_t)20,                                     /* 定时器周期 1000(tick) */
                                                    (UBaseType_t)pdTRUE,                                /* 周期模式 */
-                                                   (void *)4,                                          /* 为每个计时器分配一个索引的唯一ID */
+                                                   (void *)9,                                          /* 为每个计时器分配一个索引的唯一ID */
                                                    (TimerCallbackFunction_t)Pan_Left_Base_On_Encoder); //! 回调函数名
+    Keep_The_Car_Have_Special_Right_Distance_Handle = xTimerCreate((const char *)"Keep_The_Car_Have_Special_Right_Distance",
+                                                   (TickType_t)20,                                     /* 定时器周期 1000(tick) */
+                                                   (UBaseType_t)pdTRUE,                                /* 周期模式 */
+                                                   (void *)9,                                          /* 为每个计时器分配一个索引的唯一ID */
+                                                   (TimerCallbackFunction_t)Keep_The_Car_Have_Special_Right_Distance); //! 回调函数名
 
+
+    xTimerStart(analyse_data_Handle, 1);
     xTimerStop(line_walking_Handle, 1);
     xTimerStop(sendto_Upper_Handle, 1);
-    xTimerStart(analyse_data_Handle, 1);
     xTimerStop(Turn_Angle_Handle, 1);
     xTimerStop(Achieve_Distance_For_Front_Laser_Handle, 1);
     xTimerStop(Achieve_Distance_For_Right_Laser_Handle, 1);
     xTimerStop(Car_Running_Handle, 1);
     xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);
     xTimerStop(Pan_Left_Base_On_Encoder_Handle, 1);
+    xTimerStop(Keep_The_Car_Have_Special_Right_Distance_Handle, 1);
 
     // xTimerStart(sendto_Upper_Handle, 0); //! 发送数据到上位机定时器
 
@@ -317,16 +325,38 @@ static void AppTaskCreate(void)
  ********************************************************************/
 
 /**
+ * @description: this function is the software callback function that keep the car have special right distance
+ * @return {*}
+*/
+static void Keep_The_Car_Have_Special_Right_Distance(TimerHandle_t xTimer)
+{
+    int32_t distance = VOFA_Data[2];
+    int32_t absolute_error = fabs(distance - X_Base_On_Laser_PID.Target);
+    if( (absolute_error > 100) || (absolute_error < 10)) // 如果距离超过100cm，就不要再跑了
+    {
+        taskENTER_CRITICAL();
+        X_Speed = 0;
+        taskEXIT_CRITICAL();
+        return;
+    }
+    int32_t speed = (int32_t)PID_Realize(&X_Base_On_Laser_PID, distance);
+    speed = speed > 400 ? 400 : speed;
+    speed = speed < -400 ? -400 : speed;
+    taskENTER_CRITICAL();
+    X_Speed = speed;
+    taskEXIT_CRITICAL();
+}
+/**
  * @description: this function is the software callback function that achieve pan left base on encoder num
  * @return {*}
  */
-static void Pan_Left_Base_On_Encoder(void)
+static void Pan_Left_Base_On_Encoder(TimerHandle_t xTimer)
 {
     static int i = 0;
     int32_t distance = position_of_car[1];
     int32_t speed = (int32_t)PID_Realize(&X_Speed_PID, distance);
-    speed = speed > 400 ? 400 : speed;
-    speed = speed < -400 ? -400 : speed;
+    speed = speed > 500 ? 500 : speed;
+    speed = speed < -500 ? -500 : speed;
     taskENTER_CRITICAL();
     X_Speed = speed;
     taskEXIT_CRITICAL();
@@ -346,13 +376,13 @@ static void Pan_Left_Base_On_Encoder(void)
  * @description: this function is the software callback function that achieve go forward base on encoder num
  * @return {*}
  */
-static void Go_Forward_Base_On_Encoder(void)
+static void Go_Forward_Base_On_Encoder(TimerHandle_t xTimer)
 {
     static int i = 0;
     int32_t distance = position_of_car[0];
     int32_t speed = (int32_t)PID_Realize(&Y_Speed_PID, distance);
-    speed = speed > 1100 ? 1100 : speed;
-    speed = speed < -1100 ? -1100 : speed;
+    speed = speed > 1200 ? 1200 : speed;
+    speed = speed < -1200 ? -1200 : speed;
     taskENTER_CRITICAL();
     Y_Speed = speed;
     taskEXIT_CRITICAL();
@@ -372,7 +402,7 @@ static void Go_Forward_Base_On_Encoder(void)
  * @description: this function is the software callback function that achieve reach the target distance for right laser
  * @return {*}
  */
-static void Achieve_Distance_For_Right_Laser(void)
+static void Achieve_Distance_For_Right_Laser(TimerHandle_t xTimer)
 {
     static int i = 0;
     float distance = VOFA_Data[2];
@@ -400,7 +430,7 @@ static void Achieve_Distance_For_Right_Laser(void)
  * @description: this function is the software callback function that achieve reach the target distance for front laser
  * @return {*}
  */
-static void Achieve_Distance_Front_Head_Laser(void)
+static void Achieve_Distance_Front_Head_Laser(TimerHandle_t xTimer)
 {
     static int i = 0;
     float distance = VOFA_Data[3];
@@ -428,7 +458,7 @@ static void Achieve_Distance_Front_Head_Laser(void)
  * @description: this function is the software callback function that calculates the ccr register value of the wheel
  * @return {*}
  */
-static void Car_Running(void)
+static void Car_Running(TimerHandle_t xTimer)
 {
     taskENTER_CRITICAL(); // enter critical zone and operate global variable
 
@@ -485,7 +515,7 @@ static void Car_Running(void)
  * @description: this function is the software callback function that achieve turn angle
  * @return {*}
  */
-static void Turn_Angle(void)
+static void Turn_Angle(TimerHandle_t xTimer)
 {
     static u8 i = 0;
     float Angle, PIDOUT;
@@ -509,7 +539,7 @@ static void Turn_Angle(void)
  * @description: this function is the software callback function that send data to upper computer
  * @return {*}
  */
-static void sendto_Upper(void)
+static void sendto_Upper(TimerHandle_t xTimer)
 {
 
     VOFA_Data[0] = (float)stcAngle.Angle[2] / 32768 * 180;
@@ -520,7 +550,7 @@ static void sendto_Upper(void)
  * @description: this function is the software callback function that keep the car walking straightly
  * @return {*}
  */
-static void line_walking(void)
+static void line_walking(TimerHandle_t xTimer)
 {
     float Angle;
     //?PID开始巡线
@@ -533,13 +563,12 @@ static void line_walking(void)
  * @description: this function is the software callback function that analyse data
  * @return {*}
  */
-u16 k_R_distance, last_diance_R;
-u8 TOF_Data[7];
-static void analyse_data(void)
+static void analyse_data(TimerHandle_t xTimer)
 {
     // u8 i = 0, num_f = 0, num_r = 0;
     const static u8 VL53_Agreement_RX[] = {0x50, 0x03, 0x02};
     const u8 TOFSENSE[] = {0x57, 0x00, 0xFF, 0x01};
+    u8 TOF_Data[7] = {0};
     VL53_Send_Agrement();
     if (have_enough_data(&U3_buffer, 3, 1, 16))
     {
@@ -547,18 +576,24 @@ static void analyse_data(void)
             Read_buff_Void(&U3_buffer, VL53_Agreement_RX, 3, &Distance.F_OUT, 1, 16, 1);
     }
 
-    Read_buff_Void(&VL53_USARTX_Buff, TOFSENSE, 4, TOF_Data, 7, 8, 1);
-    Distance.R_OUT = (int32_t)(TOF_Data[4] << 8 | TOF_Data[5] << 16 | TOF_Data[6] << 24) / 256;
-    if (Distance.R_OUT == 0 )
+    if (have_enough_data(&VL53_USARTX_Buff, 4, 9, 8))
     {
-        Distance.R_OUT = k_R_distance + last_diance_R;
+        while(have_enough_data(&VL53_USARTX_Buff, 4, 9, 8))
+            Read_buff_Void(&VL53_USARTX_Buff, TOFSENSE, 4, TOF_Data, 7, 8, 1);
+        Distance.R_OUT = (int32_t)(TOF_Data[4] << 8 | TOF_Data[5] << 16 | TOF_Data[6] << 24) / 256;
     }
+    
+    // static u16 k_R_distance = 0, last_diance_R = 0;
+    // if (Distance.R_OUT == 0 )
+    // {
+    //     Distance.R_OUT = k_R_distance + last_diance_R;
+    // }
 
-    k_R_distance = Distance.R_OUT - last_diance_R;
-    last_diance_R = Distance.R_OUT;
+    // k_R_distance = Distance.R_OUT - last_diance_R;
+    // last_diance_R = Distance.R_OUT;
 
 
-    int32_t How_many_revolutions_of_the_motor[4] = {0, 0, 0, 0};
+    static int32_t How_many_revolutions_of_the_motor[4] = {0, 0, 0, 0};
 
     How_many_revolutions_of_the_motor[0] = Read_Encoder(2);
     How_many_revolutions_of_the_motor[1] = Read_Encoder(3);
@@ -748,11 +783,11 @@ static inline bool check_rgb(int color)
     }
     else if (color == yellow_color)
     {
-        if (RGB.R > 120 && RGB.R < 155)
+        if (RGB.R > 80 && RGB.R < 140)
         {
-            if (RGB.G > 110 && RGB.G < 140)
+            if (RGB.G > 70 && RGB.G < 130)
             {
-                if (RGB.B > 55 && RGB.B < 90)
+                if (RGB.B > 35 && RGB.B < 85)
                 {
                     return true;
                 }
@@ -806,7 +841,7 @@ static void OLED_SHOW(void *pvParameters)
  * @param {void} *parameter :this param is necessary for freertos task
  * @return {*}
  */
-static void Task__THREE(void *parameter)
+static void Get_Start(void *parameter)
 {
     while (1)
     {
@@ -830,11 +865,24 @@ static void Task__THREE(void *parameter)
             }
             vTaskDelay(50);
         }
+        //重置陀螺仪偏航角
+        sendcmd(YAWCMD);
+        vTaskDelay(1000);
+        //打开两个舵机
+        SetCompare1(TIM8, 1820, 1);
+        SetCompare1(TIM8, 500, 2);
+        
+        USART_Send(voice[0], 6); // 播报打开仓库门
+
+        vTaskDelay(2000);
+        //关闭两个舵机
+        SetCompare1(TIM8, 920, 1);
+        SetCompare1(TIM8, 1520, 2);
         if (check_whetherCharArrayInRange(dataFromLinux, 4, '1', '2')) //! the code in here is unfinished,we need to judge the value of the dataFromLinux[0] to decide which task we should switch to
             vTaskResume(Task__ONE_Handle);
         else
             vTaskResume(Task__FIVE_Handle);
-        vTaskDelete(Task__THREE_Handle);
+        vTaskDelete(Get_Start_Handle);
     }
 }
 
@@ -849,26 +897,6 @@ static void Task__ONE(void *parameter)
     // char qrcode=0x07;
     while (1)
     {
-        
-        USART_Send(voice[0], 6); // 播报打开仓库门
-
-        SetCompare1(TIM8, 920, 1);
-        SetCompare1(TIM8, 1520, 2);
-        // while (1)
-        // {
-        //     vTaskDelay(1000);
-        //     // printf("1:%4d 2:%4d 3:%4d 4:%4d\r\n",Read_Encoder(2), Read_Encoder(3),Read_Encoder(4), Read_Encoder(5));
-        // }
-
-        // xEventGroupWaitBits(Group_One_Handle, 0x01, pdTRUE, pdTRUE, portMAX_DELAY); //! 开始比赛
-        //-开箱 狗叫
-        //  float Angle;
-        //  Angle = (float)stcAngle.Angle[2] / 32768 * 180;
-        //  Turn_Angle_PID.Target = Angle + 90;
-        //  already_turned = 0;
-        //  xTimerStart(Turn_Angle_Handle, 0);
-        sendcmd(YAWCMD);
-        vTaskDelay(1000);
 
         startStraight_Line_Base_On_Encoder(12500, forward); // 根据编码器向前走到t型路口
         startgostraight(0);                                 // 保证走直线
@@ -910,26 +938,6 @@ static void Task__FIVE(void *parameter)
     // char qrcode=0x07;
     while (1)
     {
-        
-        USART_Send(voice[0], 6); // 播报打开仓库门
-
-        SetCompare1(TIM8, 920, 1);
-        SetCompare1(TIM8, 1520, 2);
-        // while (1)
-        // {
-        //     vTaskDelay(1000);
-        //     // printf("1:%4d 2:%4d 3:%4d 4:%4d\r\n",Read_Encoder(2), Read_Encoder(3),Read_Encoder(4), Read_Encoder(5));
-        // }
-
-        // xEventGroupWaitBits(Group_One_Handle, 0x01, pdTRUE, pdTRUE, portMAX_DELAY); //! 开始比赛
-        //-开箱 狗叫
-        //  float Angle;
-        //  Angle = (float)stcAngle.Angle[2] / 32768 * 180;
-        //  Turn_Angle_PID.Target = Angle + 90;
-        //  already_turned = 0;
-        //  xTimerStart(Turn_Angle_Handle, 0);
-        sendcmd(YAWCMD);
-        vTaskDelay(1000);
 
         startStraight_Line_Base_On_Encoder(9500, forward); // 根据编码器向前走到t型路口
         startgostraight(0);                                 // 保证走直线
@@ -992,18 +1000,14 @@ static void Task__TWO(void *parameter)
         while (!check_rgb(1))                                // 用rgb颜色识别检测到达红色区域
             vTaskDelay(20);
 
-        xTimerStop(Car_Running_Handle, 1);                // 小车停止移动
-        xTimerStop(line_walking_Handle, 1);               // 停止走直线
         xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1); // 停止前后走
         
         startStraight_Line_For_Laser(125, pan); //! the distance need to be changed,it is because only the center of road do not have barrier
-        startgostraight(-90);                   // 保证车的方向不变
+        
         while(!X_have_achieved)
         {
             vTaskDelay(20);
         }
-        xTimerStop(Car_Running_Handle, 1);                // 小车停止移动
-        xTimerStop(line_walking_Handle, 1);               // 停止走直线
         
         
         //! 打开仓库，取出物品，这是后面需要加的代码
@@ -1030,10 +1034,10 @@ static void Task__TWO(void *parameter)
         xTimerStop(Achieve_Distance_For_Right_Laser_Handle, 1);
         xTimerStop(Pan_Left_Base_On_Encoder_Handle, 1);
         // 向前走到左边红色区域
-        startStraight_Line_Base_On_Encoder(12500, forward); //go forward to the red area in the left hand side
+        startStraight_Line_Base_On_Encoder(13000, forward); //go forward to the red area in the left hand side
         startgostraight(-90);                   // 保证车的方向不变
         vTaskDelay(1500);
-        startStraight_Line_Base_On_Encoder(-500, pan); //! code is unfinished,the first param need to be changed
+        startStraight_Line_Base_On_Encoder(-450, pan); //! code is unfinished,the first param need to be changed
         while (!Y_have_achieved) // 检测到达位置
             vTaskDelay(20);
         
@@ -1088,7 +1092,7 @@ static void Task__TWO(void *parameter)
 
         startStraight_Line_Base_On_Encoder(-12500, forward); // 向后走到右边黄色区域
         startgostraight(0);                                  // 保证走直线
-        while (!check_rgb(2))                                // 用rgb颜色识别检测到达黄色区域
+        while(!Y_have_achieved)                                // 检测到达位置
             vTaskDelay(20);
         // 小车停止移动
         xTimerStop(Car_Running_Handle, 1);
@@ -1152,10 +1156,10 @@ static void Task__FOUR(void *parameter)
         while(!X_have_achieved)                           // 检测到达位置
             vTaskDelay(20);
         
-        startStraight_Line_Base_On_Encoder(-22500, forward); // 向后走到左边红色区域
+        startStraight_Line_Base_On_Encoder(-14000, forward); // 向后走到左边红色区域
         startgostraight(-90);                                // 保证走直线
-        vTaskDelay(2000);                                    // 延时1.5s，否则会检测到左边红色区域
-        startStraight_Line_Base_On_Encoder(500, pan);       // 根据右边激光测距调整距离
+        vTaskDelay(1500);                                    // 延时1.5s，否则会检测到左边红色区域
+        startStraight_Line_Base_On_Encoder(450, pan);       // 根据右边激光测距调整距离
         while (!check_rgb(1))                                // 用rgb颜色识别检测到达右边红色区域
             vTaskDelay(20);                                  // 延时20ms
 
@@ -1203,7 +1207,7 @@ static void Task__FOUR(void *parameter)
 
         startStraight_Line_Base_On_Encoder(-12500, forward); // 向后走到右边黄色区域
         startgostraight(0);                                  // 保证走直线
-        while (!check_rgb(2))                                // 用rgb颜色识别检测到达黄色区域
+        while(!Y_have_achieved)                                // 检测到达位置
             vTaskDelay(20);
         // 小车停止移动
         xTimerStop(Car_Running_Handle, 1);
@@ -1237,7 +1241,7 @@ static void BSP_Init(void)
     RCC_ClocksTypeDef get_rcc_clock;
     RCC_GetClocksFreq(&get_rcc_clock);
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-    PWM_TIM8_config(20000, 72, 1820, 500, 3, 2); //this is the pwm pin that control server motor
+    PWM_TIM8_config(20000, 72, 920, 1520, 3, 2); //this is the pwm pin that control server motor
     PWM_TIM1_config(2000, 3, Initial_Speed, Initial_Speed, Initial_Speed, Initial_Speed);
     TIMX_Delay_Init(RCC_APB1Periph_TIM6, 65530, 72, TIM6);
     Encoder_Init();
