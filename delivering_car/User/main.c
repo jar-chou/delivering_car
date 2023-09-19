@@ -26,7 +26,7 @@
  * @Author: zhaojianchao and jar-chou 2722642511@qq.com
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-18 21:37:27
+ * @LastEditTime: 2023-09-19 14:25:54
  * @FilePath: \delivering_car\User\main.c
  * @Description:
  */
@@ -414,7 +414,7 @@ static void Achieve_Distance_For_Right_Laser(TimerHandle_t xTimer)
     X_Speed = speed;
     taskEXIT_CRITICAL();
 
-    if (fabs(distance - X_Base_On_Laser_PID.Target) < 10)
+    if (fabs(distance - X_Base_On_Laser_PID.Target) < 7)
     {
         i++;
         if (i > 4)
@@ -985,14 +985,12 @@ static void Task__TWO(void *parameter)
     {
 
 
-        startStraight_Line_For_Laser(125, pan); //! the distance need to be changed,it is because only the center of road do not have barrier
+        startStraight_Line_For_Laser(140, pan); //! the distance need to be changed,it is because only the center of road do not have barrier
         startgostraight(-90);                   // 保证车的方向不变
         while (!X_have_achieved)
         {
             vTaskDelay(20);
         }
-        xTimerStop(line_walking_Handle, 1);               // 停止走直线
-        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1); // 小车停止移动
 
 
         startStraight_Line_Base_On_Encoder(-7500, forward); // 向后走到右边红色区域
@@ -1002,7 +1000,7 @@ static void Task__TWO(void *parameter)
 
         xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1); // 停止前后走
         
-        startStraight_Line_For_Laser(125, pan); //! the distance need to be changed,it is because only the center of road do not have barrier
+        startStraight_Line_For_Laser(140, pan); //! the distance need to be changed,it is because only the center of road do not have barrier
         
         while(!X_have_achieved)
         {
@@ -1010,7 +1008,7 @@ static void Task__TWO(void *parameter)
         }
         
         
-        //! 打开仓库，取出物品，这是后面需要加的代码
+        // 打开仓库，取出物品，
         if(dataFromLinux[0] == '1') //打开一号仓库
         {
             SetCompare1(TIM8, 1820, 1);
@@ -1037,7 +1035,7 @@ static void Task__TWO(void *parameter)
         startStraight_Line_Base_On_Encoder(13000, forward); //go forward to the red area in the left hand side
         startgostraight(-90);                   // 保证车的方向不变
         vTaskDelay(1500);
-        startStraight_Line_Base_On_Encoder(-450, pan); //! code is unfinished,the first param need to be changed
+        startStraight_Line_Base_On_Encoder(-350, pan); //! code is unfinished,the first param need to be changed
         while (!Y_have_achieved) // 检测到达位置
             vTaskDelay(20);
         
@@ -1047,7 +1045,7 @@ static void Task__TWO(void *parameter)
         while ((!X_have_achieved) || (!Y_have_achieved)) // 检测到达位置
             vTaskDelay(20);
 
-        //! 打开仓库，取出物品，这是后面需要加的代码
+        // 打开仓库，取出物品，
         if(dataFromLinux[2] == '1') //打开一号仓库
         {
             SetCompare1(TIM8, 1820, 1);
@@ -1067,7 +1065,7 @@ static void Task__TWO(void *parameter)
         while(!X_have_achieved)                           // 检测到达位置
             vTaskDelay(20);
         
-        startStraight_Line_Base_On_Encoder(-6800, forward); //! 向后走到t字路口 code is unfinished,the first param need to be changed
+        startStraight_Line_Base_On_Encoder(-6800, forward); // 向后走到t字路口 
        
         startgostraight(-90);                               // 保证走直线
         while (!Y_have_achieved)                            // 检测到达位置
@@ -1083,15 +1081,15 @@ static void Task__TWO(void *parameter)
 
         // to sure the car is in the center of the road
         startgostraight(0);                                  // 保证走直线
-        startStraight_Line_For_Laser(1200, pan);          // 根据右边激光测距调整距离
+        startStraight_Line_For_Laser(1150, pan);          // 根据右边激光测距调整距离
         startStraight_Line_For_Laser(240, forward); // 根据前面激光测距调整距离
-        while(!X_have_achieved)                           // 检测到达位置
-            vTaskDelay(20);
-        while (!Y_have_achieved)                    // 检测到达位置
+        while((!X_have_achieved) || (!Y_have_achieved))                           // 检测到达位置
             vTaskDelay(20);
 
         startStraight_Line_Base_On_Encoder(-12500, forward); // 向后走到右边黄色区域
         startgostraight(0);                                  // 保证走直线
+        vTaskDelay(1500);
+        startStraight_Line_Base_On_Encoder(-650, pan);       // 向左移动小车调整距离 //! code is unfinished,the first param need to be changed
         while(!Y_have_achieved)                                // 检测到达位置
             vTaskDelay(20);
         // 小车停止移动
@@ -1137,7 +1135,7 @@ static void Task__FOUR(void *parameter)
         while ((!X_have_achieved) || (!Y_have_achieved)) // 检测到达位置
             vTaskDelay(10);
 
-        //! 打开仓库，取出物品，这是后面需要加的代码
+        // 打开仓库，取出物品，
         if(dataFromLinux[0] == '1') //打开一号仓库
         {
             SetCompare1(TIM8, 1820, 1);
@@ -1152,14 +1150,14 @@ static void Task__FOUR(void *parameter)
         SetCompare1(TIM8, 920, 1);
         SetCompare1(TIM8, 1520, 2);
 
-        startStraight_Line_For_Laser(220, pan);          // 根据右边激光测距调整距离
+        startgostraight(-90);                                // 保证走直线
+        startStraight_Line_For_Laser(250, pan);          // 根据右边激光测距调整距离
         while(!X_have_achieved)                           // 检测到达位置
             vTaskDelay(20);
         
         startStraight_Line_Base_On_Encoder(-14000, forward); // 向后走到左边红色区域
-        startgostraight(-90);                                // 保证走直线
         vTaskDelay(1500);                                    // 延时1.5s，否则会检测到左边红色区域
-        startStraight_Line_Base_On_Encoder(450, pan);       // 根据右边激光测距调整距离
+        startStraight_Line_Base_On_Encoder(350, pan);       // 根据右边激光测距调整距离
         while (!check_rgb(1))                                // 用rgb颜色识别检测到达右边红色区域
             vTaskDelay(20);                                  // 延时20ms
 
@@ -1170,7 +1168,7 @@ static void Task__FOUR(void *parameter)
         while (!X_have_achieved)                // 检测到达位置
             vTaskDelay(20);
 
-        //! 打开仓库，取出物品，这是后面需要加的代码
+        // 打开仓库，取出物品，
         if(dataFromLinux[2] == '1') //打开一号仓库
         {
             SetCompare1(TIM8, 1820, 1);
@@ -1198,15 +1196,16 @@ static void Task__FOUR(void *parameter)
             vTaskDelay(20);
 
         // to sure the car is in the center of the road
-        startStraight_Line_For_Laser(1200, pan);          // 根据右边激光测距调整距离
-        while(!X_have_achieved)                           // 检测到达位置
-            vTaskDelay(20);
+        startgostraight(0);                                  // 保证走直线
+        startStraight_Line_For_Laser(1150, pan);          // 根据右边激光测距调整距离
         startStraight_Line_For_Laser(240, forward); // 根据前面激光测距调整距离
-        while (!Y_have_achieved)                    // 检测到达位置
+        while((!X_have_achieved) || (!Y_have_achieved))                           // 检测到达位置
             vTaskDelay(20);
 
         startStraight_Line_Base_On_Encoder(-12500, forward); // 向后走到右边黄色区域
         startgostraight(0);                                  // 保证走直线
+        vTaskDelay(1500);
+        startStraight_Line_Base_On_Encoder(-650, pan);       // 向左移动小车调整距离 //! code is unfinished,the first param need to be changed
         while(!Y_have_achieved)                                // 检测到达位置
             vTaskDelay(20);
         // 小车停止移动
