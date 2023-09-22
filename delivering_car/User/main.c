@@ -26,7 +26,7 @@
  * @Author: zhaojianchao and jar-chou 2722642511@qq.com
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-21 20:04:10
+ * @LastEditTime: 2023-09-22 21:15:42
  * @FilePath: \delivering_car\User\main.c
  * @Description:
  */
@@ -990,7 +990,7 @@ static void Task__TWO(void *parameter)
 
         startStraight_Line_Base_On_Encoder(-6500, forward); // 向后走到右边红色区域
         startgostraight(-90);                                // 保证走直线
-        while (!check_rgb(red_color))                                // 用rgb颜色识别检测到达红色区域
+        while (!Y_have_achieved)                                // 用rgb颜色识别检测到达红色区域
             vTaskDelay(20);
 
         xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1); // 停止前后走
@@ -1155,10 +1155,10 @@ static void Task__FOUR(void *parameter)
         while(!X_have_achieved)                           // 检测到达位置
             vTaskDelay(20);
         
-        startStraight_Line_Base_On_Encoder(-14000, forward); // 向后走到左边红色区域
+        startStraight_Line_Base_On_Encoder(-13000, forward); // 向后走到左边红色区域
         vTaskDelay(1500);                                    // 延时1.5s，否则会检测到左边红色区域
         startStraight_Line_Base_On_Encoder(350, pan);       // 根据右边激光测距调整距离
-        while (!check_rgb(1))                                // 用rgb颜色识别检测到达右边红色区域
+        while (!Y_have_achieved)                                // 用rgb颜色识别检测到达右边红色区域
             vTaskDelay(20);                                  // 延时20ms
 
         xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1); // 停止前后走
@@ -1246,7 +1246,7 @@ static void Task__TWO(void *parameter)
 
         startStraight_Line_Base_On_Encoder(-6500, forward); // 向后走到右边红色区域
         startgostraight(-90);                                // 保证走直线
-        while (!check_rgb(red_color))                                // 用rgb颜色识别检测到达红色区域
+        while (!Y_have_achieved)                                // 用rgb颜色识别检测到达红色区域
             vTaskDelay(20);
 
         xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1); // 停止前后走
@@ -1406,9 +1406,9 @@ static void Task__FOUR(void *parameter)
 				
         startgostraight(-90);                                // 保证走直线
         
-        startStraight_Line_Base_On_Encoder(-14000, forward); // 向后走到左边红色区域
+        startStraight_Line_Base_On_Encoder(-13000, forward); // 向后走到右边红色区域
         vTaskDelay(1500);                                    // 延时1.5s，否则会检测到左边红色区域
-        while (!check_rgb(1))                                // 用rgb颜色识别检测到达右边红色区域
+        while (!Y_have_achieved)                                // 用rgb颜色识别检测到达右边红色区域
             vTaskDelay(20);                                  // 延时20ms
 
         xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1); // 停止前后走
