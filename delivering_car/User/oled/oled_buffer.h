@@ -9,11 +9,14 @@
 #ifndef OLED_BUFFER_H
 #define OLED_BUFFER_H
 
+#include <stdlib.h>
+#include <stdint.h>
 
 void ClearScreenBuffer(unsigned char val);
 void UpdateScreenDisplay(void);
 
 void WriteByteBuffer(int page,int x,unsigned char byte);
+void WriteMultByteBuffer(int x,int y, const uint8_t* bytearray, size_t num);
 unsigned char ReadByteBuffer(int page,int x);
 #endif
 

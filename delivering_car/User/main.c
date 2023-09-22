@@ -26,7 +26,7 @@
  * @Author: zhaojianchao and jar-chou 2722642511@qq.com
  * @Date: 2023-09-06 13:02:19
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-20 14:31:00
+ * @LastEditTime: 2023-09-21 20:04:10
  * @FilePath: \delivering_car\User\main.c
  * @Description:
  */
@@ -110,8 +110,12 @@ struct PID Coord, Turn_Angle_PID, X_Speed_PID, Y_Speed_PID, X_Base_On_Laser_PID,
 u8 already_turned = 0, Y_have_achieved = 0, X_have_achieved = 0; // 是否达到定时器目的的信号量
 int32_t CCR_wheel[4] = {0, 0, 0, 0};
 int32_t position_of_car[3] = {0, 0, 0};
-u8 dataFromLinux[4] = {0};//{'1', '1', '2', '2'}; // the data get from linux
-u8 voice[3][6] = {0xaa, 0x07, 0x02, 0x00, 0x01, 0xb4, 0xaa, 0x07, 0x02, 0x00, 0x02, 0xb5, 0xaa, 0x07, 0x02, 0x00, 0x03, 0xb6};
+u8 dataFromLinux[5] = {0};//{'1', '1', '2', '2'}; // the data get from linux
+u8 voice[5][6] = {{0xaa, 0x07, 0x02, 0x00, 0x01, 0xb4}, 
+										{0xaa, 0x07, 0x02, 0x00, 0x02, 0xb5}, 
+										{0xaa, 0x07, 0x02, 0x00, 0x03, 0xb6}, 
+										{0xaa, 0x07, 0x02, 0x00, 0x04, 0xb7},
+										{0xaa, 0x07, 0x02, 0x00, 0x05, 0xb8}};
 struct distance
 {
     u16 F[5];
@@ -616,32 +620,35 @@ static void analyse_data(TimerHandle_t xTimer)
 
     int32_t The_distance_that_has_gone_right_head_side = (How_many_revolutions_of_the_motor[1] 
                                                         - How_many_revolutions_of_the_motor[2] ) / 2;
+		
+		if(!check_whetherCharArrayInRange(dataFromLinux, 4, '1', '2'))
+		{
+			// get data from upper computer
+			const static u8 upper_head[] = {0x1C, 0x2C, 0x3C};
+			u8 local_dataFromLinux_buff[4] = {0, 0};
+			static u8 index = 0;
+			static u8 local_dataFromLinux[4] = {0, 0};
+			while (have_enough_data(&U5_buffer, 3, 4, 8)) // judge whether the data is enough
+			{
+					Read_buff_Void(&U5_buffer, (u8 *)upper_head, 3, local_dataFromLinux_buff, 4, 8, 1); // read the data from buffer
 
-    // get data from upper computer
-    const static u8 upper_head[] = {0x1C, 0x2C, 0x3C};
-    u8 local_dataFromLinux_buff[4] = {0, 0};
-    static u8 index = 0;
-    static u8 local_dataFromLinux[4] = {0, 0};
-    while (have_enough_data(&U5_buffer, 3, 4, 8)) // judge whether the data is enough
-    {
-        Read_buff_Void(&U5_buffer, (u8 *)upper_head, 3, local_dataFromLinux_buff, 4, 8, 1); // read the data from buffer
-
-        if (!memcmp(local_dataFromLinux_buff, local_dataFromLinux, 4)) // judge whether the data is same as the last data
-        {
-            index++;
-            if (index >= 2) // if the data is same as the last data, then judge whether the data is same as the last data for 4 times
-            {
-                index = 0;
-                //
-                memcpy(dataFromLinux, local_dataFromLinux, 4); // copy the data from local variable to global variable
-            }
-        }
-        else
-        {
-            index = 0;
-            memcpy(local_dataFromLinux, local_dataFromLinux_buff, 4); // copy the data from local variable to global variable
-        }
-    }
+					if (!memcmp(local_dataFromLinux_buff, local_dataFromLinux, 4)) // judge whether the data is same as the last data
+					{
+							index++;
+							if (index >= 2) // if the data is same as the last data, then judge whether the data is same as the last data for 4 times
+							{
+									index = 0;
+									//
+									memcpy(dataFromLinux, local_dataFromLinux, 4); // copy the data from local variable to global variable
+							}
+					}
+					else
+					{
+							index = 0;
+							memcpy(local_dataFromLinux, local_dataFromLinux_buff, 4); // copy the data from local variable to global variable
+					}
+			}
+		}
 
     taskENTER_CRITICAL(); // 进入基本临界区
 
@@ -801,23 +808,7 @@ static inline bool check_rgb(int color)
     }
 }
 
-/**
- * @description: this function is used to check whether all the elements in the array are in the range
- * @param {u8} *charArray :the array that you want to check
- * @param {int} length :the length of the array
- * @param {int} min :the min value of the range
- * @param {int} max :the max value of the range
- * @return {bool} :if all the elements in the array are in the range,return true,else return false
- */
-static inline bool check_whetherCharArrayInRange(u8 *charArray, int length, int min, int max)
-{
-    for (size_t i = 0; i < length; i++)
-    {
-        if (charArray[i] < min || charArray[i] > max)
-            return false;
-    }
-    return true;
-}
+
 /**
  * the following code is about the task that we create
  */
@@ -829,11 +820,13 @@ static inline bool check_whetherCharArrayInRange(u8 *charArray, int length, int 
  */
 static void OLED_SHOW(void *pvParameters)
 {
-    while (1)
-    {
-        vTaskDelay(10);
-        OLED_SHOW_TASK();
-    }
+	
+  while (1)
+	{
+			OLED_SHOW_TASK();
+			vTaskDelay(10);
+	}
+		
 }
 
 /**
@@ -878,6 +871,7 @@ static void Get_Start(void *parameter)
         //关闭两个舵机
         SetCompare1(TIM8, 920, 1);
         SetCompare1(TIM8, 1520, 2);
+				vTaskDelay(600);
         if (check_whetherCharArrayInRange(dataFromLinux, 4, '1', '2')) //! the code in here is unfinished,we need to judge the value of the dataFromLinux[0] to decide which task we should switch to
             vTaskResume(Task__ONE_Handle);
         else
@@ -974,6 +968,7 @@ static void Task__FIVE(void *parameter)
     }
 }
 
+#if 1
 /**
  * @description: this task is used to control the car,make it go to the red area in the right hand side firstly,then go to the red area in the left hand side
  * @param {void} *parameter :this param is necessary for freertos task
@@ -1022,7 +1017,7 @@ static void Task__TWO(void *parameter)
         vTaskDelay(2000);//等待取出货物 
         SetCompare1(TIM8, 920, 1);
         SetCompare1(TIM8, 1520, 2);
-
+				vTaskDelay(600);
         
 
         xTimerStop(Car_Running_Handle, 1);                // 小车停止移动
@@ -1055,11 +1050,12 @@ static void Task__TWO(void *parameter)
             SetCompare1(TIM8, 500, 2);
         }
         // 播报到达一号收货点
-        USART_Send(voice[1], 6);
+        USART_Send(voice[3], 6);
         vTaskDelay(2000);//等待取出货物 
         SetCompare1(TIM8, 920, 1);
         SetCompare1(TIM8, 1520, 2);
-
+				vTaskDelay(600);
+				
         startgostraight(-90);                               // 保证走直线
         startStraight_Line_For_Laser(210, pan);          // 根据右边激光测距调整距离
         while(!X_have_achieved)                           // 检测到达位置
@@ -1152,7 +1148,8 @@ static void Task__FOUR(void *parameter)
         vTaskDelay(2000);//等待取出货物 
         SetCompare1(TIM8, 920, 1);
         SetCompare1(TIM8, 1520, 2);
-
+				vTaskDelay(600);
+				
         startgostraight(-90);                                // 保证走直线
         startStraight_Line_For_Laser(250, pan);          // 根据右边激光测距调整距离
         while(!X_have_achieved)                           // 检测到达位置
@@ -1181,11 +1178,11 @@ static void Task__FOUR(void *parameter)
             SetCompare1(TIM8, 500, 2);
         }
         // 播报到达二号收货点
-        USART_Send(voice[2], 6);
+        USART_Send(voice[4], 6);
         vTaskDelay(2000);//等待取出货物 
         SetCompare1(TIM8, 920, 1);
         SetCompare1(TIM8, 1520, 2);
-
+				vTaskDelay(600);
         
         startStraight_Line_Base_On_Encoder(6100, forward); //! 向前走到十字t字路口 code is unfinished,the first param need to be changed
         startgostraight(-90);                              // 保证走直线
@@ -1226,6 +1223,257 @@ static void Task__FOUR(void *parameter)
         }
     }
 }
+#else
+
+/**
+ * @description: this task is used to control the car,make it go to the red area in the right hand side firstly,then go to the red area in the left hand side
+ * @param {void} *parameter :this param is necessary for freertos task
+ * @return {*}
+ */
+static void Task__TWO(void *parameter)
+{
+    while (1)
+    {
+
+
+        startStraight_Line_For_Laser(175, pan); //! the distance need to be changed,it is because only the center of road do not have barrier
+        startgostraight(-90);                   // 保证车的方向不变
+        while (!X_have_achieved)
+        {
+            vTaskDelay(20);
+        }
+
+
+        startStraight_Line_Base_On_Encoder(-6500, forward); // 向后走到右边红色区域
+        startgostraight(-90);                                // 保证走直线
+        while (!check_rgb(red_color))                                // 用rgb颜色识别检测到达红色区域
+            vTaskDelay(20);
+
+        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1); // 停止前后走
+        
+        startStraight_Line_For_Laser(175, pan); //! the distance need to be changed,it is because only the center of road do not have barrier
+        
+        while(!X_have_achieved)
+        {
+            vTaskDelay(20);
+        }
+        
+        
+        // 打开仓库，取出物品，
+        if(dataFromLinux[0] == '1') //打开一号仓库
+        {
+            SetCompare1(TIM8, 1820, 1);
+        }
+        else if(dataFromLinux[0] == '2') //打开二号仓库
+        {
+            SetCompare1(TIM8, 500, 2);
+        }
+        // 播报到达二号收货点
+        USART_Send(voice[2], 6);
+        vTaskDelay(2000);//等待取出货物 
+        SetCompare1(TIM8, 920, 1);
+        SetCompare1(TIM8, 1520, 2);
+				vTaskDelay(600);
+        
+
+        xTimerStop(Car_Running_Handle, 1);                // 小车停止移动
+        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1); // 停止前后走
+        xTimerStop(Turn_Angle_Handle, 1);
+        xTimerStop(Achieve_Distance_For_Front_Laser_Handle, 1);
+        xTimerStop(Achieve_Distance_For_Right_Laser_Handle, 1);
+        xTimerStop(Pan_Left_Base_On_Encoder_Handle, 1);
+        // 向前走到左边红色区域
+        startStraight_Line_Base_On_Encoder(13000, forward); //go forward to the red area in the left hand side
+        startgostraight(-90);                   // 保证车的方向不变
+        vTaskDelay(1500);
+        while (!Y_have_achieved) // 检测到达位置
+            vTaskDelay(20);
+        
+        
+        startStraight_Line_For_Laser(175, pan);          // 根据右边激光测距调整距离
+        startStraight_Line_For_Laser(150, forward);      // 根据前面激光测距调整距离
+        while ((!X_have_achieved) || (!Y_have_achieved)) // 检测到达位置
+            vTaskDelay(20);
+
+        // 打开仓库，取出物品，
+        if(dataFromLinux[2] == '1') //打开一号仓库
+        {
+            SetCompare1(TIM8, 1820, 1);
+        }
+        else if(dataFromLinux[2] == '2') //打开二号仓库
+        {
+            SetCompare1(TIM8, 500, 2);
+        }
+        // 播报到达一号收货点
+        USART_Send(voice[3], 6);
+        vTaskDelay(2000);//等待取出货物 
+        SetCompare1(TIM8, 920, 1);
+        SetCompare1(TIM8, 1520, 2);
+				vTaskDelay(600);
+				
+        startgostraight(-90);                               // 保证走直线
+        startStraight_Line_For_Laser(205, pan);          // 根据右边激光测距调整距离
+        while(!X_have_achieved)                           // 检测到达位置
+            vTaskDelay(20);
+        
+        startStraight_Line_Base_On_Encoder(-6300, forward); // 向后走到t字路口 
+       
+        startgostraight(-90);                               // 保证走直线
+        while (!Y_have_achieved)                            // 检测到达位置
+            vTaskDelay(20);
+
+        xTimerStop(line_walking_Handle, 1); // 停止走直线
+        xTimerStop(Car_Running_Handle, 1);  // 小车停止移动
+
+        // 开始右转
+        start_trun(0);          // 右转
+        while (!already_turned) // 等待转弯完成
+            vTaskDelay(20);
+
+        // to sure the car is in the center of the road
+        startgostraight(0);                                  // 保证走直线
+        startStraight_Line_For_Laser(1200, pan);          // 根据右边激光测距调整距离
+        startStraight_Line_For_Laser(240, forward); // 根据前面激光测距调整距离
+        while((!X_have_achieved) || (!Y_have_achieved))                           // 检测到达位置
+            vTaskDelay(20);
+
+        startStraight_Line_Base_On_Encoder(-12500, forward); // 向后走到右边黄色区域
+        startgostraight(0);                                  // 保证走直线
+        vTaskDelay(1650);
+        while(!Y_have_achieved)                                // 检测到达位置
+            vTaskDelay(20);
+        startStraight_Line_For_Laser(1200, pan);          // 根据右边激光测距调整距离
+        while(!X_have_achieved)                           // 检测到达位置
+            vTaskDelay(20);
+        // 小车停止移动
+        xTimerStop(Car_Running_Handle, 1);
+        xTimerStop(line_walking_Handle, 1);
+
+        PULL_High();
+        while (1) // 任务完成，挂机
+        {
+            vTaskDelay(1000);
+        }
+    }
+}
+
+/**
+ * @description: this task is used to control the car,make it go to the red area in the left hand side firstly,then go to the red area in the right hand side
+ * @param {void} *parameter :this param is necessary for freertos task
+ * @return {*}
+ */
+static void Task__FOUR(void *parameter)
+{
+    while (1)
+    {
+
+        startStraight_Line_For_Laser(195, pan); //! the distance need to be changed,it is because only the center of road do not have barrier
+        startgostraight(-90);                   // 保证车的方向不变
+        while (!X_have_achieved)
+        {
+            vTaskDelay(20);
+        }
+        xTimerStop(line_walking_Handle, 1);               // 停止走直线
+        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1); // 小车停止移动
+
+
+        startStraight_Line_Base_On_Encoder(5500, forward); // 向前走到左边红色区域
+        startgostraight(-90);                              // 保证走直线
+
+        while (!Y_have_achieved) // 检测到达左边红色区域
+            vTaskDelay(10);
+
+        startStraight_Line_For_Laser(205, pan);          // 根据右边激光测距调整距离
+        startStraight_Line_For_Laser(150, forward);      // 根据前面激光测距调整距离
+        while ((!X_have_achieved) || (!Y_have_achieved)) // 检测到达位置
+            vTaskDelay(10);
+
+        // 打开仓库，取出物品，
+        if(dataFromLinux[0] == '1') //打开一号仓库
+        {
+            SetCompare1(TIM8, 1820, 1);
+        }
+        else if(dataFromLinux[0] == '2') //打开二号仓库
+        {
+            SetCompare1(TIM8, 500, 2);
+        }
+        // 播报到达一号收货点
+        USART_Send(voice[1], 6);
+        vTaskDelay(2000);//等待取出货物 
+        SetCompare1(TIM8, 920, 1);
+        SetCompare1(TIM8, 1520, 2);
+				vTaskDelay(600);
+				
+        startgostraight(-90);                                // 保证走直线
+        
+        startStraight_Line_Base_On_Encoder(-14000, forward); // 向后走到左边红色区域
+        vTaskDelay(1500);                                    // 延时1.5s，否则会检测到左边红色区域
+        while (!check_rgb(1))                                // 用rgb颜色识别检测到达右边红色区域
+            vTaskDelay(20);                                  // 延时20ms
+
+        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1); // 停止前后走
+        PULL_High();
+
+        startStraight_Line_For_Laser(175, pan); // 根据右边激光测距调整距离
+        while (!X_have_achieved)                // 检测到达位置
+            vTaskDelay(20);
+
+        // 打开仓库，取出物品，
+        if(dataFromLinux[2] == '1') //打开一号仓库
+        {
+            SetCompare1(TIM8, 1820, 1);
+        }
+        else if(dataFromLinux[2] == '2') //打开二号仓库
+        {
+            SetCompare1(TIM8, 500, 2);
+        }
+        // 播报到达二号收货点
+        USART_Send(voice[4], 6);
+        vTaskDelay(2000);//等待取出货物 
+        SetCompare1(TIM8, 920, 1);
+        SetCompare1(TIM8, 1520, 2);
+				vTaskDelay(600);
+        
+        startStraight_Line_Base_On_Encoder(6100, forward); //! 向前走到十字t字路口 code is unfinished,the first param need to be changed
+        startgostraight(-90);                              // 保证走直线
+        while (!Y_have_achieved)                           // 检测到达位置
+            vTaskDelay(20);
+
+        xTimerStop(line_walking_Handle, 1); // 停止走直线
+        // 开始右转
+        start_trun(0);          // 右转
+        while (!already_turned) // 等待转弯完成
+            vTaskDelay(20);
+
+        // to sure the car is in the center of the road
+        startgostraight(0);                                  // 保证走直线
+        startStraight_Line_For_Laser(1200, pan);          // 根据右边激光测距调整距离
+        startStraight_Line_For_Laser(240, forward); // 根据前面激光测距调整距离
+        while((!X_have_achieved) || (!Y_have_achieved))                           // 检测到达位置
+            vTaskDelay(20);
+
+        startStraight_Line_Base_On_Encoder(-12500, forward); // 向后走到右边黄色区域
+        startgostraight(0);                                  // 保证走直线
+        vTaskDelay(1650);
+        while(!Y_have_achieved)                                // 检测到达位置
+            vTaskDelay(20);
+        startStraight_Line_For_Laser(1200, pan);          // 根据右边激光测距调整距离
+        while(!X_have_achieved)                           // 检测到达位置
+            vTaskDelay(20);
+        // 小车停止移动
+        xTimerStop(Car_Running_Handle, 1);
+        xTimerStop(line_walking_Handle, 1);
+        xTimerStop(Go_Forward_Base_On_Encoder_Handle, 1);
+
+        PULL_High(); // 挂机 it is necessary to add the code that make the direction pin of the motor high
+        while (1)
+        {
+            vTaskDelay(1000);
+        }
+    }
+}
+
+#endif
 /**
  * the code that create the task is end in here
  */

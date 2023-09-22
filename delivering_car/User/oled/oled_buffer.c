@@ -37,6 +37,11 @@ void WriteByteBuffer(int x,int y,unsigned char byte)
 	ScreenBuffer[x][y] = byte;
 }
 
+void WriteMultByteBuffer(int x,int y, const uint8_t* bytearray, size_t num)
+{
+	memcpy(&ScreenBuffer[x][y], bytearray, num);
+}
+
 //刷新屏幕显示
 void UpdateScreenDisplay(void)
 {

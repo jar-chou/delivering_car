@@ -2,7 +2,7 @@
  * @Author: jar-chou 2722642511@qq.com
  * @Date: 2023-09-09 17:15:48
  * @LastEditors: jar-chou 2722642511@qq.com
- * @LastEditTime: 2023-09-09 22:53:57
+ * @LastEditTime: 2023-09-22 19:04:21
  * @FilePath: \delivering_car\User\oled\oled_draw.c
  * @Description: cn:这个文件用于在屏幕上画文字或图形
  * 			 en:The file is used to draw text or graphics on the screen
@@ -99,9 +99,29 @@ void DrawNum(unsigned char x,unsigned char y,unsigned int num,unsigned char len)
 		}
 	 	DrawChar(x+(8*t),y,temp+'0');
 	}
-
-	
 } 
+
+/**
+ * @description: cn:根据数组在缓冲区画一个图片
+ * 				 en:Draw a picture in the buffer according to the array
+ * @param {int} x	第几行
+ * @param {int} y	第几列
+ * @param {int} high	图片的高度
+ * @param {int} width	图片的宽度
+ * @param {const unsigned char} *p	图片的数组
+ * @return {*}
+ */	
+void DrawPicture(int x, int y, int high, int width, const unsigned char *p)
+{
+	int i, j;
+	for(i=0;i<high/8;i++)
+	{
+		for(j=0;j<width;j++)
+		{
+			WriteByteBuffer(x+i, y+j, *(p+i*width+j));
+		}
+	}
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //显示汉字
 // void OLED_ShowCHinese(uint8_t x,uint8_t y,uint8_t *cn)

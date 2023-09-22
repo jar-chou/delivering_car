@@ -80,7 +80,7 @@ void USART4_Config_JY62(void)
 
 void CopeSerial2Data(unsigned char ucData)
 {
-    static unsigned char ucRxBuffer[250];
+    static unsigned char ucRxBuffer[25];
     static unsigned char ucRxCnt = 0;
     ucRxBuffer[ucRxCnt++] = ucData; // 将收到的数据存入缓冲区中
     if (ucRxBuffer[0] != 0x55)      // 数据头不对，则重新开始寻找0x55数据头
