@@ -2,9 +2,9 @@
 #include "bsp_led.h"
 
 /**
- * @brief  ³õÊ¼»¯¿ØÖÆLEDµÄIO
- * @param  ÎŞ
- * @retval ÎŞ
+ * @brief  åˆå§‹åŒ–æ§åˆ¶LEDçš„IO
+ * @param  æ— 
+ * @retval æ— 
  */
 void LED_GPIO_Config(void)
 {

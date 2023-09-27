@@ -64,6 +64,10 @@
 #include <math.h>
 #include <stdbool.h>
 
+/******************************* 宏定义 ************************************/
+#define LEFT_ANGLE      -90.
+#define orginial_ANGLE  0.25
+
 /**************************** 任务句柄 ********************************/
 /*
  * 任务句柄是一个指针，用于指向一个任务，当任务创建好之后，它就具有了一个任务句柄
@@ -344,8 +348,8 @@ static void Keep_The_Car_Have_Special_Right_Distance(TimerHandle_t xTimer)
         return;
     }
     int32_t speed = (int32_t)PID_Realize(&X_Base_On_Laser_PID, distance);
-    speed = speed > 400 ? 400 : speed;
-    speed = speed < -400 ? -400 : speed;
+    speed = speed > 450 ? 450 : speed;
+    speed = speed < -450 ? -450 : speed;
     taskENTER_CRITICAL();
     X_Speed = speed;
     taskEXIT_CRITICAL();
@@ -385,8 +389,8 @@ static void Go_Forward_Base_On_Encoder(TimerHandle_t xTimer)
     static int i = 0;
     int32_t distance = position_of_car[0];
     int32_t speed = (int32_t)PID_Realize(&Y_Speed_PID, distance);
-    speed = speed > 1200 ? 1200 : speed;
-    speed = speed < -1200 ? -1200 : speed;
+    speed = speed > 1300 ? 1300 : speed;
+    speed = speed < -1300 ? -1300 : speed;
     taskENTER_CRITICAL();
     Y_Speed = speed;
     taskEXIT_CRITICAL();
@@ -411,8 +415,8 @@ static void Achieve_Distance_For_Right_Laser(TimerHandle_t xTimer)
     static int i = 0;
     float distance = VOFA_Data[2];
     int32_t speed = -(int32_t)PID_Realize(&X_Base_On_Laser_PID, distance);
-    speed = speed > 400 ? 400 : speed;
-    speed = speed < -400 ? -400 : speed;
+    speed = speed > 550 ? 550 : speed;
+    speed = speed < -550 ? -550 : speed;
 
     taskENTER_CRITICAL();
     X_Speed = speed;
@@ -860,7 +864,7 @@ static void Get_Start(void *parameter)
         }
         //重置陀螺仪偏航角
         sendcmd(YAWCMD);
-        vTaskDelay(1000);
+        vTaskDelay(200);
         //打开两个舵机
         SetCompare1(TIM8, 1820, 1);
         SetCompare1(TIM8, 500, 2);
@@ -940,7 +944,7 @@ static void Task__FIVE(void *parameter)
 
         while(!check_whetherCharArrayInRange(dataFromLinux, 4, '1', '2'))                                // 用rgb颜色识别检测到达红色区域
             vTaskDelay(20);
-        startStraight_Line_Base_On_Encoder(3000, forward); // 根据编码器向前走到t型路口
+        startStraight_Line_Base_On_Encoder(2750, forward); // 根据编码器向前走到t型路口
         startgostraight(0);                                 // 保证走直线
         while (!Y_have_achieved)                            // 检测到达位置
             vTaskDelay(20);
@@ -981,7 +985,7 @@ static void Task__TWO(void *parameter)
 
 
         startStraight_Line_For_Laser(140, pan); //! the distance need to be changed,it is because only the center of road do not have barrier
-        startgostraight(-90);                   // 保证车的方向不变
+        startgostraight(LEFT_ANGLE);                   // 保证车的方向不变
         while (!X_have_achieved)
         {
             vTaskDelay(20);
@@ -989,7 +993,7 @@ static void Task__TWO(void *parameter)
 
 
         startStraight_Line_Base_On_Encoder(-6500, forward); // 向后走到右边红色区域
-        startgostraight(-90);                                // 保证走直线
+        startgostraight(LEFT_ANGLE);                                // 保证走直线
         while (!Y_have_achieved)                                // 用rgb颜色识别检测到达红色区域
             vTaskDelay(20);
 
@@ -1028,7 +1032,7 @@ static void Task__TWO(void *parameter)
         xTimerStop(Pan_Left_Base_On_Encoder_Handle, 1);
         // 向前走到左边红色区域
         startStraight_Line_Base_On_Encoder(13000, forward); //go forward to the red area in the left hand side
-        startgostraight(-90);                   // 保证车的方向不变
+        startgostraight(LEFT_ANGLE);                   // 保证车的方向不变
         vTaskDelay(1500);
         startStraight_Line_Base_On_Encoder(-350, pan); //! code is unfinished,the first param need to be changed
         while (!Y_have_achieved) // 检测到达位置
@@ -1056,14 +1060,14 @@ static void Task__TWO(void *parameter)
         SetCompare1(TIM8, 1520, 2);
 				vTaskDelay(600);
 				
-        startgostraight(-90);                               // 保证走直线
+        startgostraight(LEFT_ANGLE);                               // 保证走直线
         startStraight_Line_For_Laser(210, pan);          // 根据右边激光测距调整距离
         while(!X_have_achieved)                           // 检测到达位置
             vTaskDelay(20);
         
         startStraight_Line_Base_On_Encoder(-6300, forward); // 向后走到t字路口 
        
-        startgostraight(-90);                               // 保证走直线
+        startgostraight(LEFT_ANGLE);                               // 保证走直线
         while (!Y_have_achieved)                            // 检测到达位置
             vTaskDelay(20);
 
@@ -1076,14 +1080,14 @@ static void Task__TWO(void *parameter)
             vTaskDelay(20);
 
         // to sure the car is in the center of the road
-        startgostraight(0);                                  // 保证走直线
+        startgostraight(orginial_ANGLE);                                  // 保证走直线
         startStraight_Line_For_Laser(1170, pan);          // 根据右边激光测距调整距离
         startStraight_Line_For_Laser(240, forward); // 根据前面激光测距调整距离
         while((!X_have_achieved) || (!Y_have_achieved))                           // 检测到达位置
             vTaskDelay(20);
 
         startStraight_Line_Base_On_Encoder(-12500, forward); // 向后走到右边黄色区域
-        startgostraight(0);                                  // 保证走直线
+        startgostraight(orginial_ANGLE);                                  // 保证走直线
         vTaskDelay(1650);
         startStraight_Line_Base_On_Encoder(-400, pan);       // 向左移动小车调整距离 //! code is unfinished,the first param need to be changed
         while(!Y_have_achieved)                                // 检测到达位置
@@ -1114,7 +1118,7 @@ static void Task__FOUR(void *parameter)
     {
 
         startStraight_Line_For_Laser(220, pan); //! the distance need to be changed,it is because only the center of road do not have barrier
-        startgostraight(-90);                   // 保证车的方向不变
+        startgostraight(LEFT_ANGLE);                   // 保证车的方向不变
         while (!X_have_achieved)
         {
             vTaskDelay(20);
@@ -1124,7 +1128,7 @@ static void Task__FOUR(void *parameter)
 
 
         startStraight_Line_Base_On_Encoder(5500, forward); // 向前走到左边红色区域
-        startgostraight(-90);                              // 保证走直线
+        startgostraight(LEFT_ANGLE);                              // 保证走直线
 
         while (!Y_have_achieved) // 检测到达左边红色区域
             vTaskDelay(10);
@@ -1150,7 +1154,7 @@ static void Task__FOUR(void *parameter)
         SetCompare1(TIM8, 1520, 2);
 				vTaskDelay(600);
 				
-        startgostraight(-90);                                // 保证走直线
+        startgostraight(LEFT_ANGLE);                                // 保证走直线
         startStraight_Line_For_Laser(250, pan);          // 根据右边激光测距调整距离
         while(!X_have_achieved)                           // 检测到达位置
             vTaskDelay(20);
@@ -1185,7 +1189,7 @@ static void Task__FOUR(void *parameter)
 				vTaskDelay(600);
         
         startStraight_Line_Base_On_Encoder(6100, forward); //! 向前走到十字t字路口 code is unfinished,the first param need to be changed
-        startgostraight(-90);                              // 保证走直线
+        startgostraight(LEFT_ANGLE);                              // 保证走直线
         while (!Y_have_achieved)                           // 检测到达位置
             vTaskDelay(20);
 
@@ -1196,14 +1200,14 @@ static void Task__FOUR(void *parameter)
             vTaskDelay(20);
 
         // to sure the car is in the center of the road
-        startgostraight(0);                                  // 保证走直线
+        startgostraight(orginial_ANGLE);                                  // 保证走直线
         startStraight_Line_For_Laser(1170, pan);          // 根据右边激光测距调整距离
         startStraight_Line_For_Laser(240, forward); // 根据前面激光测距调整距离
         while((!X_have_achieved) || (!Y_have_achieved))                           // 检测到达位置
             vTaskDelay(20);
 
         startStraight_Line_Base_On_Encoder(-12500, forward); // 向后走到右边黄色区域
-        startgostraight(0);                                  // 保证走直线
+        startgostraight(orginial_ANGLE);                                  // 保证走直线
         vTaskDelay(1650);
         startStraight_Line_Base_On_Encoder(-400, pan);       // 向左移动小车调整距离 //! code is unfinished,the first param need to be changed
         while(!Y_have_achieved)                                // 检测到达位置
@@ -1237,7 +1241,7 @@ static void Task__TWO(void *parameter)
 
 
         startStraight_Line_For_Laser(175, pan); //! the distance need to be changed,it is because only the center of road do not have barrier
-        startgostraight(-90);                   // 保证车的方向不变
+        startgostraight(LEFT_ANGLE);                   // 保证车的方向不变
         while (!X_have_achieved)
         {
             vTaskDelay(20);
@@ -1245,7 +1249,7 @@ static void Task__TWO(void *parameter)
 
 
         startStraight_Line_Base_On_Encoder(-6500, forward); // 向后走到右边红色区域
-        startgostraight(-90);                                // 保证走直线
+        startgostraight(LEFT_ANGLE);                                // 保证走直线
         while (!Y_have_achieved)                                // 用rgb颜色识别检测到达红色区域
             vTaskDelay(20);
 
@@ -1284,7 +1288,7 @@ static void Task__TWO(void *parameter)
         xTimerStop(Pan_Left_Base_On_Encoder_Handle, 1);
         // 向前走到左边红色区域
         startStraight_Line_Base_On_Encoder(13000, forward); //go forward to the red area in the left hand side
-        startgostraight(-90);                   // 保证车的方向不变
+        startgostraight(LEFT_ANGLE);                   // 保证车的方向不变
         vTaskDelay(1500);
         while (!Y_have_achieved) // 检测到达位置
             vTaskDelay(20);
@@ -1311,14 +1315,14 @@ static void Task__TWO(void *parameter)
         SetCompare1(TIM8, 1520, 2);
 				vTaskDelay(600);
 				
-        startgostraight(-90);                               // 保证走直线
+        startgostraight(LEFT_ANGLE);                               // 保证走直线
         startStraight_Line_For_Laser(205, pan);          // 根据右边激光测距调整距离
         while(!X_have_achieved)                           // 检测到达位置
             vTaskDelay(20);
         
         startStraight_Line_Base_On_Encoder(-6300, forward); // 向后走到t字路口 
        
-        startgostraight(-90);                               // 保证走直线
+        startgostraight(LEFT_ANGLE);                               // 保证走直线
         while (!Y_have_achieved)                            // 检测到达位置
             vTaskDelay(20);
 
@@ -1331,14 +1335,14 @@ static void Task__TWO(void *parameter)
             vTaskDelay(20);
 
         // to sure the car is in the center of the road
-        startgostraight(0);                                  // 保证走直线
+        startgostraight(orginial_ANGLE);                                  // 保证走直线
         startStraight_Line_For_Laser(1200, pan);          // 根据右边激光测距调整距离
         startStraight_Line_For_Laser(240, forward); // 根据前面激光测距调整距离
         while((!X_have_achieved) || (!Y_have_achieved))                           // 检测到达位置
             vTaskDelay(20);
 
         startStraight_Line_Base_On_Encoder(-12500, forward); // 向后走到右边黄色区域
-        startgostraight(0);                                  // 保证走直线
+        startgostraight(orginial_ANGLE);                                  // 保证走直线
         vTaskDelay(1650);
         while(!Y_have_achieved)                                // 检测到达位置
             vTaskDelay(20);
@@ -1368,7 +1372,7 @@ static void Task__FOUR(void *parameter)
     {
 
         startStraight_Line_For_Laser(195, pan); //! the distance need to be changed,it is because only the center of road do not have barrier
-        startgostraight(-90);                   // 保证车的方向不变
+        startgostraight(LEFT_ANGLE);                   // 保证车的方向不变
         while (!X_have_achieved)
         {
             vTaskDelay(20);
@@ -1378,7 +1382,7 @@ static void Task__FOUR(void *parameter)
 
 
         startStraight_Line_Base_On_Encoder(5500, forward); // 向前走到左边红色区域
-        startgostraight(-90);                              // 保证走直线
+        startgostraight(LEFT_ANGLE);                              // 保证走直线
 
         while (!Y_have_achieved) // 检测到达左边红色区域
             vTaskDelay(10);
@@ -1404,7 +1408,7 @@ static void Task__FOUR(void *parameter)
         SetCompare1(TIM8, 1520, 2);
 				vTaskDelay(600);
 				
-        startgostraight(-90);                                // 保证走直线
+        startgostraight(LEFT_ANGLE);                                // 保证走直线
         
         startStraight_Line_Base_On_Encoder(-13000, forward); // 向后走到右边红色区域
         vTaskDelay(1500);                                    // 延时1.5s，否则会检测到左边红色区域
@@ -1435,7 +1439,7 @@ static void Task__FOUR(void *parameter)
 				vTaskDelay(600);
         
         startStraight_Line_Base_On_Encoder(6100, forward); //! 向前走到十字t字路口 code is unfinished,the first param need to be changed
-        startgostraight(-90);                              // 保证走直线
+        startgostraight(LEFT_ANGLE);                              // 保证走直线
         while (!Y_have_achieved)                           // 检测到达位置
             vTaskDelay(20);
 
@@ -1446,14 +1450,14 @@ static void Task__FOUR(void *parameter)
             vTaskDelay(20);
 
         // to sure the car is in the center of the road
-        startgostraight(0);                                  // 保证走直线
+        startgostraight(orginial_ANGLE);                                  // 保证走直线
         startStraight_Line_For_Laser(1200, pan);          // 根据右边激光测距调整距离
         startStraight_Line_For_Laser(240, forward); // 根据前面激光测距调整距离
         while((!X_have_achieved) || (!Y_have_achieved))                           // 检测到达位置
             vTaskDelay(20);
 
         startStraight_Line_Base_On_Encoder(-12500, forward); // 向后走到右边黄色区域
-        startgostraight(0);                                  // 保证走直线
+        startgostraight(orginial_ANGLE);                                  // 保证走直线
         vTaskDelay(1650);
         while(!Y_have_achieved)                                // 检测到达位置
             vTaskDelay(20);
@@ -1514,8 +1518,8 @@ static void BSP_Init(void)
     PID_Initialize(&Coord, 45, 3, 0, 0, 25, -25);            // 微调巡线的pid初始化
     PID_Initialize(&Turn_Angle_PID, 30, 0, 10, 0, 25, -25);  // 转弯的pid初始化
     PID_Initialize(&X_Speed_PID, 3.75, 0, .5, 0, 125, -125); // x方向的远距离基于编码器的pid
-    PID_Initialize(&Y_Speed_PID, 3.75, 0, .5, 0, 125, -125); // y方向的远距离基于编码器的pid
-    PID_Initialize(&X_Base_On_Laser_PID, 50, 0, 1., 0, 125, -125);
+    PID_Initialize(&Y_Speed_PID, 2.5, 0, .35, 0, 200, -200); // y方向的远距离基于编码器的pid
+    PID_Initialize(&X_Base_On_Laser_PID, 25, 0, 1., 0, 125, -125);
     PID_Initialize(&Y_Base_On_Laser_PID, 50, 0, 1., 0, 125, -125);
     Software_USART_IOConfig();
     LED_GPIO_Config();

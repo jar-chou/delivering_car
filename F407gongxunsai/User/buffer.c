@@ -232,6 +232,8 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
     //     if ((BUFF->end_p - BUFF->read_p + 1 + BUFF->write_p - BUFF->head_p) > (head_number + data_number * size / 8))
     //         return 0;
     // }
+	if(!Check_Buffer(BUFF))
+	return 0;
     if (size == 8)
     {
         u8 *p = data;

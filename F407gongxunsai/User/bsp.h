@@ -4,7 +4,6 @@
 
 #include "stm32f4xx.h"
 void OLED_SHOW_TASK(void);
-void Read_RGB(void);
 void Forward(void);
 void Reverse(void);
 void Turn_Right_Founction(void);

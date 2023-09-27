@@ -1,7 +1,7 @@
 #ifndef software_usart__
 #define software_usart__
 #include "stm32f4xx.h"
-#define BAUDRATE 8
+#define BAUDRATE 104
 
 #define SUSART_GPIOX_TX GPIOC
 #define SUSART_GPIOX_PIN_TX GPIO_Pin_3
