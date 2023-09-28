@@ -10,6 +10,7 @@
                 "c:\\Users\\jar chou\\Desktop\\vscode-repository\\delivering_car\\F407gongxunsai\\FreeRTOS\\port\\RVDS\\ARM_CM4F",
                 "c:\\Users\\jar chou\\Desktop\\vscode-repository\\delivering_car\\F407gongxunsai\\User",
                 "c:\\Users\\jar chou\\Desktop\\vscode-repository\\delivering_car\\F407gongxunsai\\Libraries\\DSP_LIB\\Include",
+                "c:\\Users\\jar chou\\Desktop\\vscode-repository\\delivering_car\\F407gongxunsai\\kalman_fliter",
                 "C:\\Keil_v5\\ARM\\ARMCC\\include",
                 "C:\\Keil_v5\\ARM\\ARMCC\\include\\arm_linux",
                 "C:\\Keil_v5\\ARM\\ARMCC\\include\\arm_linux_compat",
@@ -24,7 +25,10 @@
             "defines": [
                 "USE_STDPERIPH_DRIVER",
                 "STM32F40_41xxx",
+                "ARM_MATH_CM4",
                 "__CC_ARM",
+                "ARM_MATH_MATRIX_CHECK",
+                "ARM_MATH_ROUNDING",
                 "__arm__",
                 "__align(x)=",
                 "__ALIGNOF__(x)=",

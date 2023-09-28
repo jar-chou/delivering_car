@@ -87,7 +87,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include "bsp.h"
-
+#include "arm_math.h"
 
 /**************************** 任务句柄 ********************************/
 /*
@@ -141,6 +141,58 @@ static void Task__THREE(void);             	//
 static void Task__FOUR(void);              	//
 void Allocation_PID(int PIDOUT);
 
+/*
+*********************************************************************************************************
+*	函 数 名: DSP_MatMultiply
+*	功能说明: here is a example that show how to multiple using cmsis dsp lib
+*	形    参: 无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+static void DSP_MatMultiply(void)
+{
+	uint8_t i;
+    
+	arm_status sta;
+	
+	/****浮点数数组******************************************************************/
+	float32_t pDataA[12] = {1.1f, 1.1f, 2.1f, 2.1f, 3.1f, 3.1f, 4.1f, 4.1f, 5.1f,0,0,0};	//顺序是一行一行的排序，例如这个矩阵最后一行是0向量
+	float32_t pDataB[9] = {1.1f, 1.1f, 2.1f, 2.1f, 3.1f, 3.1f, 4.1f, 4.1f, 5.1f};
+	float32_t pDataDst[12];
+
+		
+	arm_matrix_instance_f32 pSrcA; //4行3列数据
+	arm_matrix_instance_f32 pSrcB; //3行3列数据;
+	arm_matrix_instance_f32 pDst;
+	
+	/****浮点数***********************************************************************/
+	pSrcA.numCols = 3;
+	pSrcA.numRows = 4;
+	pSrcA.pData = pDataA;
+	
+	pSrcB.numCols = 3;
+	pSrcB.numRows = 3;
+	pSrcB.pData = pDataB;
+	
+	pDst.numCols = 3;
+	pDst.numRows = 4;
+	pDst.pData = pDataDst;
+
+	sta = arm_mat_mult_f32(&pSrcA, &pSrcB, &pDst);
+
+	/*
+		sta = ARM_MATH_SUCCESS, 即返回0，表示点积成功。
+		sta = ARM_MATH_SINGULAR, 即返回-5，表示点积失败，也表示矩阵不匹配。
+		注意，ARM提供的DSP库逆矩阵求发有局限性，通过Matlab验证是可以求逆矩阵的，而DSP库却不能正确求解。
+		
+	*/
+	printf("----sta %d\r\n", sta);
+    
+	for(i = 0; i < 12; i++)
+	{
+		printf("pDataB[%d] = %f\r\n", i, pDataDst[i]);
+	}	
+}
 
 /*****************************************************************
   * @brief  主函数
@@ -156,6 +208,8 @@ int main(void)
 
     /* 开发板硬件初始化 */
     BSP_Init();
+		DSP_MatMultiply();
+		while(1);
     /* 创建AppTaskCreate任务 */
     xReturn = xTaskCreate((TaskFunction_t)AppTaskCreate,          /* 任务入口函数 */
                           (const char *)"AppTaskCreate",          /* 任务名字 */
@@ -297,8 +351,8 @@ static void analyse_data(void)
 	const u8 TOFSENSE[] = {0x57,0x00,0xFF,0x01};
 	Usart_SendArray(USART2,Agreement,8);
 	Read_buff_Void(&VL53_USARTX_Buff,TOFSENSE,4,TOF_Data,7,8,1);
-	 temp = (int32_t)(TOF_Data[4] << 8 | TOF_Data[5] << 16 | TOF_Data[6] << 24) / 256;
-	printf("distance:%d\r\n",temp);
+	temp = (int32_t)(TOF_Data[4] << 8 | TOF_Data[5] << 16 | TOF_Data[6] << 24) / 256;
+	printf("%d\r\n", temp);
 }
 
 
@@ -425,107 +479,4 @@ Software_USART_IOConfig();
 }
 
 
-//void Allocation_PID(int PIDOUT)
-//{
-//    if (Turn_Angle_PID.Target > 0)
-//    {
-//        if (PIDOUT > 0)
-//        {
-//            Turn_Right_Founction();
-//            if (PIDOUT >= 1500)
-//            {
-//                /* code */
-//                PIDOUT = 1500;
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 2);
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 3);
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 1);
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 4);
-//            }
-//            else
-//            {
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 2);
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 3);
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 1);
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 4);
-//            }
-//        }
-//        if (PIDOUT < 0)
-//        {
-//            Turn_Left_Founction();
-//            if (PIDOUT < -1500)
-//            {
-//                /* code */
-//                PIDOUT = -1500;
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 2);
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 3);
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 1);
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 4);
-//            }
-//            else
-//            {
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 2);
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 3);
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 1);
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 4);
-//            }
-//        }
-//    }
-//    if (Turn_Angle_PID.Target < 0)
-//    {
-//        if (PIDOUT > 0)
-//        {
-//            Turn_Right_Founction();
-//            if (PIDOUT >= 1500)
-//            {
-//                /* code */
-//                PIDOUT = 1500;
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 2);
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 3);
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 1);
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 4);
-//            }
-//            else
-//            {
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 2);
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 3);
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 1);
-//                SetCompare1(TIM1, Turn_Speed + PIDOUT, 4);
-//            }
-//        }
-//        if (PIDOUT < 0)
-//        {
-//            Turn_Left_Founction();
-//            if (PIDOUT < -1500)
-//            {
-//                /* code */
-//                PIDOUT = -1500;
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 2);
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 3);
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 1);
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 4);
-//            }
-//            else
-//            {
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 2);
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 3);
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 1);
-//                SetCompare1(TIM1, Turn_Speed - PIDOUT, 4);
-//            }
-//        }
-//    }
-//	static int i;
-//    if (PIDOUT<35 & PIDOUT> -35)
-//    {
-//		i++;
-//		if( i > 3 )
-//		{
-//			PULL_High();
-//			xTimerStop(Turn_Angle_Handle, 0);
-//			already_turned = 1;
-//			i=0;
-//		}
-//        
-
-//    }
-//}
 ///********************************END OF FILE****************************/
