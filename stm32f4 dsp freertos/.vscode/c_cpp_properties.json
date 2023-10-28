@@ -10,6 +10,8 @@
                 "c:\\Users\\jar chou\\Desktop\\vscode-repository\\delivering_car\\stm32f4 dsp freertos\\FreeRTOS\\port\\RVDS\\ARM_CM4F",
                 "c:\\Users\\jar chou\\Desktop\\vscode-repository\\delivering_car\\stm32f4 dsp freertos\\User\\led",
                 "c:\\Users\\jar chou\\Desktop\\vscode-repository\\delivering_car\\stm32f4 dsp freertos\\kalman_fliter",
+                "c:\\Users\\jar chou\\AppData\\Local\\Arm\\Packs\\ARM\\CMSIS-DSP\\1.15.0\\Include",
+                "c:\\Users\\jar chou\\AppData\\Local\\Arm\\Packs\\ARM\\CMSIS\\5.9.0\\CMSIS\\Core\\Include",
                 "C:\\Keil_v5\\ARM\\ARMCLANG\\include",
                 "C:\\Keil_v5\\ARM\\ARMCLANG\\include\\arm_linux",
                 "C:\\Keil_v5\\ARM\\ARMCLANG\\include\\arm_linux_compat",

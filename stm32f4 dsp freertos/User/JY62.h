@@ -2,7 +2,7 @@
 #define JY62__
 #include "stm32f4xx.h"
 #include <string.h>
-#define EN_JY62 1
+#define EN_JY62 0
 #define JY62_USARTX UART4
 #define JY62_IRQHandler UART4_IRQHandler
 

@@ -4,7 +4,7 @@
 #include "stm32f4xx.h"
 struct PID
 {
-    int Target;
+    float Target;
     float KP, KI, KD, limit_high, limit_low;
     float Cumulation_Error; // 当前误差
     float Last_Error;       // 上一次误差

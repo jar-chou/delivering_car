@@ -172,12 +172,12 @@
 
 /* 设置可以注册的信号量和消息队列个数 */
 #define configQUEUE_REGISTRY_SIZE				10                                 
-                                                                       
+
 #define configUSE_APPLICATION_TASK_TAG		  0                       
-                      
+
 
 /*****************************************************************
-              FreeRTOS与内存申请有关配置选项                                               
+                FreeRTOS与内存申请有关配置选项                                               
 *****************************************************************/
 //支持动态内存申请
 #define configSUPPORT_DYNAMIC_ALLOCATION        1    
@@ -188,7 +188,7 @@
 
 
 /***************************************************************
-             FreeRTOS与钩子函数有关的配置选项                                            
+                FreeRTOS与钩子函数有关的配置选项                                            
 **************************************************************/
 /* 置1：使用空闲钩子（Idle Hook类似于回调函数）；置0：忽略空闲钩子
  * 
@@ -211,7 +211,7 @@
  * 函数必须非常短小，不能大量使用堆栈，
  * 不能调用以”FromISR" 或 "FROM_ISR”结尾的API函数
  */
- /*xTaskIncrementTick函数是在xPortSysTickHandler中断函数中被调用的。因此，vApplicationTickHook()函数执行的时间必须很短才行*/
+/*xTaskIncrementTick函数是在xPortSysTickHandler中断函数中被调用的。因此，vApplicationTickHook()函数执行的时间必须很短才行*/
 #define configUSE_TICK_HOOK						0           
 
 //使用内存申请失败钩子函数
@@ -225,7 +225,7 @@
 
 
 /********************************************************************
-          FreeRTOS与运行时间和任务状态收集有关的配置选项   
+            FreeRTOS与运行时间和任务状态收集有关的配置选项   
 **********************************************************************/
 //启用运行时间统计功能
 #define configGENERATE_RUN_TIME_STATS	        0             

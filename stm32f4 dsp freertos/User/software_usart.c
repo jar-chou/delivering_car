@@ -45,7 +45,7 @@ void Software_USART_TXD(u8 Data)
     __set_PRIMASK(0);
 }
 
-void USART_Send(u8 *buf, u8 len)
+void USART_Send(const u8 *buf, u8 len)
 {
     u8 t;
     for (t = 0; t < len; t++)

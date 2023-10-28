@@ -1,5 +1,5 @@
 #include "bsp.h"
-#include "stdio.h"
+
 #include "OLED.h"
 #include "FreeRTOS.h"
 #include "queue.h"
@@ -9,27 +9,12 @@
 #include "Software_iic.h"
 #include <math.h>
 #include <stdbool.h>
-#include "oled_draw.h"
-#include "oled_buffer.h"
 
 extern int32_t temp;
 
 void OLED_SHOW_TASK()
 {
-	static int i = 0;
-    ClearScreenBuffer(0x00);
 	
-    char buff[20];
-		float current_angle = (float)stcAngle.Angle[2] / 32768 * 180;
-    sprintf(buff, "Angle_Z:%.2f", current_angle);
-    DrawString(0, 0, buff);
-		sprintf(buff, "Dis:%d", i++);
-    DrawString(1, 0, buff);
-//		sprintf(buff, "Angle_Z:%.2f", current_angle);
-//    DrawString(2, 0, buff);
-//		sprintf(buff, "Dis:%d", i++);
-//    DrawString(3, 0, buff);
-    UpdateScreenDisplay();
 }
 
 void Forward()

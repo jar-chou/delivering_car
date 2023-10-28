@@ -154,12 +154,11 @@ void OLED_Clear(void)
   */
 void OLED_FILL(const uint8_t BMP[8][128])
 {
-	uint8_t i;
-
+	uint8_t i = 0;
+	
 	for (i = 0; i < 8; i++)
 	{
 		OLED_SetCursor(i, 0);
-
 		OLED_WriteMultiData(BMP[i], 128);
 	}
 

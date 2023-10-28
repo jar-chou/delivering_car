@@ -1,23 +1,28 @@
+/*
+ * @Date: 2023-10-16 11:45:55
+ * @LastEditors: zjc
+ * @LastEditTime: 2023-10-17 11:44:39
+ * @FilePath: \RVMDK（uv5）f:\桌面\F407_test\User\buffer.c
+ * @Verson:V0.2
+ * V0.2增加每个buffer可以指定大小
+ */
 #include "buffer.h"
 #include "string.h"
 #include "stdio.h"
-struct Buff U3_buffer, U2_buffer, Soft_Usart, U1_buffer, U4_buffer, U5_buffer, U1_buffer,IIC_buff;
+
+// struct Buff U3_buffer, U2_buffer, Soft_Usart, U1_buffer, U4_buffer, U5_buffer,IIC_buff;
 /**
  * @description: 初始化环形缓冲区
  * @param {Buff} *BUFF
  * @return {*}
  */
-void Iinitial_BUFF(struct Buff *BUFF)
+void Iinitial_BUFF(struct Buff *BUFF, u8 size_)
 {
     BUFF->head_p = BUFF->Data;
-    BUFF->end_p = &BUFF->Data[BUFFER_SIZE - 1];
+    BUFF->end_p = &BUFF->Data[size_ - 1];
     BUFF->write_p = BUFF->Data;
     BUFF->read_p = BUFF->Data;
     BUFF->max = 0;
-    printf("%x\n", (uint32_t)(BUFF->head_p));
-    printf("%x\n", (uint32_t)(BUFF->end_p));
-    printf("%x\n", (uint32_t)(BUFF->write_p));
-    printf("%x\n", (uint32_t)(BUFF->read_p));
 }
 /**
  * @description: 把数据写入缓冲区
@@ -29,20 +34,56 @@ void Write_BUFF(u8 *P, struct Buff *BUFF)
 {
     if (BUFF->write_p == BUFF->end_p)
     {
-        BUFF->max = 1;
+
         *BUFF->write_p = *P;
         BUFF->write_p = BUFF->head_p;
+        // printf("get data");
     }
     else
     {
         *BUFF->write_p = *P;
         BUFF->write_p++;
-        if (BUFF->max == 1)
+    }
+    if ((BUFF->read_p) == (BUFF->write_p))
+    {
+        BUFF->max = 1;
+        // BUFF->read_p++;
+        // if (BUFF->read_p > BUFF->end_p)
+        //     BUFF->read_p = BUFF->head_p;
+        // printf("buff full %x %x\r\n", BUFF->write_p, BUFF->read_p);
+    }
+    if (BUFF->max == 1)
+        BUFF->read_p = BUFF->write_p;
+}
+
+void Write_BUFF_P(u8 num, struct Buff *BUFF)
+{
+    // BUFF->write_p = BUFF->head_p + num;
+    u8 *eventually_write_p = BUFF->head_p + num;
+    // case one: the write pointer is over the end of the buffer
+    if (eventually_write_p > BUFF->end_p)
+    {
+        eventually_write_p = BUFF->head_p + (eventually_write_p - BUFF->end_p) - 1;
+        // check whether the read pointer is between the write pointer and the eventually write pointer
+        if (BUFF->read_p < eventually_write_p || BUFF->read_p >= BUFF->write_p)
         {
-            BUFF->read_p = BUFF->write_p;
+            // if so, move the read pointer to the eventually write pointer
+            BUFF->read_p = eventually_write_p + 1;
         }
     }
+    else
+    {
+        // case two: the write pointer is not over the end of the buffer
+        // check whether the read pointer is between the write pointer and the eventually write pointer
+        if (BUFF->read_p < eventually_write_p && BUFF->read_p >= BUFF->write_p)
+        {
+            // if so, move the read pointer to the eventually write pointer
+            BUFF->read_p = eventually_write_p + 1;
+        }
+    }
+    BUFF->write_p = eventually_write_p; // move the write pointer to the eventually write pointer
 }
+
 /**
  * @description: 检查缓冲区是否有数据读
  * @param {Buff} *BUFF 传入需要检测的缓冲区
@@ -50,10 +91,8 @@ void Write_BUFF(u8 *P, struct Buff *BUFF)
  */
 u8 Check_Buffer(struct Buff *BUFF)
 {
-    if ((BUFF->read_p == BUFF->write_p) && BUFF->max == 0)
-    {
+    if (((BUFF->read_p) == (BUFF->write_p)) && (BUFF->max == 0))
         return 0;
-    }
     else
         return 1;
 }
@@ -64,31 +103,36 @@ u8 Check_Buffer(struct Buff *BUFF)
  */
 u8 Read_BUFF(struct Buff *BUFF)
 {
-    u8 *p;
-    if (BUFF->read_p == BUFF->write_p && BUFF->max == 0)
+    volatile u8 *p;
+    if ((BUFF->read_p) == (BUFF->write_p))
     {
+        if(BUFF->max == 0)
+            return 0;
+        else
+        {
+            BUFF->max = 0;
+            p = BUFF->read_p;
+            BUFF->read_p++;
+            return *p;
+        }
         // printf("%u", *BUFF->read_p);
         // printf("\n数据为空\n");
-        return 0;
     }
     else
     {
+        p = BUFF->read_p;
         if (BUFF->read_p == BUFF->end_p)
         {
-
-            p = BUFF->read_p;
-            BUFF->max = 0;
             // printf("\n读到的数据为:%c\n", *p);
             BUFF->read_p = BUFF->head_p;
             return *p;
         }
         else
         {
-            p = BUFF->read_p;
             //  printf("\n读到的数据为1:%c\n", *p);
             BUFF->read_p++;
+            return *p;
         }
-        return *p;
     }
 }
 /**
@@ -149,65 +193,8 @@ u8 Find_Char(struct Buff *BUFF, char *p)
 //    }
 //    }
 //}
-
-// OPENMV 0xFF
-void Read_Data(struct Buff *BUFF, u8 head1, u8 head2, u8 head3, u8 count, u8 *p)
-{
-    u8 i, A;
-    A = 128;
-    while (A--)
-    {
-        if (Read_BUFF(BUFF) == head1)
-        {
-            if (Read_BUFF(BUFF) == head2)
-            {
-                if (Read_BUFF(BUFF) == head3)
-                {
-                    for (i = 0; i < count; i++)
-                    {
-                        *p = Read_BUFF(BUFF);
-                        p++;
-                    }
-                    A = 0;
-                }
-            }
-        }
-    }
-}
-u8 Read_buff(struct Buff *BUFF, const u8 *head, u8 head_number, u8 *data, u8 data_number)
-{
-    u8 i, n, count = 0;
-    n = BUFFER_SIZE;
-
-    for (i = 0; i < head_number; i++)
-    {
-        while (n--)
-        {
-            if (((u8)Read_BUFF(BUFF) == (u8)head[i]))
-            {
-                count++;
-                break;
-            }
-            else
-                i = 0, count = 0;
-            if (n == 0)
-                return 0;
-        }
-    }
-    if (count == head_number)
-    {
-        for (i = 0; i < data_number; i++)
-        {
-            *data = (u8)Read_BUFF(BUFF);
-            data++;
-        }
-        return 1;
-    }
-    else
-        return 0;
-}
 /**
- * @description: 读取不同类型数据   
+ * @description: 读取不同类型数据
  * @param {Buff} *BUFF 缓冲区
  * @param {u8} *head 协议头
  * @param {u8} head_number 协议头个数
@@ -221,19 +208,8 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
 {
     u8 i, n, count = 0;
     n = BUFFER_SIZE;
-    //判断环形缓冲区是否有足够数据
-    // if (BUFF->write_p > BUFF->read_p)
-    // {
-    //     if ((BUFF->write_p - BUFF->read_p) > (head_number + data_number * size / 8))
-    //         return 0;
-    // }
-    // else
-    // {
-    //     if ((BUFF->end_p - BUFF->read_p + 1 + BUFF->write_p - BUFF->head_p) > (head_number + data_number * size / 8))
-    //         return 0;
-    // }
-	if(!Check_Buffer(BUFF))
-	return 0;
+    if (!Check_Buffer(BUFF))
+        return 0;
     if (size == 8)
     {
         u8 *p = data;
@@ -342,11 +318,9 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
                     (*(u32 *)p) = four + (three << 8) + (two << 16) + (one << 24);
                     p++;
                     // ((uint32_t *)data)++;
-                    
                 }
                 else
                 {
-
                     one = (u8)Read_BUFF(BUFF);
                     two = (u8)Read_BUFF(BUFF);
                     three = (u8)Read_BUFF(BUFF);
@@ -357,10 +331,43 @@ u8 Read_buff_Void(struct Buff *BUFF, const u8 *head, u8 head_number, void *data,
             }
             return 1;
         }
-		else
+        else
             return 0;
     }
     else
         return 0;
 }
 
+/**
+ * @description: 判断环形缓冲区是否有足够数据
+ * @param {Buff} *BUFF
+ * @param {u8} head_number 协议头个数
+ * @param {u8} data_number 数据个数
+ * @param {u8} size 数据类型
+ * @return {*}
+ */
+u8 have_enough_data(volatile struct Buff *BUFF, u8 head_number, u8 data_number, u8 size)
+{
+    int need_len = (head_number + data_number * size / 8);
+    if (BUFF->write_p >= BUFF->read_p)
+    {
+        if ((BUFF->write_p - BUFF->read_p) >= need_len)
+        {
+
+            // printf("aa");
+            return 1;
+        }
+    }
+    else
+    {
+        if ((BUFF->end_p - BUFF->read_p + 1 + BUFF->write_p - BUFF->head_p) >= need_len)
+        {
+            // printf("!!\r\n");
+            return 1;
+        }
+
+        // printf("%x \r\n%x \r\n%d \r\n", (BUFF->write_p), (BUFF->read_p), need_len);
+    }
+
+    return 0;
+}

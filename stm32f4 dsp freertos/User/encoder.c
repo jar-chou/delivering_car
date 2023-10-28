@@ -251,11 +251,11 @@ int Read_Encoder(u8 TIMX)
         TIM2->CNT = 0;                  //! 清楚编码器当前计数值
         break;
     case 3:
-        Encoder_TIM = (short)TIM3->CNT;
+        Encoder_TIM = -(short)TIM3->CNT;
         TIM3->CNT = 0;
         break;
     case 4:
-        Encoder_TIM = (short)TIM4->CNT;
+        Encoder_TIM = -(short)TIM4->CNT;
         TIM4->CNT = 0;
         break;
     case 5:

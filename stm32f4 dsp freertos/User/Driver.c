@@ -56,7 +56,7 @@ void Initial_Control_PIN()
     }
 }
 
-void Advance(u8 a)
+void Back(u8 a)
 {
     switch (a)
     {
@@ -81,7 +81,8 @@ void Advance(u8 a)
         break;
    } 
 }
-void Back(u8 a)
+
+void Advance(u8 a)
 {
     switch (a)
     {
