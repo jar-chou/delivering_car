@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-//// CRCĞ£Ñéº¯Êı
+//// CRCæ ¡éªŒå‡½æ•°
 //uint16_t crc16(uint8_t *data, int length)
 //{
 //    uint16_t crc = 0xFFFF;
@@ -29,30 +29,30 @@
 //    return crc;
 //}
 
-//// ·â×°CRCĞ£ÑéÖµµ½Êı¾İÖĞ
+//// å°è£…CRCæ ¡éªŒå€¼åˆ°æ•°æ®ä¸­
 //void appendCRC(uint8_t *data, int length)
 //{
 //    uint16_t crc = crc16(data, length);
-//    data[length] = crc & 0xFF; // ½«µÍ8Î»·ÅÈëÊı¾İÄ©Î²
-//    data[length + 1] = crc >> 8; // ½«¸ß8Î»·ÅÈëÊı¾İÄ©Î²µÄÏÂÒ»¸öÎ»ÖÃ
+//    data[length] = crc & 0xFF; // å°†ä½8ä½æ”¾å…¥æ•°æ®æœ«å°¾
+//    data[length + 1] = crc >> 8; // å°†é«˜8ä½æ”¾å…¥æ•°æ®æœ«å°¾çš„ä¸‹ä¸€ä¸ªä½ç½®
 //}
 
 
-//// ÑéÖ¤CRCĞ£ÑéÖµÊÇ·ñÕıÈ·
+//// éªŒè¯CRCæ ¡éªŒå€¼æ˜¯å¦æ­£ç¡®
 //int verifyCRC(uint8_t *data, int length)
 //{
-//    uint16_t crc = crc16(data, length - 2); // È¥³ıÊı¾İÄ©Î²µÄCRCĞ£ÑéÖµ
+//    uint16_t crc = crc16(data, length - 2); // å»é™¤æ•°æ®æœ«å°¾çš„CRCæ ¡éªŒå€¼
 //    
-//    // »ñÈ¡½ÓÊÕµ½µÄCRCĞ£ÑéÖµ
+//    // è·å–æ¥æ”¶åˆ°çš„CRCæ ¡éªŒå€¼
 //    uint16_t receivedCRC = (data[length - 1] << 8) | data[length - 2];
 //    
-//    // ±È½Ï¼ÆËãµÃµ½µÄCRCĞ£ÑéÖµÓë½ÓÊÕµ½µÄCRCĞ£ÑéÖµ
+//    // æ¯”è¾ƒè®¡ç®—å¾—åˆ°çš„CRCæ ¡éªŒå€¼ä¸æ¥æ”¶åˆ°çš„CRCæ ¡éªŒå€¼
 //    if (crc == receivedCRC)
 //    {
-//        return 1; // Ğ£ÑéÍ¨¹ı
+//        return 1; // æ ¡éªŒé€šè¿‡
 //    }
 //    else
 //    {
-//        return 0; // Ğ£ÑéÊ§°Ü
+//        return 0; // æ ¡éªŒå¤±è´¥
 //    }
 //}

@@ -26,9 +26,8 @@ void PID_Initialize(struct PID *pid, float KP, float KD, float KI, int Traget, f
 /**
  * @description:位置式PID控制
  * @param {PID} pid 传入PID结构体变量
- * @param {float} Target 目标值
  * @param {float} Current 当前值
- * @return {*}
+ * @return {int} 返回输出值
  */
 int PID_Realize(struct PID *pid, float Current)
 {
@@ -44,11 +43,42 @@ int PID_Realize(struct PID *pid, float Current)
     return (int)Realize;           // 返回实际值
 }
 /**
+ * @description: en: achieve pid of angle control
+ *              cn: 实现角度控制的pid
+ * @param {PID} en: the structure of pid that you want to use
+ *              cn: 你想要使用的pid结构体
+ * @param {float} Current en: current angle
+ *                      cn: 当前角度
+ * @return {int} en: output of pid
+ *              cn: pid的输出
+ */
+int PID_Realize_angle(struct PID *pid, float Current)
+{
+    float iError, Realize;                                                                                     // 实际输出
+    iError = pid->Target - Current;                                                                            // 计算当前误差
+    // because the range of angle is -180~180, and the range of iError is -360~360, so we need to change the error to -180~180
+    if (iError > 180)
+    {
+        iError = iError - 360;
+    }
+    else if (iError < -180)
+    {
+        iError = iError + 360;
+    }
+    pid->Cumulation_Error += iError;                                                                           // 误差积分
+    pid->Cumulation_Error = pid->Cumulation_Error > pid->limit_high ? pid->limit_high : pid->Cumulation_Error; // 积分限幅//上限
+    pid->Cumulation_Error = pid->Cumulation_Error < pid->limit_low ? pid->limit_low : pid->Cumulation_Error;   // 积分限幅//下限
+    Realize = pid->KP * iError + pid->Cumulation_Error * pid->KI + pid->KD * (iError - pid->Last_Error);
+    pid->Last_Error = iError; // 更新上次误差
+    return (int)Realize;           // 返回实际值
+}
+
+
+/**
  * @description: 增量式PID算法函数
  * @param {PID} *pid
- * @param {float} Target
  * @param {float} Current
- * @return {*}
+ * @return {int} 返回输出值
  */
 int PID_Increase(struct PID *pid, int Current)
 {

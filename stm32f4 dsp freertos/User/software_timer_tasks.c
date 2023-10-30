@@ -68,7 +68,7 @@ void Pan_Left_Base_On_Encoder(TimerHandle_t xTimer)
 {
     static int i = 0;
     int32_t distance = position_of_car[1];
-    int32_t speed = (int32_t)PID_Realize(&X_Speed_PID, distance);
+    int32_t speed = -(int32_t)PID_Realize(&X_Speed_PID, distance);
     speed = speed > 500 ? 500 : speed;
     speed = speed < -500 ? -500 : speed;
     taskENTER_CRITICAL();
@@ -94,7 +94,7 @@ void Go_Forward_Base_On_Encoder(TimerHandle_t xTimer)
 {
     static int i = 0;
     int32_t distance = position_of_car[0];
-    int32_t speed = (int32_t)PID_Realize(&Y_Speed_PID, distance);
+    int32_t speed = -(int32_t)PID_Realize(&Y_Speed_PID, distance);
     speed = speed > 1300 ? 1300 : speed;
     speed = speed < -1300 ? -1300 : speed;
     taskENTER_CRITICAL();
@@ -120,9 +120,9 @@ void Achieve_Distance_For_Right_Laser(TimerHandle_t xTimer)
 {
     static int i = 0;
     float distance = VOFA_Data[2];
-    int32_t speed = -(int32_t)PID_Realize(&X_Base_On_Laser_PID, distance);
-    speed = speed > 550 ? 550 : speed;
-    speed = speed < -550 ? -550 : speed;
+    int32_t speed = (int32_t)PID_Realize(&X_Base_On_Laser_PID, distance);
+    speed = speed >  350 ?  350 : speed;
+    speed = speed < -350 ? -350 : speed;
 
     taskENTER_CRITICAL();
     X_Speed = speed;
@@ -131,7 +131,7 @@ void Achieve_Distance_For_Right_Laser(TimerHandle_t xTimer)
     if (fabs(distance - X_Base_On_Laser_PID.Target) < 7)
     {
         i++;
-        if (i > 4)
+        if (i > 10)
         {
             i = 0;
             xTimerStop(Achieve_Distance_For_Right_Laser_Handle, 0);
@@ -148,7 +148,7 @@ void Achieve_Distance_Front_Head_Laser(TimerHandle_t xTimer)
 {
     static int i = 0;
     float distance = VOFA_Data[3];
-    int32_t speed = -(int32_t)PID_Realize(&Y_Base_On_Laser_PID, distance);
+    int32_t speed = (int32_t)PID_Realize(&Y_Base_On_Laser_PID, distance);
     speed = speed > 200 ? 200 : speed;
     speed = speed < -200 ? -200 : speed;
 
@@ -233,11 +233,19 @@ void Car_Running(TimerHandle_t xTimer)
 void Turn_Angle(TimerHandle_t xTimer)
 {
     static u8 i = 0;
-    float angle, PIDOUT;
+    float angle;
+    int PIDOUT;
     angle = (float)Angle.z / 32768 * 180;
-    PIDOUT = PID_Realize(&Turn_Angle_PID, angle);
+    // PIDOUT = -PID_Realize(&Turn_Angle_PID, angle);
+
+    // !code in here need to test
+    PIDOUT = -PID_Realize_angle(&Turn_Angle_PID, angle);
+
+    // limit the range of pid output
+    PIDOUT = PIDOUT >  1300 ?  1300 : PIDOUT;
+    PIDOUT = PIDOUT < -1300 ? -1300 : PIDOUT;
     angle_speed = (int32_t)PIDOUT;
-    if (fabs(angle - Turn_Angle_PID.Target) < 1)
+    if ((fabs(angle - Turn_Angle_PID.Target) < 1) || (fabs(angle - Turn_Angle_PID.Target) > 359))
     {
         i++;
         if (i > 4)
@@ -268,9 +276,19 @@ void sendto_Upper(TimerHandle_t xTimer)
 void line_walking(TimerHandle_t xTimer)
 {
     float angle;
+    int PIDOUT;
     //? PID开始巡线
     angle = (float)Angle.z / 32768 * 180;
-    angle_speed = PID_Realize(&Coord, angle);
+    // angle_speed = -PID_Realize(&Coord, angle);
+
+    // !code in here need to test
+    PIDOUT = -PID_Realize_angle(&Coord, angle);
+
+    // limit the range of pid output
+    PIDOUT = PIDOUT > 500 ? 500 : PIDOUT;
+    PIDOUT = PIDOUT < -500 ? -500 : PIDOUT;
+
+    angle_speed = PIDOUT;
     return;
 }
 
@@ -301,13 +319,13 @@ void analyse_data(void)
             Read_buff_Void(&U3_buffer, VL53_Agreement_RX, 3, &Distance.F_OUT, 1, 16, 1);
     }
 
-    const float alpha = 0.1;        // low pass filter
+    const float alpha = 0.2; // low pass filter
     if (have_enough_data(&VL53_USARTX_Buff, 4, 9, 8))
     {
         while (have_enough_data(&VL53_USARTX_Buff, 4, 9, 8))
             Read_buff_Void(&VL53_USARTX_Buff, RIGHTLASER, 4, TOF_Data, 7, 8, 1);
         float distance = (int32_t)(TOF_Data[4] << 8 | TOF_Data[5] << 16 | TOF_Data[6] << 24) / 256;
-        Distance.R_OUT = (1 - alpha) * Distance.R_OUT + alpha * distance;       // low pass filter
+        Distance.R_OUT = (1 - alpha) * Distance.R_OUT + alpha * distance; // low pass filter
         USART_SendData(VL53_USARTX, 0x0F);
     }
 

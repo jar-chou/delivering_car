@@ -69,7 +69,7 @@ void OLED_SHOW(void *pvParameters)
         DrawString(3, 0, buff);
         UpdateScreenDisplay();
 
-        vTaskDelay(1);
+        vTaskDelay(70);
     }
 }
 
@@ -89,9 +89,15 @@ void Get_Start(void *parameter)
         //     vTaskDelay(5000);        /* 延时500个tick */
         //     USART_Send(voice[2], 6); // 播报到达二号仓库
         //     vTaskDelay(5000);        /* 延时500个tick */
-				
-				start_trun(1);
-				
+		
+		startgostraight(0);
+        vTaskDelay(1000);
+		startStraight_Line_For_Laser(200, pan);
+		while(!X_have_achieved)
+            vTaskDelay(20);
+        while(1)
+            vTaskDelay(1000);
+        
         while (1)
         {
             if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_14) == 1)
@@ -118,7 +124,7 @@ void Get_Start(void *parameter)
         SetCompare1(TIM8, 920, 1);
         SetCompare1(TIM8, 1520, 2);
         vTaskDelay(600);
-        if (check_whetherCharArrayInRange(dataFromLinux, 4, '1', '2')) //! the code in here is unfinished,we need to judge the value of the dataFromLinux[0] to decide which task we should switch to
+        if (check_whetherCharArrayInRange(dataFromLinux, 4, '1', '2')) //! switch the task that base on qrcode
             vTaskResume(Task__ONE_Handle);
         else
             vTaskResume(Task__FIVE_Handle);

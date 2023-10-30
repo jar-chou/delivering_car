@@ -15,6 +15,6 @@ int PID_Realize(struct PID *pid, float Current);
 int PID_Increase(struct PID *pid, int Current);
 void Series_PID(int *Out_PID_x, int *Out_PID_y);
 int Limited_Out(int Out_PID, int Max, int Min);
-extern struct PID Coord;
+int PID_Realize_angle(struct PID *pid, float Current);
 
 #endif
