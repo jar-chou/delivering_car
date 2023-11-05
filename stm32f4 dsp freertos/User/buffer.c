@@ -106,7 +106,7 @@ u8 Read_BUFF(struct Buff *BUFF)
     volatile u8 *p;
     if ((BUFF->read_p) == (BUFF->write_p))
     {
-        if(BUFF->max == 0)
+        if (BUFF->max == 0)
             return 0;
         else
         {

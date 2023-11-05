@@ -119,7 +119,6 @@ static EventGroupHandle_t Group_One_Handle = NULL; //+事件组句柄
 */
 static void AppTaskCreate(void); /* 用于创建任务 */
 static void BSP_Init(void);		 /* 用于初始化板载相关资源 */
-static void Allocation_PID(int PIDOUT);
 
 /*
 *********************************************************************************************************
@@ -229,7 +228,7 @@ static void AppTaskCreate(void)
 		printf("Task__TWO任务创建成功\r\n");
 	xReturn = xTaskCreate((TaskFunction_t)Task__ONE,		  /* 任务入口函数 */
 						  (const char *)"Task__ONE",		  /* 任务名字 */
-						  (uint16_t)512,					  /* 任务栈大小 */
+						  (uint16_t)256,					  /* 任务栈大小 */
 						  (void *)NULL,						  /* 任务入口函数参数 */
 						  (UBaseType_t)3,					  /* 任务的优先级 */
 						  (TaskHandle_t *)&Task__ONE_Handle); /* 任务控制块指针 */
@@ -245,7 +244,7 @@ static void AppTaskCreate(void)
 		printf("OLED_SHOW任务创建成功\r\n");
 	xReturn = xTaskCreate((TaskFunction_t)Get_Start,		  /* 任务入口函数 */
 						  (const char *)"Get_Start",		  /* 任务名字 */
-						  (uint16_t)512,					  /* 任务栈大小 */
+						  (uint16_t)256,					  /* 任务栈大小 */
 						  (void *)NULL,						  /* 任务入口函数参数 */
 						  (UBaseType_t)3,					  /* 任务的优先级 */
 						  (TaskHandle_t *)&Get_Start_Handle); /* 任务控制块指针 */
@@ -261,7 +260,7 @@ static void AppTaskCreate(void)
 		printf("Task__FOUR任务创建成功\r\n");
 	xReturn = xTaskCreate((TaskFunction_t)Task__FIVE,		   /* 任务入口函数 */
 						  (const char *)"Task__FIVE",		   /* 任务名字 */
-						  (uint16_t)512,					   /* 任务栈大小 */
+						  (uint16_t)256,					   /* 任务栈大小 */
 						  (void *)NULL,						   /* 任务入口函数参数 */
 						  (UBaseType_t)3,					   /* 任务的优先级 */
 						  (TaskHandle_t *)&Task__FIVE_Handle); /* 任务控制块指针 */
@@ -279,7 +278,7 @@ static void AppTaskCreate(void)
 									   (TimerCallbackFunction_t)analyse_data); //! 回调函数名
 
 	sendto_Upper_Handle = xTimerCreate((const char *)"sendto_Upper",
-									   (TickType_t)5,						   /* 定时器周期 1000(tick) */
+									   (TickType_t)20,						   /* 定时器周期 1000(tick) */
 									   (UBaseType_t)pdTRUE,					   /* 周期模式 */
 									   (void *)3,							   /* 为每个计时器分配一个索引的唯一ID */
 									   (TimerCallbackFunction_t)sendto_Upper); //! 回调函数名
@@ -363,6 +362,10 @@ static void BSP_Init(void)
 	 * 优先级分组只需要分组一次即可，以后如果有其他的任务需要用到中断，
 	 * 都统一用这个优先级分组，千万不要再分组，切忌。
 	 */
+	/**
+	 * warning: the order of initial the peripheral is very important,
+	 * if you initial the peripheral in the wrong order, the program will run out of control
+	*/
 	RCC_ClocksTypeDef get_rcc_clock;
 	RCC_GetClocksFreq(&get_rcc_clock);
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
@@ -382,11 +385,11 @@ static void BSP_Init(void)
 
 	// pid初始化
 	PID_Initialize(&Coord, 45, 3, 0, 0, 5, -5);				 // 微调巡线的pid初始化
-	PID_Initialize(&Turn_Angle_PID, 33, 0, 10, 0, 7.5, -7.5);	 // 转弯的pid初始化
+	PID_Initialize(&Turn_Angle_PID, 30, 0, 16, 0, 7.5, -7.5);	 // 转弯的pid初始化
 	PID_Initialize(&X_Speed_PID, 3.75, 0, .5, 0, 125, -125); // x方向的远距离基于编码器的pid
-	PID_Initialize(&Y_Speed_PID, 2.5, 0, .35, 0, 200, -200); // y方向的远距离基于编码器的pid
-	PID_Initialize(&X_Base_On_Laser_PID, 10, 0, 1., 0, 125, -125);
-	PID_Initialize(&Y_Base_On_Laser_PID, 35, 0, 1., 0, 125, -125);
+	PID_Initialize(&Y_Speed_PID, 0.70, 0., 4., 0, 40, -40); // y方向的远距离基于编码器的pid
+	PID_Initialize(&X_Base_On_Laser_PID, 7, 0, 6, 0, 25, -25);
+	PID_Initialize(&Y_Base_On_Laser_PID, 5, 0, 3., 0, 25, -25);
 
 	Buzzer_ONE(); // 开始启动小车
 	LED_GPIO_Config();

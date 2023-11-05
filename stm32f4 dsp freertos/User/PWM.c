@@ -146,16 +146,16 @@ void SetCompare1(TIM_TypeDef *TIMX, u32 CCRX_Val, uint8_t X)
     switch (X)
     {
     case 1:
-        TIM_SetCompare1(TIMX, CCRX_Val);
+        TIMX->CCR1 = CCRX_Val;
         break;
     case 2:
-        TIM_SetCompare2(TIMX, CCRX_Val);
+        TIMX->CCR2 = CCRX_Val;
         break;
     case 3:
-        TIM_SetCompare3(TIMX, CCRX_Val);
+        TIMX->CCR3 = CCRX_Val;
         break;
     case 4:
-        TIM_SetCompare4(TIMX, CCRX_Val);
+        TIMX->CCR4 = CCRX_Val;
         break;
 
     default:

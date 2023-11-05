@@ -27,7 +27,7 @@ int32_t X_Speed = 0;
 int32_t angle_speed = 0;
 int32_t position_of_car[3] = {0};
 u8 already_turned = 0, Y_have_achieved = 0, X_have_achieved = 0; // 是否达到定时器目的的信号量
-u8 dataFromLinux[5] = {0};                                       //{'1', '1', '2', '2'}; // the data get from linux
+u8 dataFromLinux[5] = {'2', '2', '1', '1'};                                       //{'1', '1', '2', '2'}; // the data get from linux
 float VOFA_Data[4];
 struct angle Angle; // the angle of the car
 extern struct Buff VL53_USARTX_Buff;
@@ -60,6 +60,8 @@ void Keep_The_Car_Have_Special_Right_Distance(TimerHandle_t xTimer)
     X_Speed = speed;
     taskEXIT_CRITICAL();
 }
+
+
 /**
  * @description: this function is the software callback function that achieve pan left base on encoder num
  * @return {*}
@@ -69,7 +71,7 @@ void Pan_Left_Base_On_Encoder(TimerHandle_t xTimer)
     static int i = 0;
     int32_t distance = position_of_car[1];
     int32_t speed = -(int32_t)PID_Realize(&X_Speed_PID, distance);
-    speed = speed > 500 ? 500 : speed;
+    speed = speed >  500 ?  500 : speed;
     speed = speed < -500 ? -500 : speed;
     taskENTER_CRITICAL();
     X_Speed = speed;
@@ -86,6 +88,8 @@ void Pan_Left_Base_On_Encoder(TimerHandle_t xTimer)
     }
 }
 
+#define maximum_speed 1750
+#define maximum_accelerate_rate 100
 /**
  * @description: this function is the software callback function that achieve go forward base on encoder num
  * @return {*}
@@ -95,15 +99,32 @@ void Go_Forward_Base_On_Encoder(TimerHandle_t xTimer)
     static int i = 0;
     int32_t distance = position_of_car[0];
     int32_t speed = -(int32_t)PID_Realize(&Y_Speed_PID, distance);
-    speed = speed > 1300 ? 1300 : speed;
-    speed = speed < -1300 ? -1300 : speed;
+    static int32_t last_speed = 0;
+
+    // limit the range of Y_Speed
+    speed = speed >  maximum_speed ?  maximum_speed : speed;
+    speed = speed < -maximum_speed ? -maximum_speed : speed;
+
+    // limit the accelerate rate of Y_Speed
+    if (speed > 0)
+    {
+        if (speed - last_speed > maximum_accelerate_rate)
+            speed = last_speed + maximum_accelerate_rate;
+    }
+    else
+    {
+        if (speed - last_speed < -maximum_accelerate_rate)
+            speed = last_speed -  maximum_accelerate_rate;
+    }
+    last_speed = speed;
+
     taskENTER_CRITICAL();
     Y_Speed = speed;
     taskEXIT_CRITICAL();
     if (fabs(distance - Y_Speed_PID.Target) < 20)
     {
         i++;
-        if (i > 4)
+        if (i > 2)
         {
             i = 0;
             xTimerStop(Go_Forward_Base_On_Encoder_Handle, 0);
@@ -121,14 +142,14 @@ void Achieve_Distance_For_Right_Laser(TimerHandle_t xTimer)
     static int i = 0;
     float distance = VOFA_Data[2];
     int32_t speed = (int32_t)PID_Realize(&X_Base_On_Laser_PID, distance);
-    speed = speed >  350 ?  350 : speed;
-    speed = speed < -350 ? -350 : speed;
+    speed = speed >  300 ?  300 : speed;
+    speed = speed < -300 ? -300 : speed;
 
     taskENTER_CRITICAL();
     X_Speed = speed;
     taskEXIT_CRITICAL();
 
-    if (fabs(distance - X_Base_On_Laser_PID.Target) < 7)
+    if (fabs(distance - X_Base_On_Laser_PID.Target) < 5)
     {
         i++;
         if (i > 10)
@@ -149,17 +170,17 @@ void Achieve_Distance_Front_Head_Laser(TimerHandle_t xTimer)
     static int i = 0;
     float distance = VOFA_Data[3];
     int32_t speed = (int32_t)PID_Realize(&Y_Base_On_Laser_PID, distance);
-    speed = speed > 200 ? 200 : speed;
+    speed = speed >  200 ?  200 : speed;
     speed = speed < -200 ? -200 : speed;
 
     taskENTER_CRITICAL();
     Y_Speed = speed;
     taskEXIT_CRITICAL();
 
-    if (fabs(distance - Y_Base_On_Laser_PID.Target) < 10)
+    if (fabs(distance - Y_Base_On_Laser_PID.Target) < 5)
     {
         i++;
-        if (i > 2)
+        if (i > 5)
         {
             i = 0;
             xTimerStop(Achieve_Distance_For_Front_Laser_Handle, 0);
@@ -306,7 +327,7 @@ void analyse_data(void)
     if (Angle.data[8] == check_sum)
     {
         Angle.z = -((Angle.data[5] << 8) + Angle.data[4]);
-        printf("%.2f\r\n", (float)Angle.z / 32768 * 180);
+        // printf("%.2f\r\n", (float)Angle.z / 32768 * 180);
     }
 
     const u8 VL53_Agreement_RX[] = {0x50, 0x03, 0x02};
@@ -319,14 +340,17 @@ void analyse_data(void)
             Read_buff_Void(&U3_buffer, VL53_Agreement_RX, 3, &Distance.F_OUT, 1, 16, 1);
     }
 
-    const float alpha = 0.2; // low pass filter
+    const float alpha = 1.; // low pass filter
     if (have_enough_data(&VL53_USARTX_Buff, 4, 9, 8))
     {
         while (have_enough_data(&VL53_USARTX_Buff, 4, 9, 8))
             Read_buff_Void(&VL53_USARTX_Buff, RIGHTLASER, 4, TOF_Data, 7, 8, 1);
-        float distance = (int32_t)(TOF_Data[4] << 8 | TOF_Data[5] << 16 | TOF_Data[6] << 24) / 256;
-        Distance.R_OUT = (1 - alpha) * Distance.R_OUT + alpha * distance; // low pass filter
-        USART_SendData(VL53_USARTX, 0x0F);
+        if (TOF_Data[4] || TOF_Data[5] || TOF_Data[6])
+        {
+            float distance = (int32_t)(TOF_Data[4] << 8 | TOF_Data[5] << 16 | TOF_Data[6] << 24) / 256;
+            Distance.R_OUT = (1 - alpha) * Distance.R_OUT + alpha * distance; // low pass filter
+            // printf("%.2f\n", (float)Distance.R_OUT);
+        }
     }
 
     static int32_t How_many_revolutions_of_the_motor[4] = {0, 0, 0, 0};
@@ -339,7 +363,7 @@ void analyse_data(void)
     u8 get_howmanyencoder = 0;
     for (u8 n = 0; n < 4; n++)
     {
-        if (abs(How_many_revolutions_of_the_motor[n]) > 5)
+        if (abs(How_many_revolutions_of_the_motor[n]) > 1)
             get_howmanyencoder++;
     }
 
@@ -409,11 +433,11 @@ void analyse_data(void)
  */
 void startStraight_Line_For_Laser(float target, int which_laser)
 {
-
     if (which_laser == 0)
     {
         X_Base_On_Laser_PID.Target = target;
         X_Base_On_Laser_PID.Cumulation_Error = 0;
+        X_Base_On_Laser_PID.Last_Error = target - VOFA_Data[2];
         X_have_achieved = 0;
         xTimerStart(Achieve_Distance_For_Right_Laser_Handle, 1);
         xTimerStart(Car_Running_Handle, 0);
@@ -422,6 +446,7 @@ void startStraight_Line_For_Laser(float target, int which_laser)
     {
         Y_Base_On_Laser_PID.Target = target;
         Y_Base_On_Laser_PID.Cumulation_Error = 0;
+        Y_Base_On_Laser_PID.Last_Error = target - VOFA_Data[3];
         Y_have_achieved = 0;
         xTimerStart(Achieve_Distance_For_Front_Laser_Handle, 1);
         xTimerStart(Car_Running_Handle, 0);
@@ -440,6 +465,7 @@ void startStraight_Line_Base_On_Encoder(float target, int forwardOrPan)
     {
         X_Speed_PID.Target = target;
         X_Speed_PID.Cumulation_Error = 0;
+        X_Speed_PID.Last_Error = target - position_of_car[1];
         X_have_achieved = 0;
         position_of_car[1] = 0;
         xTimerStart(Pan_Left_Base_On_Encoder_Handle, 1);
@@ -449,6 +475,7 @@ void startStraight_Line_Base_On_Encoder(float target, int forwardOrPan)
     {
         Y_Speed_PID.Target = target;
         Y_Speed_PID.Cumulation_Error = 0;
+        Y_Speed_PID.Last_Error = target - position_of_car[0];
         Y_have_achieved = 0;
         position_of_car[0] = 0;
         xTimerStart(Go_Forward_Base_On_Encoder_Handle, 1);
@@ -459,7 +486,7 @@ void startStraight_Line_Base_On_Encoder(float target, int forwardOrPan)
 
 /**
  * @description: start to Keep the direction Angle of the car
- * @param {float} target_angle  :the angle that you want to keep
+ * @param {float} target_angle : the angle that you want to keep
  * @return {*}
  */
 void startgostraight(float target_angle)

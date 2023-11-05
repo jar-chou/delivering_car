@@ -21,7 +21,7 @@ void DrawPicture(int x, int y, int high, int width, const unsigned char *p);
 // 5*8  :2
 // 6*8  :1
 // 8*16 :0
-#define sizeofonechar 0
+#define sizeofonechar 1
 
 
 #endif

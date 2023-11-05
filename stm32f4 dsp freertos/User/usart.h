@@ -11,7 +11,7 @@ void Init_USART1_All(void);
 #define DMA_USART2_RX //*使用DMA接受数据#define DMA_USART2_RX  #define DMA_USART2_RX和#define NORMAL_USART2不能同时出现 下同
 void Init_USART2_All(void);
 // 串口3-USART3
-#define DMA_USART3_RX
+#define NORMAL_USART3
 void Init_USART3_All(void);
 // 串口4-UART4
 #define DMA_UART4_RX

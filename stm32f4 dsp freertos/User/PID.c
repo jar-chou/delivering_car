@@ -76,6 +76,7 @@ int PID_Realize_angle(struct PID *pid, float Current)
 
 /**
  * @description: 增量式PID算法函数
+ *              en: achieve incremental pid
  * @param {PID} *pid
  * @param {float} Current
  * @return {int} 返回输出值
