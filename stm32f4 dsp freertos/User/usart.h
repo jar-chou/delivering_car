@@ -14,10 +14,10 @@ void Init_USART2_All(void);
 #define NORMAL_USART3
 void Init_USART3_All(void);
 // 串口4-UART4
-#define DMA_UART4_RX
+#define NORMAL_UART4
 void Init_UART4_All(void);
 // 串口5-UART5
-#define DMA_UART5_RX
+#define NORMAL_UART5
 void Init_UART5_All(void);
 
 void VOFA_Send_float(float *Data, u8 b);

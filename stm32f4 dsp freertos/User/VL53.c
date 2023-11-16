@@ -4,9 +4,9 @@
 
 #define EN_VL53 1
 #if EN_VL53
-//static void NVIC_USARTX_VL53_Configuration(void)
+// static void NVIC_USARTX_VL53_Configuration(void)
 //{
-//    NVIC_InitTypeDef NVIC_InitStructure;
+//     NVIC_InitTypeDef NVIC_InitStructure;
 
 //    /* 嵌套向量中断控制器组选择 */
 //    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
@@ -23,10 +23,10 @@
 //    NVIC_Init(&NVIC_InitStructure);
 //}
 
-//void USARTX_VL53_Config(void)
+// void USARTX_VL53_Config(void)
 //{
-//    GPIO_InitTypeDef GPIO_InitStructure;
-//    USART_InitTypeDef USART_InitStructure;
+//     GPIO_InitTypeDef GPIO_InitStructure;
+//     USART_InitTypeDef USART_InitStructure;
 
 //    // 打开串口GPIO的时钟
 //    RCC_AHB1PeriphClockCmd(VL53_GPIO_CLOCK, ENABLE);
@@ -74,25 +74,23 @@
 //    USART_Cmd(VL53_USARTX, ENABLE);
 //}
 
-
-
-//void VL53_USARTX_IRQHandler()
+// void VL53_USARTX_IRQHandler()
 //{
-//    u8 Data;
-//    if (USART_GetFlagStatus(VL53_USARTX, USART_FLAG_RXNE) == 1)
-//    {
-//        Data = VL53_USARTX->DR;
-//        Write_BUFF(&Data, &VL53_USARTX_Buff); // 把串口接收到的数据并存进环形缓冲区
-//    }
-//    USART_ClearFlag(VL53_USARTX, USART_FLAG_RXNE);
-//}
+//     u8 Data;
+//     if (USART_GetFlagStatus(VL53_USARTX, USART_FLAG_RXNE) == 1)
+//     {
+//         Data = VL53_USARTX->DR;
+//         Write_BUFF(&Data, &VL53_USARTX_Buff); // 把串口接收到的数据并存进环形缓冲区
+//     }
+//     USART_ClearFlag(VL53_USARTX, USART_FLAG_RXNE);
+// }
 /**
  * @description: 初始化激光测距（总函数）
  * @return {*}
  */
 void VL53_Initial()
 {
-		Init_UART5_All();
+    Init_UART5_All();
     return;
 }
 /**
@@ -102,7 +100,7 @@ void VL53_Initial()
  */
 // void VL53_Read_Data(u16 *distance)
 // {
-    
+
 //     u8 H_bit, L_bit, i = 5;
 //     while (i--)
 //     {
@@ -130,16 +128,18 @@ void VL53_Send_Agrement()
     u8 i;
     const u8 Agreement[] = {0x50, 0x03, 0x00, 0x34, 0x00, 0X01, 0XC8, 0X45};
     const u8 Agreement1[8] = {0x57, 0x10, 0xff, 0xff, 0x01, 0xff, 0xff, 0x64};
+	
     for (i = 0; i < 8; i++)
     {
-        USART_SendData(VL53_USARTX, Agreement1[i]);
+        USART_SendData(VL53_USARTX, Agreement[i]);
         while (USART_GetFlagStatus(VL53_USARTX, USART_FLAG_TXE) == RESET)
             ;
     }
     for (i = 0; i < 8; i++)
     {
         USART_SendData(USART3, Agreement[i]);
-        while (USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);
+        while (USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET)
+            ;
     }
 }
 

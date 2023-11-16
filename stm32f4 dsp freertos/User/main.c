@@ -82,7 +82,6 @@
 #include "VL53.h"
 #include "sys.h"
 #include "my_tasks.h"
-// #include "bsp.h"
 
 /* arm或c标准库 */
 #include "stdio.h"
@@ -111,7 +110,7 @@ QueueHandle_t Task_Number_Handle = NULL;
 #define Turn_Speed 0
 
 struct PID Coord, Turn_Angle_PID, X_Speed_PID, Y_Speed_PID, X_Base_On_Laser_PID, Y_Base_On_Laser_PID;
-static EventGroupHandle_t Group_One_Handle = NULL; //+事件组句柄
+EventGroupHandle_t Group_One_Handle = NULL; //+事件组句柄
 /*
 *************************************************************************
 *                             函数声明
@@ -365,12 +364,12 @@ static void BSP_Init(void)
 	/**
 	 * warning: the order of initial the peripheral is very important,
 	 * if you initial the peripheral in the wrong order, the program will run out of control
-	*/
+	 */
 	RCC_ClocksTypeDef get_rcc_clock;
 	RCC_GetClocksFreq(&get_rcc_clock);
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 	delay_init(168);
-	PWM_TIM8_config(20000, 72, 920, 1520, 3, 2); // this is the pwm pin that control server motor
+	PWM_TIM8_config(20000, 168, 920, 1520, 3, 2); // this is the pwm pin that control server motor
 	PWM_TIM1_config(2000, 3, Initial_Speed, Initial_Speed, Initial_Speed, Initial_Speed);
 	Forward();
 	Encoder_Init();
@@ -384,20 +383,20 @@ static void BSP_Init(void)
 	Software_USART_IOConfig();
 
 	// pid初始化
-	PID_Initialize(&Coord, 45, 3, 0, 0, 5, -5);				 // 微调巡线的pid初始化
-	PID_Initialize(&Turn_Angle_PID, 30, 0, 16, 0, 7.5, -7.5);	 // 转弯的pid初始化
-	PID_Initialize(&X_Speed_PID, 3.75, 0, .5, 0, 125, -125); // x方向的远距离基于编码器的pid
-	PID_Initialize(&Y_Speed_PID, 0.70, 0., 4., 0, 40, -40); // y方向的远距离基于编码器的pid
-	PID_Initialize(&X_Base_On_Laser_PID, 7, 0, 6, 0, 25, -25);
-	PID_Initialize(&Y_Base_On_Laser_PID, 5, 0, 3., 0, 25, -25);
+	PID_Initialize(&Coord, 55, 3, 0, 0, 0, -0);				  // 微调巡线的pid初始化
+	PID_Initialize(&Turn_Angle_PID, 25, 0, 12, 0, 7.5, -7.5); // 转弯的pid初始化
+	PID_Initialize(&X_Speed_PID, 3.75, 0, .5, 0, 125, -125);  // x方向的远距离基于编码器的pid
+	PID_Initialize(&Y_Speed_PID, 0.75, 0., 4., 0, 30, -30);	  // y方向的远距离基于编码器的pid
+	PID_Initialize(&X_Base_On_Laser_PID, 25, 0, 2, 0, 20, -20);
+	PID_Initialize(&Y_Base_On_Laser_PID, 10, 0, 0, 0, 0, -0);
 
-	Buzzer_ONE(); // 开始启动小车
+	// Buzzer_ONE(); // 开始启动小车
 	LED_GPIO_Config();
 	KEY_ONE();
 	OLED_Init();
 
 	// 陀螺仪初始化
-	Delayms(100);
+	Delayms(200);
 	Init_USART2_All(); //*101陀螺仪
 
 	GPIO_SetBits(GPIOE, GPIO_Pin_1);

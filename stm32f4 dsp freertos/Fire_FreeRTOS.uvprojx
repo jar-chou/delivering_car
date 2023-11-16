@@ -341,7 +341,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,ARM_MATH_CM4,ARM_MATH_MATRIX_CHECK,ARM_MATH_ROUNDING</Define>
               <Undefine></Undefine>
-              <IncludePath>.\Libraries\CMSIS\Device\ST\STM32F4xx\Include;.\Libraries\STM32F4xx_StdPeriph_Driver\inc;.\User;.\FreeRTOS\include;.\FreeRTOS\port\RVDS\ARM_CM4F;.\User\led;.\kalman_fliter;..\..\..\..\AppData\Local\Arm\Packs\ARM\CMSIS-DSP\1.15.0\Include;..\..\..\..\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include</IncludePath>
+              <IncludePath>.\Libraries\CMSIS\Device\ST\STM32F4xx\Include;.\Libraries\STM32F4xx_StdPeriph_Driver\inc;.\User;.\FreeRTOS\include;.\FreeRTOS\port\RVDS\ARM_CM4F;.\User\led;..\..\..\..\AppData\Local\Arm\Packs\ARM\CMSIS-DSP\1.15.0\Include;..\..\..\..\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Include;.\User\algorithm;.\User\algorithm\kalman_fliter;.\User\algorithm\mecanum;.\User\bsp_base_tim</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -631,11 +631,6 @@
               <FilePath>.\User\encoder.c</FilePath>
             </File>
             <File>
-              <FileName>JY62.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\JY62.c</FilePath>
-            </File>
-            <File>
               <FileName>key.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\key.c</FilePath>
@@ -725,6 +720,11 @@
               <FileType>5</FileType>
               <FilePath>.\User\FreeRTOSConfig.h</FilePath>
             </File>
+            <File>
+              <FileName>SysInfoTest.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\SysInfoTest.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -788,12 +788,32 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>kalman filter</GroupName>
+          <GroupName>algorithm</GroupName>
           <Files>
+            <File>
+              <FileName>my_math.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\algorithm\my_math.h</FilePath>
+            </File>
             <File>
               <FileName>kalman filter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\kalman_fliter\kalman filter.c</FilePath>
+              <FilePath>.\User\algorithm\kalman_fliter\kalman filter.c</FilePath>
+            </File>
+            <File>
+              <FileName>mecanum.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\algorithm\mecanum\mecanum.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>bsp</GroupName>
+          <Files>
+            <File>
+              <FileName>bsp_base_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\bsp_base_tim\bsp_base_tim.c</FilePath>
             </File>
           </Files>
         </Group>

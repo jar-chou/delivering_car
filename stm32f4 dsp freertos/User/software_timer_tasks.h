@@ -32,6 +32,7 @@ extern float VOFA_Data[4];
 extern uint8_t dataFromLinux[5];//{'1', '1', '2', '2'}; // the data get from linux
 extern u8 already_turned, Y_have_achieved, X_have_achieved; // 是否达到定时器目的的信号量
 extern int32_t position_of_car[3];
+extern int16_t maximum_Y_speed; // the maximum speed of Y axis
 
 extern TimerHandle_t Turn_Angle_Handle;                       //+发送数据到上位机定时器句柄
 extern TimerHandle_t sendto_Upper_Handle;                     //+发送数据到上位机定时器句柄

@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "oled.h": "c"
+        "oled.h": "c",
+        "my_math.h": "c",
+        "mecanum.h": "c",
+        "sys.h": "c"
     }
 }

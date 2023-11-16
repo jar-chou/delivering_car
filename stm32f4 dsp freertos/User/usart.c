@@ -582,7 +582,7 @@ static void NVIC_USART4_Configuration(void)
     NVIC_Init(&NVIC_InitStructure);
 }
 
-void USART4_Config_JY62(void)
+void USART4_Config(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     USART_InitTypeDef USART_InitStructure;
@@ -646,7 +646,7 @@ void UART4_IRQHandler()
 void Init_UART4_All()
 {
     Iinitial_BUFF(&U4_buffer, BUFFER_SIZE_U4);
-    USART3_Config();
+    USART4_Config();
 }
 #endif
 #ifdef DMA_UART5_RX
@@ -686,7 +686,7 @@ void UART5_Config(void)
     GPIO_PinAFConfig(GPIOC, GPIO_PinSource12, GPIO_AF_UART5);
     GPIO_PinAFConfig(GPIOD, GPIO_PinSource2, GPIO_AF_UART5);
 
-    USART_InitStructure.USART_BaudRate = 921600;
+    USART_InitStructure.USART_BaudRate = 115200;
     USART_InitStructure.USART_WordLength = USART_WordLength_8b;
     USART_InitStructure.USART_StopBits = USART_StopBits_1;
     USART_InitStructure.USART_Parity = USART_Parity_No;

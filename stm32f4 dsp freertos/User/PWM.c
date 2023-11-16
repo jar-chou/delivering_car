@@ -24,13 +24,13 @@ void PWM_TIM1_config(uint16_t arr, uint16_t psc, uint16_t CCR1_Val, uint16_t CCR
 
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_11 | GPIO_Pin_13 | GPIO_Pin_14;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; // 复用推挽输出
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_Init(GPIOE, &GPIO_InitStructure); // 初始化GPIO
-GPIO_PinAFConfig(GPIOE,GPIO_PinSource11,GPIO_AF_TIM1);
-	GPIO_PinAFConfig(GPIOE,GPIO_PinSource13,GPIO_AF_TIM1);
-		GPIO_PinAFConfig(GPIOE,GPIO_PinSource14,GPIO_AF_TIM1);
-	GPIO_PinAFConfig(GPIOE,GPIO_PinSource9,GPIO_AF_TIM1);
+    GPIO_PinAFConfig(GPIOE, GPIO_PinSource11, GPIO_AF_TIM1);
+    GPIO_PinAFConfig(GPIOE, GPIO_PinSource13, GPIO_AF_TIM1);
+    GPIO_PinAFConfig(GPIOE, GPIO_PinSource14, GPIO_AF_TIM1);
+    GPIO_PinAFConfig(GPIOE, GPIO_PinSource9, GPIO_AF_TIM1);
     // 初始化TIM1
     TIM_TimeBaseStructure.TIM_Period = arr - 1;                 // 设置在下一个更新事件装入活动的自动重装载寄存器周期的值
     TIM_TimeBaseStructure.TIM_Prescaler = psc - 1;              // 设置用来作为TIMx时钟频率除数的预分频值
@@ -83,15 +83,15 @@ void PWM_TIM8_config(uint16_t arr, uint16_t psc, uint16_t CCR1_Val, uint16_t CCR
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; // 复用推挽输出
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; // 复用推挽输出
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_Init(GPIOC, &GPIO_InitStructure); // 初始化GPIO
-	
-		GPIO_PinAFConfig(GPIOC,GPIO_PinSource6,GPIO_AF_TIM8);
-	GPIO_PinAFConfig(GPIOC,GPIO_PinSource7,GPIO_AF_TIM8);
-		GPIO_PinAFConfig(GPIOC,GPIO_PinSource8,GPIO_AF_TIM8);
-	GPIO_PinAFConfig(GPIOC,GPIO_PinSource9,GPIO_AF_TIM8);
+
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource6, GPIO_AF_TIM8);
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_TIM8);
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource8, GPIO_AF_TIM8);
+    GPIO_PinAFConfig(GPIOC, GPIO_PinSource9, GPIO_AF_TIM8);
 
     // 初始化TIM8
     TIM_TimeBaseStructure.TIM_Period = arr - 1;                 // 设置在下一个更新事件装入活动的自动重装载寄存器周期的值
@@ -108,21 +108,21 @@ void PWM_TIM8_config(uint16_t arr, uint16_t psc, uint16_t CCR1_Val, uint16_t CCR
     TIM_OCInitStructure.TIM_Pulse = 0;
     TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High; // 输出通道电平极性配置
     TIM_CtrlPWMOutputs(TIM8, ENABLE);                         // MOE 主输出使能
-    // 输出比较通道 1     
+    // 输出比较通道 1
     TIM_OCInitStructure.TIM_Pulse = CCR1_Val;
     TIM_OC1Init(TIM8, &TIM_OCInitStructure);
     TIM_OC1PreloadConfig(TIM8, TIM_OCPreload_Enable);
-    // 输出比较通道 2      
+    // 输出比较通道 2
     TIM_OCInitStructure.TIM_Pulse = CCR2_Val;
     TIM_OC2Init(TIM8, &TIM_OCInitStructure);
     TIM_OC2PreloadConfig(TIM8, TIM_OCPreload_Enable);
 
-    // 输出比较通道 3       
+    // 输出比较通道 3
     TIM_OCInitStructure.TIM_Pulse = CCR3_Val;
     TIM_OC3Init(TIM8, &TIM_OCInitStructure);
     TIM_OC3PreloadConfig(TIM8, TIM_OCPreload_Enable);
 
-    // 输出比较通道 4      
+    // 输出比较通道 4
     TIM_OCInitStructure.TIM_Pulse = CCR4_Val;
     TIM_OC4Init(TIM8, &TIM_OCInitStructure);
     TIM_OC4PreloadConfig(TIM8, TIM_OCPreload_Enable);
@@ -163,7 +163,7 @@ void SetCompare1(TIM_TypeDef *TIMX, u32 CCRX_Val, uint8_t X)
         break;
     }
 }
-void ControledMonitor(u8 channel ,u16 Count)
+void ControledMonitor(u8 channel, u16 Count)
 {
     if (Count > 250)
     {
@@ -173,7 +173,7 @@ void ControledMonitor(u8 channel ,u16 Count)
     {
         Count = 50;
     }
-    
+
     switch (channel)
     {
     case 1:
